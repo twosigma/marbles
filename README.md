@@ -124,4 +124,4 @@ FAILED (failures=1)
 
 ## Future Work
 
-`marbles` is the first step toward extending `unittest` to support assertions we may want to express about resources. Future extensions will most likely focus on beign able to pass trivially different/dynamic resources to the same test cases.
+`marbles` is the first step toward extending `unittest` to support assertions we may want to express about resources. Future extensions will most likely focus on enabling test authors to pass trivially different/dynamic resources to the same test cases.
