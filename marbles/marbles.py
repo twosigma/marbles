@@ -11,6 +11,7 @@ though unfortunately only on test failure currently.
 
 import ast
 import linecache
+import pdb
 import sys
 import textwrap
 import traceback
@@ -70,37 +71,78 @@ Advice:
             defined within the test itself, but this string is meant to inform
             the user of what to do when the test fails.
         '''
+        # These attributes are publicly exposed as properties below to
+        # facilitate programmatic interactions with test failures (e.g.,
+        # aggregating and formatting output into a consolidated report)
         self._annotation, self._msg = args[0]
+        self._locals = None
+        self._filename = None
+        self._linenumber = None
+        self._assert_expr = None
+        self._formatted_msg = None
+
         self._verify_annotation()
-
-        # Capture locals, filename, and line number from the stacktrace to
-        # provide the source of the assertion error and formatted advice
-        tb = traceback.walk_stack(sys._getframe().f_back)
-        stack = traceback.StackSummary.extract(tb, capture_locals=True)
-
-        for level in stack:
-            if 'advice' in level.locals.keys():
-                self._locals = level.locals.copy()
-        filename = stack[2].filename
-        linenumber = stack[2].lineno
-
         self._format_annotation()
-        assert_expr = self._source(filename, linenumber)
 
-        formatted_msg = self._META_FORMAT_STRING.format(
-            standardMsg=self._msg, message=self._annotation['message'],
-            assert_expr=assert_expr, advice=self._annotation['advice'],
-            locals=self._format_locals())
-
-        super(AnnotatedAssertionError, self).__init__(formatted_msg)
+        super(AnnotatedAssertionError, self).__init__(self.formattedMsg)
 
     @property
     def annotation(self):
         return self._annotation
 
     @property
-    def msg(self):
+    def standardMsg(self):  # use unittest's name
         return self._msg
+
+    @property
+    def locals(self):
+        if not self._locals:
+            self._get_stack()
+        return self._locals
+
+    @property
+    def filename(self):
+        if not self._filename:
+            self._get_stack()
+        return self._filename
+
+    @property
+    def linenumber(self):
+        if not self._linenumber:
+            self._get_stack()
+        return self._linenumber
+
+    @property
+    def assert_expr(self):
+        if not self._assert_expr:
+            assert_expr = self._get_source(self.filename, self.linenumber)
+            setattr(self, '_assert_expr', assert_expr)
+        return self._assert_expr
+
+    @property
+    def formattedMsg(self):  # mimic unittest's name for standardMsg
+        if not self._formatted_msg:
+            formatted_msg = self._format_msg()
+            setattr(self, '_formatted_msg', formatted_msg)
+        return self._formatted_msg
+
+    def _get_stack(self):
+        '''Capture locals, filename, and line number from the stacktrace to
+        provide the source of the assertion error and formatted advice.
+        '''
+        tb = traceback.walk_stack(sys._getframe().f_back)
+        stack = traceback.StackSummary.extract(tb, capture_locals=True)
+
+        for level in stack:
+            # We want locals from the test definition (which always begins with
+            # 'test_' in unittest), which will be at a different level in the
+            # stack depending on how many tests are in each test case, how many
+            # test cases there are, etc.
+            if level.name.startswith('test_'):
+                setattr(self, '_locals', level.locals.copy())
+                setattr(self, '_filename', level.filename)
+                setattr(self, '_linenumber', level.lineno)
+                break
 
     def _verify_annotation(self):
         '''Verify that the assertion error was annotated properly, e.g., that a
@@ -121,9 +163,9 @@ Advice:
                 self.__class__.__name__))
     
     def _format_annotation(self):
-        '''Format locals into message and advice strings.'''
-        formatted_message = self._annotation['message'].format(**self._locals)
-        formatted_advice = self._annotation['advice'].format(**self._locals)
+        '''Format locals into into message and advice.'''
+        formatted_message = self._annotation['message'].format(**self.locals)
+        formatted_advice = self._annotation['advice'].format(**self.locals)
 
         # Break long strings onto multple lines for prettier output
         formatted_message = textwrap.wrap(formatted_message, 74)
@@ -134,10 +176,16 @@ Advice:
 
     def _format_locals(self):
         return '\n\t'.join(['{0}={1}'.format(
-            k, v) for k, v in self._locals.items() if k not in self._IGNORE_LOCALS])
+            k, v) for k, v in self.locals.items() if k not in self._IGNORE_LOCALS])
+
+    def _format_msg(self):
+        return self._META_FORMAT_STRING.format(
+            standardMsg=self.standardMsg, message=self.annotation['message'],
+            assert_expr=self.assert_expr, advice=self.annotation['advice'],
+            locals=self._format_locals())
 
     @staticmethod
-    def _source(filename, linenumber, leading=1, following=2):
+    def _get_source(filename, linenumber, leading=1, following=2):
         '''Given a Python filename and line number, return all lines that are a
         part of the statement containing that line, indicating the line number
         given with '>'.
