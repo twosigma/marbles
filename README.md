@@ -1,6 +1,6 @@
 # marbles
 
-`marbles` is a small `unittest` extension by [Jane Adams](mailto:jane.adams@twosigma.com) and [Leif Walsh](leif.walsh@twosigma.com) that allows test authors to provide additional information to test consumers on test failure.
+`marbles` is a small `unittest` extension by [Jane Adams](mailto:jane@twosigma.com) and [Leif Walsh](mailto:leif@twosigma.com) that allows test authors to provide additional information to test consumers on test failure.
 
 ## Background
 
