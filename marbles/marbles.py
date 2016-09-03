@@ -11,7 +11,6 @@ though unfortunately only on test failure currently.
 
 import ast
 import linecache
-import pdb
 import sys
 import textwrap
 import traceback
