@@ -15,8 +15,9 @@ setup(
     test_suite='tests',
     version=__version__,
     description='a small unittest extension that provides additional information on test failure',
+    long_description=readme(),
     author=['Jane Adams', 'Leif Walsh'],
-    author_email=['jane.adams@twosigma.com', 'leif.walsh@twosigma.com'],
+    author_email=['jane@twosigma.com', 'leif@twosigma.com'],
     url='https://gitlab.twosigma.com/jane/marbles'
     )
 

@@ -53,11 +53,11 @@ Advice:
         '''Assume args contains a tuple of two arguments:
             1. the annotation provided by the test author, and
             2. the "standardMsg" from :mod:`unittest` which is the string
-               represetntation of the asserted fact that wasn't true
+               representation of the asserted fact that wasn't true
 
         Annotation can be provided as either a tuple containing at least two
         strings, the first containing a message and the second containing
-        advice as a dictionary containing the keys 'message' and 'advice'.
+        advice, or as a dictionary containing the keys 'message' and 'advice'.
 
         ``message``
             This should be similar to the normal message provided to assert
@@ -174,8 +174,9 @@ Advice:
         self._annotation['advice'] = '\n\t'.join(formatted_advice)
 
     def _format_locals(self):
-        return '\n\t'.join(['{0}={1}'.format(
-            k, v) for k, v in self.locals.items() if k not in self._IGNORE_LOCALS])
+        return '\n\t'.join('{0}={1}'.format(k, v)
+                           for k, v in self.locals.items()
+                           if k not in self._IGNORE_LOCALS)
 
     def _format_msg(self):
         return self._META_FORMAT_STRING.format(
@@ -229,6 +230,8 @@ class AnnotatedTestCase(unittest.TestCase):
 
     Example:
 
+    .. code-block:: py
+
         import os
         import re
 
@@ -236,15 +239,15 @@ class AnnotatedTestCase(unittest.TestCase):
 
         class ExampleTestCase(AnnotatedTestCase):
 
-        def test_filename_pattern(self):
-            expected = '^file_[0-9]{8}$'
-            actual = os.path.splittext('file_2016_01_01.py')[0]
+            def test_filename_pattern(self):
+                expected = '^file_[0-9]{8}$'
+                actual = os.path.splittext('file_2016_01_01.py')[0]
 
-            message = 'Filename {actual} does not match the pattern {expected}.'
-            advice = ('Determine if this is a one-off error or if the file naming '
-                      'pattern has changed. If the file naming pattern has changed, '
-                      'consider updating this test.')
-            self.assertIsNotNone(re.search(expected, actual), (msg, adv))
+                message = 'Filename {actual} does not match the pattern {expected}.'
+                advice = ('Determine if this is a one-off error or if the file naming '
+                          'pattern has changed. If the file naming pattern has changed, '
+                          'consider updating this test.')
+                self.assertIsNotNone(re.search(expected, actual), (msg, adv))
     '''
 
     failureException = AnnotatedAssertionError
