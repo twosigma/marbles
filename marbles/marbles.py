@@ -53,11 +53,11 @@ Advice:
         '''Assume args contains a tuple of two arguments:
             1. the annotation provided by the test author, and
             2. the "standardMsg" from :mod:`unittest` which is the string
-               represetntation of the asserted fact that wasn't true
+               representation of the asserted fact that wasn't true
 
         Annotation can be provided as either a tuple containing at least two
         strings, the first containing a message and the second containing
-        advice as a dictionary containing the keys 'message' and 'advice'.
+        advice, or as a dictionary containing the keys 'message' and 'advice'.
 
         ``message``
             This should be similar to the normal message provided to assert
