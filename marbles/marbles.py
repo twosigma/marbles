@@ -174,8 +174,9 @@ Advice:
         self._annotation['advice'] = '\n\t'.join(formatted_advice)
 
     def _format_locals(self):
-        return '\n\t'.join(['{0}={1}'.format(
-            k, v) for k, v in self.locals.items() if k not in self._IGNORE_LOCALS])
+        return '\n\t'.join('{0}={1}'.format(k, v)
+                           for k, v in self.locals.items()
+                           if k not in self._IGNORE_LOCALS)
 
     def _format_msg(self):
         return self._META_FORMAT_STRING.format(
