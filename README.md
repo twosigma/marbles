@@ -1,5 +1,7 @@
 # marbles
 
+`marbles` is a small `unittest` extension by [Jane Adams](mailto:jane.adams@twosigma.com) and [Leif Walsh](leif.walsh@twosigma.com) that allows test authors to provide additional information to test consumers on test failure.
+
 ## Background
 
 Two Sigma needs to make assertions about different resources, e.g., directories, files, pandas DataFrames, etc. These are generally referred to as "sanity checks". Python's builtin `unittest` module is a natural framework for expressing these assertions. That being said, testing functionality (which is what `unittest` is designed to do) is different than testing a resource. If an assertion about a piece of functionality fails, you go inspect the code that defines that functionality. If an assertion about a resource fails, it is not as obvious what you should do.
