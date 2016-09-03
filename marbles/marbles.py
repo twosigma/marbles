@@ -230,6 +230,8 @@ class AnnotatedTestCase(unittest.TestCase):
 
     Example:
 
+    .. code-block:: py
+
         import os
         import re
 
@@ -237,15 +239,15 @@ class AnnotatedTestCase(unittest.TestCase):
 
         class ExampleTestCase(AnnotatedTestCase):
 
-        def test_filename_pattern(self):
-            expected = '^file_[0-9]{8}$'
-            actual = os.path.splittext('file_2016_01_01.py')[0]
+            def test_filename_pattern(self):
+                expected = '^file_[0-9]{8}$'
+                actual = os.path.splittext('file_2016_01_01.py')[0]
 
-            message = 'Filename {actual} does not match the pattern {expected}.'
-            advice = ('Determine if this is a one-off error or if the file naming '
-                      'pattern has changed. If the file naming pattern has changed, '
-                      'consider updating this test.')
-            self.assertIsNotNone(re.search(expected, actual), (msg, adv))
+                message = 'Filename {actual} does not match the pattern {expected}.'
+                advice = ('Determine if this is a one-off error or if the file naming '
+                          'pattern has changed. If the file naming pattern has changed, '
+                          'consider updating this test.')
+                self.assertIsNotNone(re.search(expected, actual), (msg, adv))
     '''
 
     failureException = AnnotatedAssertionError
