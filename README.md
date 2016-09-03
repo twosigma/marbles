@@ -1,7 +1,5 @@
 # marbles
 
-`marbles` is a small `unittest` extension by [Jane Adams](mailto:jane.adams@twosigma.com) and [Leif Walsh](leif.walsh@twosigma.com) that allows test authors to provide additional information to test consumers on test failure.
-
 ## Background
 
 Two Sigma needs to make assertions about different resources, e.g., directories, files, pandas DataFrames, etc. These are generally referred to as "sanity checks". Python's builtin `unittest` module is a natural framework for expressing these assertions. That being said, testing functionality (which is what `unittest` is designed to do) is different than testing a resource. If an assertion about a piece of functionality fails, you go inspect the code that defines that functionality. If an assertion about a resource fails, it is not as obvious what you should do.
@@ -35,7 +33,7 @@ The `marbles` test suite is written in the [unittest](https://docs.python.org/3.
 
 # Overview
 
-Writing `marbles` test cases is, intentionally, very similar to writing `unittest` TestCases. The main difference is that, in a `marbles.AnnotatedTestCase`, the `assert*` methods, rather than accepting an option final string parameter `msg`, require a tuple or a dictionary containing a message and some advice for the test consumer.
+Writing `marbles` test cases is, intentionally, very similar to writing `unittest` TestCases. The main difference is that, in a `marbles.AnnotatedTestCase`, the `assert*` methods, rather than accepting an optional final string parameter `msg`, require a tuple or a dictionary containing a message and some advice for the test consumer.
 
 On test failure, the message and advice strings are formatted with the local variables defined within the test itself, which is crucial information when testing resources, especially if those resources can change. The message, advice, and locals allow the test consumer to reconstruct, at the point of test failure, what the expectation was, what the resource actually was, and what to do about it.
 
@@ -124,4 +122,6 @@ FAILED (failures=1)
 
 ## Future Work
 
-`marbles` is the first step toward extending `unittest` to support assertions we may want to express about resources. Future extensions will most likely focus on enabling test authors to pass trivially different/dynamic resources to the same test cases.
+`marbles` is the first step toward extending `unittest` to support assertions we may want to express about resources. Future extensions will most likely focus on:
+1. enabling test authors to pass trivially different/dynamic resources to the same test cases, and
+2. enabling better programmatic interaction with test failures to make it easier to aggregate them into a single report covering multiple resources
