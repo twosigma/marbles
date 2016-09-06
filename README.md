@@ -22,7 +22,7 @@ You can either clone this repostory and run the setup script, or install `marble
 ```
 
 ```bash
-(env) $ pip install -U git+ssh://gitlab.twosigma.com/jane/marbles.git@master
+(env) $ pip install -U git+ssh://git@gitlab.twosigma.com/jane/marbles.git@master
 ```
 
 ## Tests
