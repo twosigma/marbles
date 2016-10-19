@@ -123,6 +123,44 @@ Ran 2 tests in 0.004s
 FAILED (failures=1)
 ```
 
+## Controlling Test Output
+
+Variables can be excluded from the "Locals" section of the test output by making them internal or name-mangled (prepending the variable name with one or two underscores). This can be useful for hiding especially large variables (e.g., DataFrames) that are needed in the test but aren't needed and/or are overwhelming in the test output. Internal and name-mangled variables will still be formatted into message and advice strings if there are matching directives for them, but if you're internalizing/name-mangling a variable because it's value is large you probably don't want to include it in your annotations.
+
+```python
+def test_dataframe(self):
+    '''Is something about a DataFrame true?'''
+    foo = 'bar'
+    _ignoreme = pd.DataFrame()
+
+    message = 'some message'
+    advice = 'some advice'
+
+    self.assertSomethingAbout(_ignoreme, (message, advice))
+```
+
+When this test fails, you'll see the following output. Notice that `_ignoreme` has been excluded from the "Locals" section.
+
+```bash
+======================================================================
+FAIL: test_dataframe (__main__.DataFrameTestCase)
+Is something about a DataFrame true?
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "somefile.py", line 48, in test_dataframe
+    self.assertSomethingAbout(_ignoreme, (message, advice))
+marbles.marbles.AnnotatedAssertionError
+some message
+
+Source:
+     47
+ >   48 self.assertSomethingAbout(_ignoreme, (message, advice))
+     49
+Locals:
+        foo='bar'
+Advice:
+        some advice
+```
 ## Future Work
 
 `marbles` is the first step toward extending `unittest` to support assertions we may want to express about resources. Future extensions will most likely focus on:

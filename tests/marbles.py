@@ -49,6 +49,11 @@ class ExampleAnnotatedTestCase(ReversingTestCaseMixin, AnnotatedTestCase):
                                 message='some message',
                                 advice='some advice')
 
+    def test_internal_mangled_locals(self):
+        _foo = 'bar'
+        __bar = 'baz'
+        self.assertTrue(False, ('some message', 'some advice about {_foo}'))
+
 
 class TestAnnotatedTestCase(unittest.TestCase):
 
@@ -184,7 +189,28 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             self.assertEqual(e.annotation['message'], 'some message')
             self.assertEqual(e.annotation['advice'], 'some advice')
 
+    def test_exclude_ignored_locals(self):
+        '''Are ignored variables excluded from output?'''
+        try:
+            self.case.test_locals()
+        except AnnotatedAssertionError as e:
+            locals_section = e._format_locals().split('\n\t')
+            locals_ = [local.split('=')[0] for local in locals_section]
+            for local in locals_:
+                self.assertNotIn(local, e._IGNORE_LOCALS)
+
+    def test_exclude_internal_mangled_locals(self):
+        '''Are internal/mangled variables excluded from "Locals" section of output?'''
+        try:
+            self.case.test_internal_mangled_locals()
+        except AnnotatedAssertionError as e:
+            locals_section = e._format_locals().split('\n\t')
+            locals_ = [local.split('=')[0] for local in locals_section]
+            for local in locals_:
+                self.assertNotIn(local, ['_foo', '__bar'])
+                self.assertFalse(local.startswith('_'))
+            self.assertEqual(e.annotation['advice'], "some advice about 'bar'")
+
 
 if __name__ == '__main__':
     unittest.main()
-
