@@ -5,16 +5,24 @@ Briefly, by inheriting from :class:`marbles.AnnotatedTestCase` rather than
 :class:`unittest.TestCase`, the test author gains the ability to provide richer
 failure messages in their assert statements. These messages can be format
 strings which are expanded using local variables defined within the test itself.
-The inclusion of this additional information is enforced within the class,
-though unfortunately only on test failure currently.
+The inclusion of this additional information is enforced within the class.
 '''
 
 import ast
+import collections.abc
+import functools
 import linecache
 import sys
 import textwrap
 import traceback
 import unittest
+
+
+class AnnotationError(Exception):
+    '''Raised when there is a problem with the way an assertion was
+    annotated.
+    '''
+    pass
 
 
 class AnnotatedAssertionError(AssertionError):
@@ -41,7 +49,7 @@ Locals:
 Advice:
 \t{advice}
     '''
-    _REQUIRED_KEYS = ['message', 'advice']
+    REQUIRED_KEYS = ('message', 'advice')
     # If message and/or advice are declared in the test's scope and passed as
     # variables to the assert statement, instead of being declared directly in
     # the assert statement, we don't want to display them in the Locals section
@@ -58,6 +66,8 @@ Advice:
         Annotation can be provided as either a tuple containing at least two
         strings, the first containing a message and the second containing
         advice, or as a dictionary containing the keys 'message' and 'advice'.
+        The 'message' and 'advice' arguments can also be passed as keyword
+        arguments.
 
         ``message``
             This should be similar to the normal message provided to assert
@@ -80,7 +90,6 @@ Advice:
         self._assert_expr = None
         self._formatted_msg = None
 
-        self._verify_annotation()
         self._format_annotation()
 
         super(AnnotatedAssertionError, self).__init__(self.formattedMsg)
@@ -143,24 +152,6 @@ Advice:
                 setattr(self, '_linenumber', level.lineno)
                 break
 
-    def _verify_annotation(self):
-        '''Verify that the assertion error was annotated properly, e.g., that a
-        dictionary or tuple was provided.
-
-        If a tuple was provided, coerce it to a dictionary for ease of use
-        elsewhere in the class.
-        '''
-        if isinstance(self._annotation, tuple):
-            self._annotation = dict(zip(['message', 'advice'], self._annotation))
-        elif isinstance(self._annotation, dict):
-            for key in self._REQUIRED_KEYS:
-                if key not in self._annotation:
-                    raise Exception(
-                        'Annotation missing required key: {0}'.format(key))
-        else:
-            raise Exception('{0} missing required annotations'.format(
-                self.__class__.__name__))
-    
     def _format_annotation(self):
         '''Format locals into into message and advice.'''
         formatted_message = self._annotation['message'].format(**self.locals)
@@ -220,13 +211,16 @@ Advice:
 class AnnotatedTestCase(unittest.TestCase):
     '''AnnotatedTestCase is an extension of :class:`unittest.TestCase`.
 
-    When writing a test class based on :class:`AnnotatedTestCase`, all assert
-    statements like :meth:`unittest.TestCase.assertEqual`, rather than accepting
-    an optional final string parameter ``msg``, require a dictionary or tuple
-    containing two stings: a message and some advice.
+    When writing a test class based on :class:`AnnotatedTestCase`, all
+    assert statements like :meth:`unittest.TestCase.assertEqual`,
+    rather than accepting an optional final string parameter ``msg``,
+    require a dictionary or tuple containing two stings: a message and
+    some advice.  Alternatively, ``message`` and ``advice`` can be
+    passed as keyword arguments to the assertion function.
 
-    The message and advice strings provided are formatted with :meth:`str.format`
-    given the local variables defined within the test itself.
+    The message and advice strings provided are formatted with
+    :meth:`str.format` given the local variables defined within the
+    test itself.
 
     Example:
 
@@ -247,7 +241,8 @@ class AnnotatedTestCase(unittest.TestCase):
                 advice = ('Determine if this is a one-off error or if the file naming '
                           'pattern has changed. If the file naming pattern has changed, '
                           'consider updating this test.')
-                self.assertIsNotNone(re.search(expected, actual), (msg, adv))
+                self.assertIsNotNone(re.search(expected, actual), (message, advice))
+
     '''
 
     failureException = AnnotatedAssertionError
@@ -255,3 +250,74 @@ class AnnotatedTestCase(unittest.TestCase):
     def _formatMessage(self, msg, standardMsg):
         return (msg, standardMsg)
 
+    @staticmethod
+    def _coerce_annotation_dict(annotation):
+        '''Transform the annotation into a dict.
+
+        If a tuple was provided, coerce it to a dictionary for ease of use
+        elsewhere in AnnotatedAssertionError.
+        '''
+        if isinstance(annotation, collections.abc.Sequence):
+            return dict(zip(AnnotatedAssertionError.REQUIRED_KEYS, annotation))
+        elif isinstance(annotation, collections.abc.Mapping):
+            return annotation
+        else:
+            error = 'Annotation type not supported: {0}'.format(
+                type(annotation))
+            raise AnnotationError(error)
+
+    @staticmethod
+    def _validate_annotation(annotation):
+        '''Ensures that the annotation has the right fields.'''
+        required = set(AnnotatedAssertionError.REQUIRED_KEYS)
+        missing = required.difference(set(annotation.keys()))
+        if missing:
+            error = 'Annotation missing required fields: {0}'.format(missing)
+            raise AnnotationError(error)
+
+    def __getattribute__(self, key):
+        '''Keyword argument support for assertions.
+
+        We want AnnotatedTestCases to be able to call assertions with
+        syntax like this:
+
+            self.assertTrue(True, message='message', advice='advice')
+
+        in addition to this:
+
+            self.assertTrue(True, ('message', 'advice'))
+
+        To do so, we override __getattribute__ so that any method that
+        gets looked up and starts with 'assert' gets wrapped so that
+        it does what we want.  We override __getattribute__ rather
+        than __getattr__ because __getattr__ doesn't get called when
+        the method just exists.
+
+        To add other keyword arguments in the future, you have to make
+        sure that the way the underlying assertion gets called is
+        going to work with _formatMessage above, and the unpacking of
+        args in AnnotatedAssertionError.__init__, and you should watch
+        out for backwards compatibility with existing usage.
+
+        '''
+        attr = object.__getattribute__(self, key)
+
+        if callable(attr) and key.startswith('assert'):
+            @functools.wraps(attr)
+            def wrapper(*args, **kwargs):
+                required_keys = set(AnnotatedAssertionError.REQUIRED_KEYS)
+
+                provided_keys = set(kwargs).intersection(required_keys)
+                if provided_keys:
+                    bundle = {key: kwargs.pop(key) for key in provided_keys}
+                    annotation = self._coerce_annotation_dict(bundle)
+                else:
+                    last_arg = args[-1]
+                    args = args[:-1]
+                    annotation = self._coerce_annotation_dict(last_arg)
+
+                self._validate_annotation(annotation)
+                return attr(*args, annotation, **kwargs)
+            return wrapper
+
+        return attr

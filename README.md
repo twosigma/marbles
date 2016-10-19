@@ -35,7 +35,7 @@ The `marbles` test suite is written in the [unittest](https://docs.python.org/3.
 
 # Overview
 
-Writing `marbles` test cases is, intentionally, very similar to writing `unittest` TestCases. The main difference is that, in a `marbles.AnnotatedTestCase`, the `assert*` methods, rather than accepting an optional final string parameter `msg`, require a tuple or a dictionary containing a message and some advice for the test consumer.
+Writing `marbles` test cases is, intentionally, very similar to writing `unittest` TestCases. The main difference is that, in a `marbles.AnnotatedTestCase`, the `assert*` methods, rather than accepting an optional final string parameter `msg`, require a tuple, a dictionary, or keyword arguments containing a message and some advice for the test consumer.
 
 On test failure, the message and advice strings are formatted with the local variables defined within the test itself, which is crucial information when testing resources, especially if those resources can change. The message, advice, and locals allow the test consumer to reconstruct, at the point of test failure, what the expectation was, what the resource actually was, and what to do about it.
 
@@ -81,7 +81,8 @@ class FilenameTestCase(AnnotatedTestCase):
                   'pattern has changed. If the file naming pattern has changed, '
                   'consider updating this test.')
 
-        self.assertIsNotNone(re.search(expected, actual), (message, advice))
+        self.assertIsNotNone(re.search(expected, actual),
+                             message=message, advice=advice)
 
 
 if __name__ == '__main__':

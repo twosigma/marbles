@@ -2,11 +2,17 @@ import linecache
 import os
 import unittest
 
-from marbles import AnnotatedTestCase, AnnotatedAssertionError
+from marbles import AnnotatedTestCase, AnnotatedAssertionError, AnnotationError
+
+
+class ReversingTestCaseMixin(object):
+
+    def assertReverseEqual(self, left, right, *args, **kwargs):
+        self.assertEqual(left, reversed(right), *args, **kwargs)
 
 
 @unittest.skip('This is the TestCase being tested')
-class ExampleAnnotatedTestCase(AnnotatedTestCase):
+class ExampleAnnotatedTestCase(ReversingTestCaseMixin, AnnotatedTestCase):
 
     def test_succeed(self):
         self.assertTrue(True, ('some message', 'some advice'))
@@ -17,6 +23,31 @@ class ExampleAnnotatedTestCase(AnnotatedTestCase):
     def test_locals(self):
         foo = 'bar'
         self.assertTrue(False, ('some message', 'some advice about {foo}'))
+
+    def test_missing_annotation_pass(self):
+        self.assertTrue(True)
+
+    def test_missing_annotation_fail(self):
+        self.assertTrue(False)
+
+    def test_missing_annotation_partial(self):
+        self.assertTrue(True, ('message',))
+
+    def test_kwargs(self):
+        self.assertTrue(False, message='kwargs message', advice='kwargs advice')
+
+    def test_kwargs_advice_missing(self):
+        self.assertTrue(True, message='kwargs message')
+
+    def test_reverse_equality(self):
+        s = 'leif'
+        self.assertReverseEqual(s, s, ('some message', 'some advice'))
+
+    def test_reverse_equality_kwargs(self):
+        s = 'leif'
+        self.assertReverseEqual(s, s,
+                                message='some message',
+                                advice='some advice')
 
 
 class TestAnnotatedTestCase(unittest.TestCase):
@@ -35,6 +66,15 @@ class TestAnnotatedTestCase(unittest.TestCase):
         '''Is an AnnotatedAssertionError raised if a test fails?'''
         with self.assertRaises(AnnotatedAssertionError):
             self.case.test_failure()
+
+    def test_missing_annotation(self):
+        '''Does marbles check for missing annotations?'''
+        with self.assertRaises(AnnotationError, msg='for a passing test'):
+            self.case.test_missing_annotation_pass()
+        with self.assertRaises(AnnotationError, msg='for a failing test'):
+            self.case.test_missing_annotation_fail()
+        with self.assertRaises(AnnotationError, msg='for a bad tuple'):
+            self.case.test_missing_annotation_partial()
 
 
 class TestAnnotatedAssertionError(unittest.TestCase):
@@ -71,7 +111,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             self.assertEqual(e._filename, os.path.abspath(__file__))
             # This isn't great because I have to change it every time I add/
             # remove imports but oh well
-            self.assertEqual(e._linenumber, 15)
+            self.assertEqual(e._linenumber, 21)
 
         try:
             self.case.test_locals()
@@ -79,7 +119,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             self.assertCountEqual(list(e._locals.keys()), ['foo', 'self'])
             self.assertEqual(e._filename, os.path.abspath(__file__))
             # Ditto L72-73
-            self.assertEqual(e._linenumber, 19)
+            self.assertEqual(e._linenumber, 25)
 
     def test_get_source_indicate_line(self):
         '''Does _get_source() read and indicate the line from the file provided?'''
@@ -112,6 +152,37 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             more_lines = e._get_source(
                 test_filename, test_linenumber, 2, 5).split('\n')
             self.assertEqual(len(more_lines), 7)
+
+    def test_use_kwargs_form(self):
+        '''Does the kwargs form of an assertion work?'''
+        try:
+            self.case.test_kwargs()
+        except AnnotatedAssertionError as e:
+            self.assertEqual(e.annotation['message'], 'kwargs message')
+            self.assertEqual(e.annotation['advice'], 'kwargs advice')
+
+    def test_kwargs_stick_together(self):
+        '''Does the kwargs form of an assertion enforce that message and
+        advice must both be present?
+        '''
+        with self.assertRaises(AnnotationError):
+            self.case.test_kwargs_advice_missing()
+
+    def test_custom_assertions(self):
+        '''Does the marbles advice work with custom-defined assertions?'''
+        try:
+            self.case.test_reverse_equality()
+        except AnnotatedAssertionError as e:
+            self.assertEqual(e.annotation['message'], 'some message')
+            self.assertEqual(e.annotation['advice'], 'some advice')
+
+    def test_custom_assertions_kwargs(self):
+        '''Does the marbles kwargs advice work with custom-defined assertions?'''
+        try:
+            self.case.test_reverse_equality_kwargs()
+        except AnnotatedAssertionError as e:
+            self.assertEqual(e.annotation['message'], 'some message')
+            self.assertEqual(e.annotation['advice'], 'some advice')
 
 
 if __name__ == '__main__':
