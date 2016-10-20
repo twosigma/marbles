@@ -313,12 +313,15 @@ class AnnotatedTestCase(unittest.TestCase):
                     bundle = {key: kwargs.pop(key) for key in provided_keys}
                     annotation = self._coerce_annotation_dict(bundle)
                 else:
-                    last_arg = args[-1]
-                    args = args[:-1]
-                    annotation = self._coerce_annotation_dict(last_arg)
+                    if 'msg' in kwargs:
+                        msg = kwargs.pop('msg')
+                    else:
+                        msg = args[-1]
+                        args = args[:-1]
+                    annotation = self._coerce_annotation_dict(msg)
 
                 self._validate_annotation(annotation)
-                return attr(*args, annotation, **kwargs)
+                return attr(*args, msg=annotation, **kwargs)
             return wrapper
 
         return attr

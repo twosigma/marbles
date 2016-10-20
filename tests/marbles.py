@@ -54,6 +54,12 @@ class ExampleAnnotatedTestCase(ReversingTestCaseMixin, AnnotatedTestCase):
         __bar = 'baz'
         self.assertTrue(False, ('some message', 'some advice about {_foo}'))
 
+    def test_positional_assert_args(self):
+        self.assertAlmostEqual(1, 2, 1, ('some message', 'some advice'))
+
+    def test_named_assert_args(self):
+        self.assertAlmostEqual(1, 2, places=1, msg=('some message', 'some advice'))
+
 
 class TestAnnotatedTestCase(unittest.TestCase):
 
@@ -157,6 +163,22 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             more_lines = e._get_source(
                 test_filename, test_linenumber, 2, 5).split('\n')
             self.assertEqual(len(more_lines), 7)
+
+    def test_positional_assert_args(self):
+        '''Is annotation captured correctly if positional arguments are provided?'''
+        try:
+            self.case.test_positional_assert_args()
+        except AnnotatedAssertionError as e:
+            self.assertEqual(e.annotation['message'], 'some message')
+            self.assertEqual(e.annotation['advice'], 'some advice')
+
+    def test_named_assert_args(self):
+        '''Is annotation captured correctly if named arguments are provided?'''
+        try:
+            self.case.test_named_assert_args()
+        except AnnotatedAssertionError as e:
+            self.assertEqual(e.annotation['message'], 'some message')
+            self.assertEqual(e.annotation['advice'], 'some advice')
 
     def test_use_kwargs_form(self):
         '''Does the kwargs form of an assertion work?'''
