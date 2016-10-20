@@ -165,9 +165,10 @@ Advice:
         self._annotation['advice'] = '\n\t'.join(formatted_advice)
 
     def _format_locals(self):
-        return '\n\t'.join('{0}={1}'.format(k, v)
-                           for k, v in self.locals.items()
-                           if k not in self._IGNORE_LOCALS)
+        locals_ = {k: v for k, v in self.locals.items()
+                   if k not in self._IGNORE_LOCALS and not k.startswith('_')}
+
+        return '\n\t'.join('{0}={1}'.format(k, v) for k, v in locals_.items())
 
     def _format_msg(self):
         return self._META_FORMAT_STRING.format(
@@ -312,12 +313,15 @@ class AnnotatedTestCase(unittest.TestCase):
                     bundle = {key: kwargs.pop(key) for key in provided_keys}
                     annotation = self._coerce_annotation_dict(bundle)
                 else:
-                    last_arg = args[-1]
-                    args = args[:-1]
-                    annotation = self._coerce_annotation_dict(last_arg)
+                    if 'msg' in kwargs:
+                        msg = kwargs.pop('msg')
+                    else:
+                        msg = args[-1]
+                        args = args[:-1]
+                    annotation = self._coerce_annotation_dict(msg)
 
                 self._validate_annotation(annotation)
-                return attr(*args, annotation, **kwargs)
+                return attr(*args, msg=annotation, **kwargs)
             return wrapper
 
         return attr
