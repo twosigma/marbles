@@ -8,3 +8,7 @@ requests==2.11.1
 requests-kerberos==0.8.0
 six==1.10.0
 ts-min==0.12.3
+Sphinx
+sphinx_rtd_theme
+coverage
+flake8
