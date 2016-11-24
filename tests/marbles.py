@@ -114,86 +114,86 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_verify_annotation_locals(self):
         '''Are locals in the test definition formatted into annotations?'''
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
-        except AnnotatedAssertionError as e:
-            self.assertEqual(e.annotation['advice'],
-                             'some advice about \'bar\'')
+        e = ar.exception
+        self.assertEqual(e.annotation['advice'],
+                         'some advice about \'bar\'')
 
     def test_get_stack(self):
         '''Does _get_stack() find the stack level with the test definition?'''
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
-        except AnnotatedAssertionError as e:
-            self.assertCountEqual(list(e._locals.keys()), ['self'])
-            self.assertEqual(e._filename, os.path.abspath(__file__))
-            # This isn't great because I have to change it every time
-            # I add/ remove imports but oh well
-            self.assertEqual(e._linenumber, 25)
+        e = ar.exception
+        self.assertCountEqual(list(e._locals.keys()), ['self'])
+        self.assertEqual(e._filename, os.path.abspath(__file__))
+        # This isn't great because I have to change it every time I
+        # add/ remove imports but oh well
+        self.assertEqual(e._linenumber, 25)
 
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
-        except AnnotatedAssertionError as e:
-            self.assertCountEqual(list(e._locals.keys()), ['foo', 'self'])
-            self.assertEqual(e._filename, os.path.abspath(__file__))
-            # Ditto L72-73
-            self.assertEqual(e._linenumber, 29)
+        e = ar.exception
+        self.assertCountEqual(list(e._locals.keys()), ['foo', 'self'])
+        self.assertEqual(e._filename, os.path.abspath(__file__))
+        # Ditto L72-73
+        self.assertEqual(e._linenumber, 29)
 
     def test_get_source_indicate_line(self):
         '''Does _get_source() indicate the line from the file provided?'''
         test_linenumber = 5
         test_filename = os.path.abspath(__file__)
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
-        except AnnotatedAssertionError as e:
-            lines = e._get_source(test_filename, test_linenumber).split('\n')
-            for i, line in enumerate(lines):
-                # Is the linenumber provided indicated with a '>'?
-                if i == 1:
-                    self.assertTrue(lines[i].startswith(' >'))
-                else:
-                    self.assertFalse(lines[i].startswith(' >'))
-            # Is the line represented correctly after the line number?
-            self.assertEqual(
-                lines[1].split('{0} '.format(test_linenumber))[-1],
-                linecache.getline(test_filename, test_linenumber).strip())
+        e = ar.exception
+        lines = e._get_source(test_filename, test_linenumber).split('\n')
+        for i, line in enumerate(lines):
+            # Is the linenumber provided indicated with a '>'?
+            if i == 1:
+                self.assertTrue(lines[i].startswith(' >'))
+            else:
+                self.assertFalse(lines[i].startswith(' >'))
+        # Is the line represented correctly after the line number?
+        self.assertEqual(
+            lines[1].split('{0} '.format(test_linenumber))[-1],
+            linecache.getline(test_filename, test_linenumber).strip())
 
     def test_get_source_surrounding_lines(self):
         '''Does _get_source() read surrounding lines from the file provided?'''
         test_linenumber = 5
         test_filename = os.path.abspath(__file__)
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
-        except AnnotatedAssertionError as e:
-            lines = e._get_source(test_filename, test_linenumber).split('\n')
-            self.assertEqual(len(lines), 3)
-            more_lines = e._get_source(
-                test_filename, test_linenumber, 2, 5).split('\n')
-            self.assertEqual(len(more_lines), 7)
+        e = ar.exception
+        lines = e._get_source(test_filename, test_linenumber).split('\n')
+        self.assertEqual(len(lines), 3)
+        more_lines = e._get_source(
+            test_filename, test_linenumber, 2, 5).split('\n')
+        self.assertEqual(len(more_lines), 7)
 
     def test_positional_assert_args(self):
         '''Is annotation captured correctly when using positional arguments?'''
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_positional_assert_args()
-        except AnnotatedAssertionError as e:
-            self.assertEqual(e.annotation['message'], 'some message')
-            self.assertEqual(e.annotation['advice'], 'some advice')
+        e = ar.exception
+        self.assertEqual(e.annotation['message'], 'some message')
+        self.assertEqual(e.annotation['advice'], 'some advice')
 
     def test_named_assert_args(self):
         '''Is annotation captured correctly if named arguments are provided?'''
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_named_assert_args()
-        except AnnotatedAssertionError as e:
-            self.assertEqual(e.annotation['message'], 'some message')
-            self.assertEqual(e.annotation['advice'], 'some advice')
+        e = ar.exception
+        self.assertEqual(e.annotation['message'], 'some message')
+        self.assertEqual(e.annotation['advice'], 'some advice')
 
     def test_use_kwargs_form(self):
         '''Does the kwargs form of an assertion work?'''
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_kwargs()
-        except AnnotatedAssertionError as e:
-            self.assertEqual(e.annotation['message'], 'kwargs message')
-            self.assertEqual(e.annotation['advice'], 'kwargs advice')
+        e = ar.exception
+        self.assertEqual(e.annotation['message'], 'kwargs message')
+        self.assertEqual(e.annotation['advice'], 'kwargs advice')
 
     def test_kwargs_stick_together(self):
         '''Does the kwargs form of an assertion enforce that message and
@@ -204,41 +204,41 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_custom_assertions(self):
         '''Does the marbles advice work with custom-defined assertions?'''
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_reverse_equality()
-        except AnnotatedAssertionError as e:
-            self.assertEqual(e.annotation['message'], 'some message')
-            self.assertEqual(e.annotation['advice'], 'some advice')
+        e = ar.exception
+        self.assertEqual(e.annotation['message'], 'some message')
+        self.assertEqual(e.annotation['advice'], 'some advice')
 
     def test_custom_assertions_kwargs(self):
         '''Does the marbles kwargs advice work with custom assertions?'''
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_reverse_equality_kwargs()
-        except AnnotatedAssertionError as e:
-            self.assertEqual(e.annotation['message'], 'some message')
-            self.assertEqual(e.annotation['advice'], 'some advice')
+        e = ar.exception
+        self.assertEqual(e.annotation['message'], 'some message')
+        self.assertEqual(e.annotation['advice'], 'some advice')
 
     def test_exclude_ignored_locals(self):
         '''Are ignored variables excluded from output?'''
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
-        except AnnotatedAssertionError as e:
-            locals_section = e._format_locals().split('\n\t')
-            locals_ = [local.split('=')[0] for local in locals_section]
-            for local in locals_:
-                self.assertNotIn(local, e._IGNORE_LOCALS)
+        e = ar.exception
+        locals_section = e._format_locals().split('\n\t')
+        locals_ = [local.split('=')[0] for local in locals_section]
+        for local in locals_:
+            self.assertNotIn(local, e._IGNORE_LOCALS)
 
     def test_exclude_internal_mangled_locals(self):
         '''Are internal/mangled variables excluded from the "Locals"?'''
-        try:
+        with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_internal_mangled_locals()
-        except AnnotatedAssertionError as e:
-            locals_section = e._format_locals().split('\n\t')
-            locals_ = [local.split('=')[0] for local in locals_section]
-            for local in locals_:
-                self.assertNotIn(local, ['_foo', '__bar'])
-                self.assertFalse(local.startswith('_'))
-            self.assertEqual(e.annotation['advice'], "some advice about 'bar'")
+        e = ar.exception
+        locals_section = e._format_locals().split('\n\t')
+        locals_ = [local.split('=')[0] for local in locals_section]
+        for local in locals_:
+            self.assertNotIn(local, ['_foo', '__bar'])
+            self.assertFalse(local.startswith('_'))
+        self.assertEqual(e.annotation['advice'], "some advice about 'bar'")
 
 
 if __name__ == '__main__':
