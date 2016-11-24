@@ -2,7 +2,11 @@ import linecache
 import os
 import unittest
 
-from marbles import AnnotatedTestCase, AnnotatedAssertionError, AnnotationError
+from marbles import (
+    AnnotatedTestCase,
+    AnnotatedAssertionError,
+    AnnotationError
+)
 
 
 class ReversingTestCaseMixin(object):
@@ -21,7 +25,7 @@ class ExampleAnnotatedTestCase(ReversingTestCaseMixin, AnnotatedTestCase):
         self.assertTrue(False, ('some message', 'some advice'))
 
     def test_locals(self):
-        foo = 'bar'
+        foo = 'bar'  # noqa: F841
         self.assertTrue(False, ('some message', 'some advice about {foo}'))
 
     def test_missing_annotation_pass(self):
@@ -34,7 +38,8 @@ class ExampleAnnotatedTestCase(ReversingTestCaseMixin, AnnotatedTestCase):
         self.assertTrue(True, ('message',))
 
     def test_kwargs(self):
-        self.assertTrue(False, message='kwargs message', advice='kwargs advice')
+        self.assertTrue(False, message='kwargs message',
+                        advice='kwargs advice')
 
     def test_kwargs_advice_missing(self):
         self.assertTrue(True, message='kwargs message')
@@ -50,15 +55,16 @@ class ExampleAnnotatedTestCase(ReversingTestCaseMixin, AnnotatedTestCase):
                                 advice='some advice')
 
     def test_internal_mangled_locals(self):
-        _foo = 'bar'
-        __bar = 'baz'
+        _foo = 'bar'  # noqa: F841
+        __bar = 'baz'  # noqa: F841
         self.assertTrue(False, ('some message', 'some advice about {_foo}'))
 
     def test_positional_assert_args(self):
         self.assertAlmostEqual(1, 2, 1, ('some message', 'some advice'))
 
     def test_named_assert_args(self):
-        self.assertAlmostEqual(1, 2, places=1, msg=('some message', 'some advice'))
+        self.assertAlmostEqual(1, 2, places=1,
+                               msg=('some message', 'some advice'))
 
 
 class TestAnnotatedTestCase(unittest.TestCase):
@@ -97,7 +103,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         delattr(self, 'case')
 
     def test_verify_annotation_dict_missing_keys(self):
-        '''Is an Exception raised if annotation doesn't contain expected keys?'''
+        '''Is an Exception raised if annotation is missing expected keys?'''
         with self.assertRaises(Exception):
             AnnotatedAssertionError(({'foo': 'bar'}, 'standard message'))
 
@@ -107,11 +113,12 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             AnnotatedAssertionError(())
 
     def test_verify_annotation_locals(self):
-        '''Are locals defined in the test definition formatted into annotations?'''
+        '''Are locals in the test definition formatted into annotations?'''
         try:
             self.case.test_locals()
         except AnnotatedAssertionError as e:
-            self.assertEqual(e.annotation['advice'], 'some advice about \'bar\'')
+            self.assertEqual(e.annotation['advice'],
+                             'some advice about \'bar\'')
 
     def test_get_stack(self):
         '''Does _get_stack() find the stack level with the test definition?'''
@@ -120,9 +127,9 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         except AnnotatedAssertionError as e:
             self.assertCountEqual(list(e._locals.keys()), ['self'])
             self.assertEqual(e._filename, os.path.abspath(__file__))
-            # This isn't great because I have to change it every time I add/
-            # remove imports but oh well
-            self.assertEqual(e._linenumber, 21)
+            # This isn't great because I have to change it every time
+            # I add/ remove imports but oh well
+            self.assertEqual(e._linenumber, 25)
 
         try:
             self.case.test_locals()
@@ -130,10 +137,10 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             self.assertCountEqual(list(e._locals.keys()), ['foo', 'self'])
             self.assertEqual(e._filename, os.path.abspath(__file__))
             # Ditto L72-73
-            self.assertEqual(e._linenumber, 25)
+            self.assertEqual(e._linenumber, 29)
 
     def test_get_source_indicate_line(self):
-        '''Does _get_source() read and indicate the line from the file provided?'''
+        '''Does _get_source() indicate the line from the file provided?'''
         test_linenumber = 5
         test_filename = os.path.abspath(__file__)
         try:
@@ -165,7 +172,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             self.assertEqual(len(more_lines), 7)
 
     def test_positional_assert_args(self):
-        '''Is annotation captured correctly if positional arguments are provided?'''
+        '''Is annotation captured correctly when using positional arguments?'''
         try:
             self.case.test_positional_assert_args()
         except AnnotatedAssertionError as e:
@@ -204,7 +211,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             self.assertEqual(e.annotation['advice'], 'some advice')
 
     def test_custom_assertions_kwargs(self):
-        '''Does the marbles kwargs advice work with custom-defined assertions?'''
+        '''Does the marbles kwargs advice work with custom assertions?'''
         try:
             self.case.test_reverse_equality_kwargs()
         except AnnotatedAssertionError as e:
@@ -222,7 +229,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
                 self.assertNotIn(local, e._IGNORE_LOCALS)
 
     def test_exclude_internal_mangled_locals(self):
-        '''Are internal/mangled variables excluded from "Locals" section of output?'''
+        '''Are internal/mangled variables excluded from the "Locals"?'''
         try:
             self.case.test_internal_mangled_locals()
         except AnnotatedAssertionError as e:
