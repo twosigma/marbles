@@ -22,22 +22,22 @@ class FilenameTestCase(AnnotatedTestCase):
         expected = '.py'
         actual = os.path.splitext(self.filename)[1]
 
-        message = 'Expected a {expected} file but received a {actual} file.'
-        advice = 'Contact the ingestion owner: Jane Doe'
+        advice = ('Tell Jane Doe that we expected a {expected} file but '
+                  'received a {actual} file. If we should expect {expected} '
+                  'files moving forward, please update this test.')
 
-        self.assertEqual(expected, actual, (message, advice))
+        self.assertEqual(expected, actual, advice=advice)
 
     def test_filename_pattern(self):
         '''Verifies filename pattern.'''
         expected = '^file_[0-9]{8}$'
         actual = os.path.splitext(self.filename)[0]
 
-        message = 'Filename {actual} does not match the pattern {expected}.'
         advice = ('Determine if this is a one-off error or if the file naming '
-                  'pattern has changed. If the file naming pattern has '
-                  'changed, consider updating this test.')
+                  'pattern has changed to {actual}. If the file naming '
+                  'pattern has changed, please update this test.')
 
-        self.assertIsNotNone(re.search(expected, actual), (message, advice))
+        self.assertRegex(actual, expected, advice=advice)
 
 
 if __name__ == '__main__':

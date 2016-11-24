@@ -35,13 +35,13 @@ The `marbles` test suite is written in the [unittest](https://docs.python.org/3.
 
 # Overview
 
-Writing `marbles` test cases is, intentionally, very similar to writing `unittest` TestCases. The main difference is that, in a `marbles.AnnotatedTestCase`, the `assert*` methods, rather than accepting an optional final string parameter `msg`, require a tuple, a dictionary, or keyword arguments containing a message and some advice for the test consumer.
+Writing `marbles` test cases is, intentionally, very similar to writing `unittest` TestCases. The main difference is that, in a `marbles.AnnotatedTestCase`, the `assert*` methods, in addition to accepting an optional final string parameter ``msg``, expect a keyword parameter ``advice``, which should describe what steps should be taken when the test fails.
 
-On test failure, the message and advice strings are formatted with the local variables defined within the test itself, which is crucial information when testing resources, especially if those resources can change. The message, advice, and locals allow the test consumer to reconstruct, at the point of test failure, what the expectation was, what the resource actually was, and what to do about it.
+On test failure, the `msg` and `advice` strings are formatted with the local variables defined within the test itself, which is crucial information when testing resources, especially if those resources can change. The `msg`, `advice`, and locals allow the test consumer to reconstruct, at the point of test failure, what the expectation was, what the resource actually was, and what to do about it.
 
 ## Example
 
-Below is an example test file that uses the `marbles` AnnotatedTestCase. You'll notice that there is one succeeding and one failing test.
+Below is an example test file that uses the `marbles` `AnnotatedTestCase`. You'll notice that there is one succeeding and one failing test.
 
 ```python
 import os
@@ -50,11 +50,13 @@ import unittest
 
 from marbles import AnnotatedTestCase
 
+
 filename = 'file_2016_01_01.py'
+
 
 class FilenameTestCase(AnnotatedTestCase):
     '''FilenameTestCase makes assertions about a filename.'''
-    
+
     def setUp(self):
         self.filename = filename
 
@@ -66,23 +68,22 @@ class FilenameTestCase(AnnotatedTestCase):
         expected = '.py'
         actual = os.path.splitext(self.filename)[1]
 
-        message = 'Expected a {expected} file but received a {actual} file.'
-        advice = 'Contact the ingestion owner: Jane Doe'
+        advice = ('Tell Jane Doe that we expected a {expected} file but '
+                  'received a {actual} file. If we should expect {expected} '
+                  'files moving forward, please update this test.')
 
-        self.assertEqual(expected, actual, (message, advice))
+        self.assertEqual(expected, actual, advice=advice)
 
     def test_filename_pattern(self):
         '''Verifies filename pattern.'''
         expected = '^file_[0-9]{8}$'
         actual = os.path.splitext(self.filename)[0]
 
-        message = 'Filename {actual} does not match the pattern {expected}.'
         advice = ('Determine if this is a one-off error or if the file naming '
-                  'pattern has changed. If the file naming pattern has changed, '
-                  'consider updating this test.')
+                  'pattern has changed to {actual}. If the file naming '
+                  'pattern has changed, please update this test.')
 
-        self.assertIsNotNone(re.search(expected, actual),
-                             message=message, advice=advice)
+        self.assertRegex(actual, expected, advice=advice)
 
 
 if __name__ == '__main__':
@@ -99,26 +100,27 @@ FAIL: test_filename_pattern (examples.filename.FilenameTestCase)
 Verifies filename pattern.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/home/jane/Development/marbles/examples/filename.py", line 38, in test_filename_pattern
-    self.assertIsNotNone(re.search(expected, actual), (message, advice))
-marbles.marbles.AnnotatedAssertionError: unexpectedly None
-Filename 'file_2016_01_01' does not match the pattern '^file_[0-9]{8}$'.
+  File "/home/jane/Development/marbles/examples/filename.py", line 40, in test_filename_pattern
+    self.assertRegex(actual, expected, advice=advice)
+  File "/home/jane/Development/marbles/marbles/marbles.py", line 416, in wrapper
+    return attr(*args, msg=annotation, **kwargs)
+marbles.marbles.AnnotatedAssertionError: Regex didn't match: '^file_[0-9]{8}$' not found in 'file_2016_01_01'
 
 Source:
-     37
- >   38 self.assertIsNotNone(re.search(expected, actual), (message, advice))
      39
+ >   40 self.assertRegex(actual, expected, advice=advice)
+     41
 Locals:
-        actual='file_2016_01_01'
-        expected='^file_[0-9]{8}$'
+	expected='^file_[0-9]{8}$'
+	actual='file_2016_01_01'
 Advice:
-        Determine if this is a one-off error or if the file naming
-        pattern has changed. If the file naming pattern has changed,
-        consider updating this test.
+	Determine if this is a one-off error or if the file naming pattern has
+	changed to 'file_2016_01_01'. If the file naming pattern has changed,
+	please update this test.
 
 
 ----------------------------------------------------------------------
-Ran 2 tests in 0.004s
+Ran 2 tests in 0.003s
 
 FAILED (failures=1)
 ```
