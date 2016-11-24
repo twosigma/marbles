@@ -117,7 +117,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
         e = ar.exception
-        self.assertEqual(e.annotation['advice'],
+        self.assertEqual(e.annotation['advice'].strip(),
                          'some advice about \'bar\'')
 
     def test_get_stack(self):
@@ -126,27 +126,27 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             self.case.test_failure()
         e = ar.exception
         self.assertCountEqual(list(e._locals.keys()), ['self'])
-        self.assertEqual(e._filename, os.path.abspath(__file__))
+        self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/ remove imports but oh well
-        self.assertEqual(e._linenumber, 25)
+        self.assertEqual(e.linenumber, 25)
 
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
         e = ar.exception
         self.assertCountEqual(list(e._locals.keys()), ['foo', 'self'])
-        self.assertEqual(e._filename, os.path.abspath(__file__))
+        self.assertEqual(e.filename, os.path.abspath(__file__))
         # Ditto L72-73
-        self.assertEqual(e._linenumber, 29)
+        self.assertEqual(e.linenumber, 29)
 
-    def test_get_source_indicate_line(self):
-        '''Does _get_source() indicate the line from the file provided?'''
-        test_linenumber = 5
+    def test_assert_stmt_indicates_line(self):
+        '''Does e.assert_stmt indicate the line from the source code?'''
+        test_linenumber = 25
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
         e = ar.exception
-        lines = e._get_source(test_filename, test_linenumber).split('\n')
+        lines = e.assert_stmt.split('\n')
         for i, line in enumerate(lines):
             # Is the linenumber provided indicated with a '>'?
             if i == 1:
@@ -155,20 +155,20 @@ class TestAnnotatedAssertionError(unittest.TestCase):
                 self.assertFalse(lines[i].startswith(' >'))
         # Is the line represented correctly after the line number?
         self.assertEqual(
-            lines[1].split('{0} '.format(test_linenumber))[-1],
+            lines[1].split('{0} '.format(test_linenumber))[-1].strip(),
             linecache.getline(test_filename, test_linenumber).strip())
 
-    def test_get_source_surrounding_lines(self):
-        '''Does _get_source() read surrounding lines from the file provided?'''
+    def test_assert_stmt_surrounding_lines(self):
+        '''Does _find_assert_stmt read surrounding lines from the file?'''
         test_linenumber = 5
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
         e = ar.exception
-        lines = e._get_source(test_filename, test_linenumber).split('\n')
+        lines = e._find_assert_stmt(test_filename, test_linenumber)[0]
         self.assertEqual(len(lines), 3)
-        more_lines = e._get_source(
-            test_filename, test_linenumber, 2, 5).split('\n')
+        more_lines = e._find_assert_stmt(
+            test_filename, test_linenumber, 2, 5)[0]
         self.assertEqual(len(more_lines), 7)
 
     def test_positional_assert_args(self):
@@ -176,24 +176,24 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_positional_assert_args()
         e = ar.exception
-        self.assertEqual(e.annotation['message'], 'some message')
-        self.assertEqual(e.annotation['advice'], 'some advice')
+        self.assertEqual(e.annotation['message'].strip(), 'some message')
+        self.assertEqual(e.annotation['advice'].strip(), 'some advice')
 
     def test_named_assert_args(self):
         '''Is annotation captured correctly if named arguments are provided?'''
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_named_assert_args()
         e = ar.exception
-        self.assertEqual(e.annotation['message'], 'some message')
-        self.assertEqual(e.annotation['advice'], 'some advice')
+        self.assertEqual(e.annotation['message'].strip(), 'some message')
+        self.assertEqual(e.annotation['advice'].strip(), 'some advice')
 
     def test_use_kwargs_form(self):
         '''Does the kwargs form of an assertion work?'''
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_kwargs()
         e = ar.exception
-        self.assertEqual(e.annotation['message'], 'kwargs message')
-        self.assertEqual(e.annotation['advice'], 'kwargs advice')
+        self.assertEqual(e.annotation['message'].strip(), 'kwargs message')
+        self.assertEqual(e.annotation['advice'].strip(), 'kwargs advice')
 
     def test_kwargs_stick_together(self):
         '''Does the kwargs form of an assertion enforce that message and
@@ -207,25 +207,27 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_reverse_equality()
         e = ar.exception
-        self.assertEqual(e.annotation['message'], 'some message')
-        self.assertEqual(e.annotation['advice'], 'some advice')
+        self.assertEqual(e.annotation['message'].strip(), 'some message')
+        self.assertEqual(e.annotation['advice'].strip(), 'some advice')
 
     def test_custom_assertions_kwargs(self):
         '''Does the marbles kwargs advice work with custom assertions?'''
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_reverse_equality_kwargs()
         e = ar.exception
-        self.assertEqual(e.annotation['message'], 'some message')
-        self.assertEqual(e.annotation['advice'], 'some advice')
+        self.assertEqual(e.annotation['message'].strip(), 'some message')
+        self.assertEqual(e.annotation['advice'].strip(), 'some advice')
 
     def test_exclude_ignored_locals(self):
         '''Are ignored variables excluded from output?'''
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
         e = ar.exception
-        locals_section = e._format_locals().split('\n\t')
+        locals_section = e._format_locals(e.locals).split('\n')
         locals_ = [local.split('=')[0] for local in locals_section]
         for local in locals_:
+            self.assertTrue(local.startswith('\t'))
+            local = local.strip()
             self.assertNotIn(local, e._IGNORE_LOCALS)
 
     def test_exclude_internal_mangled_locals(self):
@@ -233,12 +235,15 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_internal_mangled_locals()
         e = ar.exception
-        locals_section = e._format_locals().split('\n\t')
-        locals_ = [local.split('=')[0] for local in locals_section]
+        locals_section = e._format_locals(e.locals).split('\n')
+        locals_ = [local.split('=')[0] for local in locals_section if local]
         for local in locals_:
+            self.assertTrue(local.startswith('\t'))
+            local = local.strip()
             self.assertNotIn(local, ['_foo', '__bar'])
             self.assertFalse(local.startswith('_'))
-        self.assertEqual(e.annotation['advice'], "some advice about 'bar'")
+        self.assertEqual(e.annotation['advice'].strip(),
+                         "some advice about 'bar'")
 
 
 if __name__ == '__main__':
