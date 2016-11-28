@@ -4,11 +4,13 @@ import unittest
 
 from marbles import AnnotatedTestCase
 
+
 filename = 'file_2016_01_01.py'
+
 
 class FilenameTestCase(AnnotatedTestCase):
     '''FilenameTestCase makes assertions about a filename.'''
-    
+
     def setUp(self):
         self.filename = filename
 
@@ -32,8 +34,8 @@ class FilenameTestCase(AnnotatedTestCase):
 
         message = 'Filename {actual} does not match the pattern {expected}.'
         advice = ('Determine if this is a one-off error or if the file naming '
-                  'pattern has changed. If the file naming pattern has changed, '
-                  'consider updating this test.')
+                  'pattern has changed. If the file naming pattern has '
+                  'changed, consider updating this test.')
 
         self.assertIsNotNone(re.search(expected, actual), (message, advice))
 
