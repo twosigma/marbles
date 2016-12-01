@@ -47,11 +47,11 @@ class AnnotatedAssertionError(AssertionError):
 {message}
 
 Source:
-{assert_expr}
+{assert_stmt}
 Locals:
-\t{locals}
+{locals}
 Advice:
-\t{advice}
+{advice}
     '''
     REQUIRED_KEYS = ('message', 'advice')
     # If message and/or advice are declared in the test's scope and
@@ -91,20 +91,39 @@ Advice:
         # facilitate programmatic interactions with test failures
         # (e.g., aggregating and formatting output into a consolidated
         # report)
-        self._annotation, self._msg = args[0]
-        self._locals = None
-        self._filename = None
-        self._linenumber = None
-        self._assert_expr = None
-        self._formatted_msg = None
+        annotation, msg = args[0]
+        locals_, filename, linenumber = self._get_stack_info()
 
-        self._format_annotation()
+        setattr(self, '_annotation', annotation)
+        setattr(self, '_msg', msg)
+        setattr(self, '_locals', locals_)
+        setattr(self, '_filename', filename)
+        setattr(self, '_linenumber', linenumber)
 
         super(AnnotatedAssertionError, self).__init__(self.formattedMsg)
 
     @property
+    def message(self):
+        formatted_message = self._annotation['message'].format(**self.locals)
+        return textwrap.fill(formatted_message, width=74,
+                             break_long_words=False)
+
+    @property
+    def advice(self):
+        formatted_advice = self._annotation['advice'].format(**self.locals)
+        return textwrap.fill(formatted_advice, width=72,
+                             break_long_words=False, initial_indent='\t',
+                             subsequent_indent='\t')
+
+    @property
     def annotation(self):
-        return self._annotation
+        # TODO(leif): This is used by tests, but they should use message
+        # and advice directly.  Once changed, we can remove this
+        # property.
+        return {
+            'message': self.message,
+            'advice': self.advice
+        }
 
     @property
     def standardMsg(self):  # use unittest's name
@@ -112,37 +131,50 @@ Advice:
 
     @property
     def locals(self):
-        if not self._locals:
-            self._get_stack()
         return self._locals
 
     @property
     def filename(self):
-        if not self._filename:
-            self._get_stack()
         return self._filename
 
     @property
     def linenumber(self):
-        if not self._linenumber:
-            self._get_stack()
         return self._linenumber
 
     @property
-    def assert_expr(self):
-        if not self._assert_expr:
-            assert_expr = self._get_source(self.filename, self.linenumber)
-            setattr(self, '_assert_expr', assert_expr)
-        return self._assert_expr
+    def assert_stmt(self):
+        '''Returns a string displaying the whole statement that failed,
+        with a '>' indicator on the line starting the expression.
+        '''
+        line_range, lineno = self._find_assert_stmt(self.filename,
+                                                    self.linenumber)
+        source = [linecache.getline(self.filename, x) for x in line_range]
+
+        # Dedent the source, removing the final newline added by dedent
+        dedented_lines = textwrap.dedent(''.join(source)).split('\n')[:-1]
+
+        formatted_lines = []
+        for i, line in zip(line_range, dedented_lines):
+            prefix = '>' if i == lineno else ' '
+            formatted_lines.append(' {0} {1:4d} {2}'.format(prefix, i, line))
+
+        return '\n'.join(formatted_lines)
 
     @property
     def formattedMsg(self):  # mimic unittest's name for standardMsg
-        if not self._formatted_msg:
-            formatted_msg = self._format_msg()
-            setattr(self, '_formatted_msg', formatted_msg)
-        return self._formatted_msg
+        return self._META_FORMAT_STRING.format(
+            standardMsg=self.standardMsg, message=self.message,
+            assert_stmt=self.assert_stmt, advice=self.advice,
+            locals=self._format_locals(self.locals))
 
-    def _get_stack(self):
+    @classmethod
+    def _format_locals(cls, locals_):
+        locals_ = {k: v for k, v in locals_.items()
+                   if k not in cls._IGNORE_LOCALS and not k.startswith('_')}
+        return '\n'.join('\t{0}={1}'.format(k, v) for k, v in locals_.items())
+
+    @staticmethod
+    def _get_stack_info():
         '''Capture locals, filename, and line number from the stacktrace
         to provide the source of the assertion error and formatted
         advice.
@@ -150,89 +182,60 @@ Advice:
         tb = traceback.walk_stack(sys._getframe().f_back)
         stack = traceback.StackSummary.extract(tb, capture_locals=True)
 
-        for level in stack:
-            # We want locals from the test definition (which always
-            # begins with 'test_' in unittest), which will be at a
-            # different level in the stack depending on how many tests
-            # are in each test case, how many test cases there are,
-            # etc.
-            if level.name.startswith('test_'):
-                setattr(self, '_locals', level.locals.copy())
-                setattr(self, '_filename', level.filename)
-                setattr(self, '_linenumber', level.lineno)
-                break
+        # We want locals from the test definition (which always begins
+        # with 'test_' in unittest), which will be at a different
+        # level in the stack depending on how many tests are in each
+        # test case, how many test cases there are, etc.
 
-    def _format_annotation(self):
-        '''Format locals into into message and advice.'''
-        formatted_message = self._annotation['message'].format(**self.locals)
-        formatted_advice = self._annotation['advice'].format(**self.locals)
-
-        # Break long strings onto multple lines for prettier output
-        formatted_message = textwrap.wrap(formatted_message, 74)
-        formatted_advice = textwrap.wrap(formatted_advice, 64)
-
-        self._annotation['message'] = '\n'.join(formatted_message)
-        self._annotation['advice'] = '\n\t'.join(formatted_advice)
-
-    def _format_locals(self):
-        locals_ = {k: v for k, v in self.locals.items()
-                   if k not in self._IGNORE_LOCALS and not k.startswith('_')}
-
-        return '\n\t'.join('{0}={1}'.format(k, v) for k, v in locals_.items())
-
-    def _format_msg(self):
-        return self._META_FORMAT_STRING.format(
-            standardMsg=self.standardMsg, message=self.annotation['message'],
-            assert_expr=self.assert_expr, advice=self.annotation['advice'],
-            locals=self._format_locals())
+        # The branch where we exhaust this loop is not covered
+        # because we always find a test.
+        for frame in stack:  # pragma: no branch
+            if frame.name.startswith('test_'):
+                return frame.locals.copy(), frame.filename, frame.lineno
 
     @staticmethod
-    def _get_source(filename, linenumber, leading=1, following=2):
-        '''Given a Python filename and line number, return all lines
-        that are a part of the statement containing that line,
-        indicating the line number given with '>'.
+    def _find_assert_stmt(filename, linenumber, leading=1, following=2):
+        '''Given a Python filename and line number, find the lines that
+        are a part of the statement containing that line.
 
-        Python stacktraces, when reporting which line they're on,
-        always show the last line of the statement. This can be
-        confusing if the statement spans multiple lines. This function
-        will reconstruct the whole statement.
+        Python stacktraces, when reporting which line they're on, always
+        show the last line of the statement. This can be confusing if
+        the statement spans multiple lines. This function helps
+        reconstruct the whole statement, and is used by
+        :meth:`marbles.AnnotatedAssertionError.assert_stmt`.
+
+        Returns a tuple of the range of lines spanned by the source
+        being returned, the number of the line on which the interesting
+        statement starts.
         '''
         _source = ''.join(linecache.getlines(filename))
         _tree = ast.parse(_source)
 
-        for node in ast.walk(_tree):
+        # We don't cover the branch where we exhaust all nodes without
+        # finding the right statement.
+        for node in ast.walk(_tree):  # pragma: no branch
             if isinstance(node, ast.stmt):
                 statement = node
             if hasattr(node, 'lineno') and node.lineno == linenumber:
-                line_range = list(
-                    range(statement.lineno - leading, linenumber + following))
-                source = [linecache.getline(filename, x) for x in line_range]
-                break  # we have the lines we're after and can stop walking
-
-        # Dedent the source, removing the final newline added by dedent
-        dedented_lines = textwrap.dedent(''.join(source)).split('\n')[:-1]
-
-        formatted_lines = []
-        for i, line in zip(line_range, dedented_lines):
-            prefix = '>' if i == statement.lineno else ' '
-            formatted_lines.append(' {0} {1:4d} {2}'.format(prefix, i, line))
-
-        return '\n'.join(formatted_lines)
+                line_range = range(statement.lineno - leading,
+                                   linenumber + following)
+                return line_range, statement.lineno
 
 
 class AnnotatedTestCase(unittest.TestCase):
     '''AnnotatedTestCase is an extension of :class:`unittest.TestCase`.
 
     When writing a test class based on :class:`AnnotatedTestCase`, all
-    assert statements like :meth:`unittest.TestCase.assertEqual`,
-    rather than accepting an optional final string parameter ``msg``,
-    require a dictionary or tuple containing two stings: a message and
-    some advice.  Alternatively, ``message`` and ``advice`` can be
-    passed as keyword arguments to the assertion function.
+    assert statements like :meth:`unittest.TestCase.assertEqual`, rather
+    than accepting an optional final string parameter ``msg``, require a
+    dictionary or tuple containing two stings: a message and some
+    advice. Alternatively, ``message`` and ``advice`` can be passed as
+    keyword arguments to the assertion function.
 
     The message and advice strings provided are formatted with
-    :meth:`str.format` given the local variables defined within the
-    test itself.
+    :meth:`str.format` given the local variables defined within the test
+    itself. Every assertion checks to make sure both message and advice
+    are provided, and if not, raises an :class:`AnnotationError`.
 
     Example:
 
