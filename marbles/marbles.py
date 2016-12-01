@@ -20,6 +20,58 @@ import traceback
 import unittest
 
 
+class _StatementFinder(ast.NodeVisitor):
+    '''Finds the line of the statement containing a target line.
+
+    For reasons passing understanding, :meth:`ast.walk` traverses the
+    tree in breadth-first order rather than depth-first. In order to
+    traverse depth-first (which we want), you have to implement a
+    :class:`ast.NodeVisitor`.
+
+    Startlingly, :meth:`ast.walk`'s documentation says that it traverses
+    "in no particular order". While I respect the decision to document
+    the fact that the order should not be relied on as it might change
+    in the future, to claim that it traverses "in no particular order"
+    is simply a lie.
+
+    In any case, this visitor will traverse the tree, and when it finds
+    a node on the target line, it sets ``self.found`` to the line number
+    of the innermost ancestor which is a Statement.
+
+    Example::
+
+        finder = _StatementFinder(target_linenumber)
+        finder.visit(tree)
+        containing_statement_linenumber = finder.found
+    '''
+
+    def __init__(self, target):
+        self.target = target
+        self.stack = []
+        self.found = None
+
+    @property
+    def current_stmt(self):
+        return self.stack[-1]
+
+    def visit(self, node):
+        lineno = getattr(node, 'lineno', None)
+        if lineno == self.target and self.found is None:
+            if isinstance(node, ast.stmt):
+                self.found = node.lineno
+            else:
+                self.found = self.current_stmt.lineno
+
+        if isinstance(node, ast.stmt):
+            self.stack.append(node)
+            try:
+                self.generic_visit(node)
+            finally:
+                self.stack.pop()
+        else:
+            self.generic_visit(node)
+
+
 class AnnotationError(Exception):
     '''Raised when there is a problem with the way an assertion was
     annotated.
@@ -211,15 +263,10 @@ Advice:
         _source = ''.join(linecache.getlines(filename))
         _tree = ast.parse(_source)
 
-        # We don't cover the branch where we exhaust all nodes without
-        # finding the right statement.
-        for node in ast.walk(_tree):  # pragma: no branch
-            if isinstance(node, ast.stmt):
-                statement = node
-            if hasattr(node, 'lineno') and node.lineno == linenumber:
-                line_range = range(statement.lineno - leading,
-                                   linenumber + following)
-                return line_range, statement.lineno
+        finder = _StatementFinder(linenumber)
+        finder.visit(_tree)
+        line_range = range(finder.found - leading, linenumber + following)
+        return line_range, finder.found
 
 
 class AnnotatedTestCase(unittest.TestCase):
