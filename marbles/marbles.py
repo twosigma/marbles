@@ -6,7 +6,7 @@ Briefly, by inheriting from :class:`marbles.AnnotatedTestCase` rather
 than :class:`unittest.TestCase`, the test author gains the ability to
 provide richer failure messages in their assert statements. These
 messages can be format strings which are expanded using local
-variables defined within the test itself.  The inclusion of this
+variables defined within the test itself. The inclusion of this
 additional information is enforced within the class.
 '''
 
@@ -122,9 +122,8 @@ Advice:
                true
 
         Annotation is a dictionary containing at least the key
-        'advice'.  See the documentation for
-        :class:`AnnotatedTestCase` to see what the user API looks
-        like.
+        'advice'. See the documentation for :class:`AnnotatedTestCase`
+        to see what the user API looks like.
 
         ``advice``
             This string is meant to inform the test consumer of what
@@ -141,7 +140,7 @@ Advice:
 
         # When the wrapper in AnnotatedTestCase sees both msg and
         # advice, it bundles msg with advice in order to thread it
-        # down the stack.  So if the user was trying to override the
+        # down the stack. So if the user was trying to override the
         # standard message, their value would actually be here.
         msg = annotation.pop('msg', None)
         if not msg:
@@ -255,7 +254,7 @@ class AnnotationContext(object):
 
     Within this context manager, if another assertion is called
     without passing advice, we use the advice from the earlier call
-    rather than raising an error about missing advice.  This allows
+    rather than raising an error about missing advice. This allows
     e.g. :meth:`unittest.TestCase.assertMultiLineEqual` to make some
     additional assertions and pass its own msg without advice, without
     causing an error there.
@@ -310,7 +309,7 @@ def _find_msg_argument(signature):
     except ValueError:  # 'msg' is not in list
         # It's likely that this is a custom assertion that's just
         # passing all remaining args and kwargs through
-        # (e.g. tests.marbles.ReversingTestCaseMixin).  Unfortunately,
+        # (e.g. tests.marbles.ReversingTestCaseMixin). Unfortunately,
         # we can't inspect its code to find the assert it's wrapping,
         # so we just have to assume it's of the standard form with msg
         # in the last position with a default of None.
@@ -318,10 +317,10 @@ def _find_msg_argument(signature):
         default_msg = None
 
     # We also don't want to steal any actually positional arguments if
-    # we can help it.  Therefore, we leave the default msg if there
-    # are fewer than this many args passed.  We stop counting at a
+    # we can help it. Therefore, we leave the default msg if there are
+    # fewer than this many args passed. We stop counting at a
     # parameter named 'msg' or when we hit a varargs or keyword-only
-    # parameter.  See
+    # parameter. See
     # https://gitlab.twosigma.com/jane/marbles/issues/10.
     kinds = (inspect.Parameter.POSITIONAL_ONLY,
              inspect.Parameter.POSITIONAL_OR_KEYWORD)
@@ -451,9 +450,9 @@ class AnnotatedTestCase(unittest.TestCase):
 
         To do so, we override __getattribute__ so that any method that
         gets looked up and starts with 'assert' gets wrapped so that
-        it does what we want.  We override __getattribute__ rather
-        than __getattr__ because __getattr__ doesn't get called when
-        the method just exists.
+        it does what we want. We override __getattribute__ rather than
+        __getattr__ because __getattr__ doesn't get called when the
+        method just exists.
 
         To add other keyword arguments in the future, you have to make
         sure that the way the underlying assertion gets called is
