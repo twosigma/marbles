@@ -1,6 +1,7 @@
 conda-api==1.1.0
 Jinja2==2.8
 MarkupSafe==0.23
+pandas==0.19.1
 pbr==1.10.0
 pykerberos==1.1.10
 PyYAML==3.11

@@ -14,6 +14,7 @@ setup(
     test_suite='tests',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
+    setup_requires=['Sphinx', 'sphinx_rtd_theme'],
     description=('a small unittest extension that provides additional '
                  'information on test failure'),
     long_description=readme(),

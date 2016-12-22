@@ -126,14 +126,16 @@ Advice:
                string representation of the asserted fact that wasn't
                true
 
-        Annotation is a dictionary containing at least the key
-        'advice'. See the documentation for :class:`AnnotatedTestCase`
-        to see what the user API looks like.
+        Annotation is a dictionary containing at least the key 'advice'.
+        See the documentation for :class:`AnnotatedTestCase` to see
+        what the user API looks like.
 
-        ``advice``
+        Parameters
+        ----------
+        advice : str
             This string is meant to inform the test consumer of what
             to do when the test fails. It can contain format string
-            directives that will be formatted with local variables
+            fields that will be formatted with local variables
             defined within the test itself.
         '''
         # These attributes are publicly exposed as properties below to
@@ -293,9 +295,11 @@ def _find_msg_argument(signature):
     We need to determine where we expect to find msg if it's passed
     positionally, so we can extract it if the user passed it.
 
-    :returns: The index of the ``msg`` param, the default value for
-        it, and the number of non-``msg`` positional parameters we
-        expect.
+    Returns
+    -------
+    tuple
+        The index of the ``msg`` param, the default value for it,
+        and the number of non-``msg`` positional parameters we expect.
     '''
     names = signature.parameters.keys()
     try:
@@ -329,7 +333,10 @@ def _find_msg_argument(signature):
 def _extract_msg(args, kwargs, msg_idx, default_msg, non_msg_params):
     '''Extracts the msg argument from the passed args.
 
-    :returns: The found ``msg``, the args and kwargs with that ``msg``
+    Returns
+    -------
+    tuple
+        The found ``msg``, the args and kwargs with that ``msg``
         removed, and any remaining positional args after ``msg``.
     '''
     rem_args = []
@@ -356,31 +363,55 @@ class AnnotatedTestCase(unittest.TestCase):
 
     The advice string (and the ``msg`` parameter, if provided) are
     formatted with :meth:`str.format` given the local variables
-    defined within the test itself. Every assertion checks to make
-    sure both message and advice are provided, and if not, raises an
-    :class:`AnnotationError`.
+    defined within the test itself.
+
+    .. warning::
+
+        Compound field names and format specifiers are not supported
+        in advice annotation fields.
+
+    Every assertion checks to make sure both message and advice are
+    provided, and if not, raises an :class:`AnnotationError`.
 
     Example:
 
     .. code-block:: py
 
-        import os
         import re
+        import unittest
+        from datetime import date, datetime, timedelta
 
         from marbles import AnnotatedTestCase
 
-        class ExampleTestCase(AnnotatedTestCase):
 
-            def test_filename_pattern(self):
-                expected = '^file_[0-9]{8}$'
-                actual = os.path.splitext('file_2016_01_01.py')[0]
+        filename = 'data.csv'
+        # Fake data that, in the real world, we would read in from data.csv
+        data = '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
 
-                advice = ('Determine if this is a one-off error or if the file naming '
-                          'pattern has changed. If the file naming pattern has changed, '
-                          'consider updating this test.')
-                self.assertRegex(actual, expected, advice=advice)
 
-    '''  # noqa: E501
+        class SLATestCase(AnnotatedTestCase):
+            """SLATestCase makes sure that SLAs are being met."""
+
+            def setUp(self):
+                setattr(self, 'filename', filename)
+                setattr(self, 'data', data)
+
+            def tearDown(self):
+                delattr(self, 'filename')
+                delattr(self, 'data')
+
+            def test_for_pii(self):
+                advice = ('{_filename} appears to contain SSN(s). '
+                          'Please report this incident to legal and '
+                          'compliance.')
+
+                _filename = self.filename
+
+                data = self.data
+                ssn_regex = '\d{3}-?\d{2}-?\d{4}'
+
+                self.assertNotRegex(data, ssn_regex, advice=advice)
+    '''
 
     failureException = AnnotatedAssertionError
 

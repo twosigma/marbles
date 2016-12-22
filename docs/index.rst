@@ -6,19 +6,15 @@
 Welcome to marbles's documentation!
 ===================================
 
-Contents:
-
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
+   winning
    reference
-
 
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
-

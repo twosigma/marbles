@@ -1,12 +1,9 @@
-=========
-Reference
-=========
+=============
+API Reference
+=============
 
-.. automodule:: marbles
-   :members: AnnotatedTestCase, AnnotatedAssertionError
+.. toctree::
+   :maxdepth: 2
 
-:mod:`marbles.log`
-------------------
-
-.. automodule:: marbles.log
-   :members:
+   marbles
+   mixins

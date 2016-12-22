@@ -32,8 +32,10 @@
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinx.ext.todo',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -118,7 +120,7 @@ pygments_style = 'sphinx'
 # keep_warnings = False
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = False
+todo_include_todos = True
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -343,3 +345,9 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #
 # texinfo_no_detailmenu = False
+
+autodoc_member_order = 'bysource'
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3.5', 'python-inv.txt'),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable', 'pandas-inv.txt')
+}
