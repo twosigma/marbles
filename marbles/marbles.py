@@ -16,10 +16,15 @@ import functools
 import inspect
 import itertools
 import linecache
-import sys
+import logging
 import textwrap
-import traceback
 import unittest
+
+from . import log
+from . import _stack
+
+
+_log = logging.getLogger(__name__)
 
 
 class _StatementFinder(ast.NodeVisitor):
@@ -136,7 +141,7 @@ Advice:
         # (e.g., aggregating and formatting output into a consolidated
         # report)
         annotation, standardMsg = args[0]
-        locals_, filename, linenumber = self._get_stack_info()
+        locals_, filename, linenumber = _stack.get_stack_info()
 
         # When the wrapper in AnnotatedTestCase sees both msg and
         # advice, it bundles msg with advice in order to thread it
@@ -205,26 +210,6 @@ Advice:
         return '\n'.join('\t{0}={1}'.format(k, v) for k, v in locals_.items())
 
     @staticmethod
-    def _get_stack_info():
-        '''Capture locals, filename, and line number from the stacktrace
-        to provide the source of the assertion error and formatted
-        advice.
-        '''
-        tb = traceback.walk_stack(sys._getframe().f_back)
-        stack = traceback.StackSummary.extract(tb, capture_locals=True)
-
-        # We want locals from the test definition (which always begins
-        # with 'test_' in unittest), which will be at a different
-        # level in the stack depending on how many tests are in each
-        # test case, how many test cases there are, etc.
-
-        # The branch where we exhaust this loop is not covered
-        # because we always find a test.
-        for frame in stack:  # pragma: no branch
-            if frame.name.startswith('test_'):
-                return frame.locals.copy(), frame.filename, frame.lineno
-
-    @staticmethod
     def _find_assert_stmt(filename, linenumber, leading=1, following=2):
         '''Given a Python filename and line number, find the lines that
         are a part of the statement containing that line.
@@ -260,10 +245,13 @@ class AnnotationContext(object):
     causing an error there.
     '''
 
-    def __init__(self, case, msg, advice):
-        self._case = case
-        self._msg = msg
-        self._advice = advice
+    def __init__(self, case, assertion, msg, advice, args, kwargs):
+        setattr(self, '_case', case)
+        setattr(self, '_assertion', assertion)
+        setattr(self, '_msg', msg)
+        setattr(self, '_advice', advice)
+        setattr(self, '_args', args)
+        setattr(self, '_kwargs', kwargs)
 
     @staticmethod
     def _validate_annotation(annotation):
@@ -290,6 +278,13 @@ class AnnotationContext(object):
 
     def __exit__(self, *exc_info):
         setattr(self._case, '__current_advice', self._old_advice)
+        if self._old_advice is None:
+            try:
+                log.logger._log_assertion(self._case, self._assertion,
+                                          self._args, self._kwargs, self._msg,
+                                          self._advice, *exc_info)
+            except Exception:
+                _log.exception('Failed to log assertion')
 
 
 def _find_msg_argument(signature):
@@ -403,7 +398,8 @@ class AnnotatedTestCase(unittest.TestCase):
 
             advice = kwargs.pop('advice', None)
 
-            with AnnotationContext(self, msg, advice) as annotation:
+            with AnnotationContext(self, attr, msg, advice,
+                                   list(args) + list(rem_args), kwargs) as annotation:
                 if rem_args:
                     return attr(*args, annotation, *rem_args, **kwargs)
                 return attr(*args, msg=annotation, **kwargs)
@@ -428,7 +424,8 @@ class AnnotatedTestCase(unittest.TestCase):
 
             advice = kwargs.pop('advice', None)
 
-            with AnnotationContext(self, msg, advice) as annotation:
+            with AnnotationContext(self, attr, msg, advice,
+                                   list(args) + list(rem_args), kwargs) as annotation:
                 # Some builtin assertions (like assertIsNotNone)
                 # have already called _formatMessage and pass that
                 # to TestCase.fail, so if what we get is already a
