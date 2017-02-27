@@ -1,3 +1,4 @@
+import datetime
 import io
 import json
 import linecache
@@ -110,7 +111,7 @@ Orleans.'''
 
     def test_locals(self):
         foo = 'bar'  # noqa: F841
-        self.assertTrue(False, advice='some advice about {foo}')
+        self.assertTrue(False, advice='some advice about {foo!r}')
 
     def test_string_equality(self):
         s = ''
@@ -164,7 +165,7 @@ Orleans.'''
     def test_internal_mangled_locals(self):
         _foo = 'bar'  # noqa: F841
         __bar = 'baz'  # noqa: F841
-        self.assertTrue(False, advice='some advice about {_foo}')
+        self.assertTrue(False, advice='some advice about {_foo!r}')
 
     def test_positional_assert_args(self):
         self.assertAlmostEqual(1, 2, 1, 'some message', advice='some advice')
@@ -172,6 +173,18 @@ Orleans.'''
     def test_named_assert_args(self):
         self.assertAlmostEqual(1, 2, places=1, msg='some message',
                                advice='some advice')
+
+    def test_advice_format_strings_attribute_access(self):
+        class Foo(object):
+            answer = 42
+        obj = Foo()
+        advice = 'the answer is {obj.answer}'
+        self.assertTrue(False, advice=advice)
+
+    def test_advice_format_strings_custom_format(self):
+        date = datetime.date(2017, 8, 12)
+        advice = 'the date is {date:%Y%m%d}'
+        self.assertTrue(False, advice=advice)
 
 
 class TestAnnotatedTestCase(unittest.TestCase):
@@ -328,7 +341,7 @@ class TestAnnotationLogging(unittest.TestCase):
             'assertion_class': 'tests.marbles.ReversingTestCaseMixin',
             'args': ['leif', 'leif'],
             'kwargs': [],
-            'locals': [{'key': 's', 'value': "'leif'"}],
+            'locals': [{'key': 's', 'value': 'leif'}],
             'msg': 'some message',
             'advice': 'some advice',
         }
@@ -431,7 +444,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
         e = ar.exception
-        self.assertEqual(e.advice.strip(), 'some advice about \'bar\'')
+        self.assertEqual(e.advice.strip(), "some advice about 'bar'")
 
     def test_assert_raises_without_msg(self):
         '''Do we capture annotations properly for assertRaises?'''
@@ -459,7 +472,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 39)
+        self.assertEqual(e.linenumber, 40)
 
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
@@ -468,11 +481,11 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 113)
+        self.assertEqual(e.linenumber, 114)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''
-        test_linenumber = 39
+        test_linenumber = 40
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
@@ -624,6 +637,16 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             self.assertFalse(local.startswith('_'))
         self.assertEqual(e.advice.strip(), "some advice about 'bar'")
 
+    def test_advice_rich_format_strings(self):
+        with self.assertRaises(AnnotatedAssertionError) as ar:
+            self.case.test_advice_format_strings_attribute_access()
+        e = ar.exception
+        self.assertEqual('the answer is 42', e.advice.strip())
+
+        with self.assertRaises(AnnotatedAssertionError) as ar:
+            self.case.test_advice_format_strings_custom_format()
+        e = ar.exception
+        self.assertEqual('the date is 20170812', e.advice.strip())
 
 if __name__ == '__main__':
     unittest.main()
