@@ -174,6 +174,17 @@ Orleans.'''
         self.assertAlmostEqual(1, 2, places=1, msg='some message',
                                advice='some advice')
 
+    def test_advice_format_strings_list_getitem(self):
+        l = [1, 42, 2]
+        advice = 'the answer is {l[1]}'
+        self.assertTrue(False, advice=advice)
+
+    def test_advice_format_strings_dict_getitem(self):
+        l = {'answer': 42,
+             'query': 'the answer to life, the universe, and everything'}
+        advice = 'the answer is {l[answer]}'
+        self.assertTrue(False, advice=advice)
+
     def test_advice_format_strings_attribute_access(self):
         class Foo(object):
             answer = 42
@@ -640,6 +651,16 @@ class TestAnnotatedAssertionError(unittest.TestCase):
     def test_advice_rich_format_strings(self):
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_advice_format_strings_attribute_access()
+        e = ar.exception
+        self.assertEqual('the answer is 42', e.advice.strip())
+
+        with self.assertRaises(AnnotatedAssertionError) as ar:
+            self.case.test_advice_format_strings_list_getitem()
+        e = ar.exception
+        self.assertEqual('the answer is 42', e.advice.strip())
+
+        with self.assertRaises(AnnotatedAssertionError) as ar:
+            self.case.test_advice_format_strings_dict_getitem()
         e = ar.exception
         self.assertEqual('the answer is 42', e.advice.strip())
 
