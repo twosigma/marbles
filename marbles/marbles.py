@@ -365,11 +365,6 @@ class AnnotatedTestCase(unittest.TestCase):
     formatted with :meth:`str.format` given the local variables
     defined within the test itself.
 
-    .. warning::
-
-        Compound field names and format specifiers are not supported
-        in advice annotation fields.
-
     Every assertion checks to make sure both message and advice are
     provided, and if not, raises an :class:`AnnotationError`.
 
