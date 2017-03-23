@@ -170,6 +170,14 @@ Advice:
 
     @property
     def locals(self):
+        '''Returns a string displaying the public (a.k.a., not internal
+        or name-mangled) locals defined within the test.
+
+        .. note:
+
+           The public local variables ``self`` and ``advice`` are
+           also excluded.
+        '''
         return self._locals
 
     @property
@@ -370,42 +378,7 @@ class AnnotatedTestCase(unittest.TestCase):
 
     Example:
 
-    .. code-block:: py
-
-        import re
-        import unittest
-        from datetime import date, datetime, timedelta
-
-        from marbles import AnnotatedTestCase
-
-
-        filename = 'data.csv'
-        # Fake data that, in the real world, we would read in from data.csv
-        data = '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
-
-
-        class SLATestCase(AnnotatedTestCase):
-            """SLATestCase makes sure that SLAs are being met."""
-
-            def setUp(self):
-                setattr(self, 'filename', filename)
-                setattr(self, 'data', data)
-
-            def tearDown(self):
-                delattr(self, 'filename')
-                delattr(self, 'data')
-
-            def test_for_pii(self):
-                advice = ('{_filename} appears to contain SSN(s). '
-                          'Please report this incident to legal and '
-                          'compliance.')
-
-                _filename = self.filename
-
-                data = self.data
-                ssn_regex = '\d{3}-?\d{2}-?\d{4}'
-
-                self.assertNotRegex(data, ssn_regex, advice=advice)
+    .. literalinclude:: ../examples/sla.py
     '''
 
     failureException = AnnotatedAssertionError
