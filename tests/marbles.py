@@ -1,10 +1,15 @@
+'''Tests about marbles assertions.
+
+Generally, we set up a fake AnnotatedTestCase, run its tests, and
+check whether it responds by raising the right AnnotatedAssertionError
+with fields filled in.
+'''
+
 import datetime
 import io
-import json
 import linecache
 import logging
 import os
-import tempfile
 import unittest
 
 from marbles import (
@@ -32,6 +37,8 @@ class ExampleAnnotatedTestCase(
         ReversingTestCaseMixin,
         OddArgumentOrderTestCaseMixin,
         AnnotatedTestCase):
+
+    longMessage = 'This is a long message'
 
     def test_success(self):
         self.assertTrue(True, advice='some advice')
@@ -329,11 +336,13 @@ class TestAnnotatedTestCase(unittest.TestCase):
             self.case.test_missing_annotation_fail()
 
 
-class TestAnnotationLoggingFailure(unittest.TestCase):
+class TestAssertionLoggingFailure(unittest.TestCase):
 
     def setUp(self):
         self.case = ExampleAnnotatedTestCase()
         self.file_handle = object()
+        self.old_logger = log.logger
+        log.logger = log.AssertionLogger()
         log.logger.configure(logfile=self.file_handle)
         self.log_buffer = io.StringIO()
         self.handler = logging.StreamHandler(self.log_buffer)
@@ -344,6 +353,8 @@ class TestAnnotationLoggingFailure(unittest.TestCase):
     def tearDown(self):
         self.logger.propagate = True
         self.logger.removeHandler(self.handler)
+        log.logger = self.old_logger
+        delattr(self, 'old_logger')
         delattr(self, 'logger')
         delattr(self, 'handler')
         delattr(self, 'log_buffer')
@@ -356,131 +367,6 @@ class TestAnnotationLoggingFailure(unittest.TestCase):
         self.case.test_success()
         self.assertIn("'object' object has no attribute 'write'",
                       self.log_buffer.getvalue())
-
-
-class TestAnnotationLogging(unittest.TestCase):
-
-    def setUp(self):
-        self.case = ExampleAnnotatedTestCase()
-        self.file_handle = io.StringIO()
-        log.logger.configure(logfile=self.file_handle)
-
-    def tearDown(self):
-        log.logger.configure(logfile=None)
-        delattr(self, 'file_handle')
-        delattr(self, 'case')
-
-    def test_success(self):
-        '''On a successful assertion, do we log information?'''
-        self.case.test_success()
-        log = self.file_handle.getvalue()
-        lines = [line for line in log.split('\n') if len(line) > 0]
-        self.assertEqual(len(lines), 1)
-        obj = json.loads(lines[0])
-        expected = {
-            'file': __file__,
-            'assertion': 'assertTrue',
-            'args': ['True'],
-            'kwargs': [],
-            'locals': [],
-            'msg': None,
-            'advice': 'some advice',
-        }
-        self.assertEqual({k: v for k, v in obj.items() if k in expected},
-                         expected)
-
-    def test_failure(self):
-        '''On a failed assertion, do we log information?'''
-        with self.assertRaises(AnnotatedAssertionError):
-            self.case.test_reverse_equality_positional_msg()
-        log = self.file_handle.getvalue()
-        lines = [line for line in log.split('\n') if len(line) > 0]
-        self.assertEqual(len(lines), 1)
-        obj = json.loads(lines[0])
-        expected = {
-            'file': __file__,
-            'assertion': 'assertReverseEqual',
-            'assertion_class': 'tests.marbles.ReversingTestCaseMixin',
-            'args': ['leif', 'leif'],
-            'kwargs': [],
-            'locals': [{'key': 's', 'value': 'leif'}],
-            'msg': 'some message',
-            'advice': 'some advice',
-        }
-        self.assertEqual({k: v for k, v in obj.items() if k in expected},
-                         expected)
-
-
-class TestAnnotationLoggingAttributeCapture(unittest.TestCase):
-
-    def setUp(self):
-        self.case = ExampleAnnotatedTestCase()
-        _, self.tempfilename = tempfile.mkstemp()
-        log.logger.configure(logfile=self.tempfilename)
-        log.logger.configure(attrs=['longMessage'])
-
-    def tearDown(self):
-        log.logger.configure(logfile=None, attrs=[])
-        os.remove(self.tempfilename)
-        delattr(self, 'tempfilename')
-        delattr(self, 'case')
-
-    def test_capture_test_case_attributes(self):
-        '''Can we capture other attributes of a TestCase?'''
-        self.case.test_success()
-        log.logger.configure(logfile=None)  # force logfile to close and flush
-        with open(self.tempfilename, 'r') as f:
-            lines = [line for line in f.readlines() if len(line) > 0]
-        self.assertEqual(len(lines), 1)
-        obj = json.loads(lines[0])
-        expected = {
-            'assertion': 'assertTrue'
-        }
-        self.assertEqual({k: v for k, v in obj.items() if k in expected},
-                         expected)
-
-
-class TestAnnotationLoggingAttributeCaptureEnvVars(unittest.TestCase):
-
-    def setUp(self):
-        self.case = ExampleAnnotatedTestCase()
-        _, self.tempfilename = tempfile.mkstemp()
-
-        old_logfile = os.environ.get('MARBLES_LOGFILE')
-        old_attrs = os.environ.get('MARBLES_TEST_CASE_ATTRS')
-
-        os.environ['MARBLES_LOGFILE'] = self.tempfilename
-        os.environ['MARBLES_TEST_CASE_ATTRS'] = 'longMessage'
-        log.logger = log.AssertionLogger()
-
-        if old_logfile:
-            os.environ['MARBLES_LOGFILE'] = old_logfile
-        else:
-            del os.environ['MARBLES_LOGFILE']
-        if old_attrs:
-            os.environ['MARBLES_TEST_CASE_ATTRS'] = old_attrs
-        else:
-            del os.environ['MARBLES_TEST_CASE_ATTRS']
-
-    def tearDown(self):
-        log.logger.configure(logfile=None, attrs=[])
-        os.remove(self.tempfilename)
-        delattr(self, 'tempfilename')
-        delattr(self, 'case')
-
-    def test_capture_test_case_attributes(self):
-        '''Can we configure assertion logging with environment vars?'''
-        self.case.test_success()
-        log.logger.configure(logfile=None)  # force logfile to close and flush
-        with open(self.tempfilename, 'r') as f:
-            lines = [line for line in f.readlines() if len(line) > 0]
-        self.assertEqual(len(lines), 1)
-        obj = json.loads(lines[0])
-        expected = {
-            'assertion': 'assertTrue'
-        }
-        self.assertEqual({k: v for k, v in obj.items() if k in expected},
-                         expected)
 
 
 class TestAnnotatedAssertionError(unittest.TestCase):
@@ -534,7 +420,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 40)
+        self.assertEqual(e.linenumber, 47)
 
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
@@ -543,11 +429,11 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 165)
+        self.assertEqual(e.linenumber, 172)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''
-        test_linenumber = 40
+        test_linenumber = 47
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
@@ -566,7 +452,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_assert_stmt_surrounding_lines(self):
         '''Does _find_assert_stmt read surrounding lines from the file?'''
-        test_linenumber = 5
+        test_linenumber = 47
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
@@ -743,6 +629,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             self.case.test_advice_format_strings_custom_format()
         e = ar.exception
         self.assertEqual('the date is 20170812', e.advice.strip())
+
 
 if __name__ == '__main__':
     unittest.main()

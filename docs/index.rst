@@ -10,6 +10,7 @@ Welcome to marbles's documentation!
    :maxdepth: 3
 
    winning
+   logging
    reference
 
 
