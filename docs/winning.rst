@@ -286,7 +286,7 @@ What does bad advice look like? Let's use a `file`_ example. This example uses a
 This will give the following output on failure:
 
 .. code-block:: bash
-   :linenos:
+   :emphasize-lines: 23, 25
 
     F
     ======================================================================
@@ -315,7 +315,7 @@ This will give the following output on failure:
             data directory /home/user/data/ to see if any other files
             are missing.
 
-The beginning of line 23 just restates the standard message on line 14 and so is a waste of the test consumer's time. Line 25 contains the path to the data directory `on the test author's machine`; the relevant directory might be somewhere completely different on the test consumer's machine, so this information won't help them find the missing file.
+Firstly, the beginning of the advice just restates the standard message and so is a waste of the test consumer's time. Also, the recommended action contains the path to the data directory `on the test author's machine`; the relevant directory might be somewhere completely different on the test consumer's machine, so this information won't help them find the missing file.
 
 
 Dynamic Advice
@@ -352,32 +352,7 @@ These assertions would accept different advice annotations, each of which would 
 In this example, we'd want to test for the most severe failure first; 2 and 3 would also fail if 1 fails, but the correct action to take is the action specified in the advice provided to the 1st assertion, so that is the advice that we want the test consumer to see.
 
 
-.. code-block:: python
-   
-    import collections
-
-    import marbles
-    import numpy as np
-
-    class TestCase(marbles.AnnotatedTestCase):
-
-        def test_month_to_month_changes(self):
-            mtm_change = ((current - historic) / historic) * 100
-            expectation = 10.
-
-            # We use an OrderedDict to ensure that the most severe failure
-            # is tested first; this could also be accomplished outside of
-            # a for loop.
-            params = collections.OrderedDict(
-                (10, 'Stop all processes using these data.'),
-                (2, 'File a JIRA with the data provider.'),
-                (1, 'Continue to monitor this test over the next month.')
-            )
-
-            for severity, advice in params.items():
-                self.assertLessEqual(np.abs(mtm_change),
-                                     expectation * severity,
-                                     advice=advice)
+.. literalinclude:: ../examples/severity.py
 
 
 If you want the test consumer to have the advice for each severity level (i.e., you've written advice that builds naturally on itself with severity), you could loop through the severity assertions using :ref:`subtests <python:subtests>` instead of a ``for`` loop.
