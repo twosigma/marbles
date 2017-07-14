@@ -17,6 +17,8 @@ import inspect
 import itertools
 import linecache
 import logging
+import pdb
+import re
 import textwrap
 import unittest
 
@@ -25,6 +27,41 @@ from . import _stack
 
 
 _log = logging.getLogger(__name__)
+
+
+# We subclass TextWrapper (instead of just writing a wrap()
+# function) because we ultimately use TextWrapper.fill() to
+# return the advice as a wrapped string.
+class _AdviceWrapper(textwrap.TextWrapper):
+
+    def wrap(self, text, **kwargs):
+        '''Wraps each paragraph in ``text`` individually.
+
+        Parameters
+        ----------
+        text : str
+
+        Returns
+        -------
+        str
+            Single string containing the wrapped paragraphs.
+        '''
+        pilcrow = re.compile(r'(\n\s*\n)', re.MULTILINE)
+        list_prefix = re.compile(r'\s*(?:\w|[0-9]+)[\.\)]\s+')
+
+        paragraphs = pilcrow.split(text)
+        wrapped_lines = []
+        for paragraph in paragraphs:
+            if paragraph.isspace():
+                wrapped_lines.append('')
+            else:
+                wrapper = textwrap.TextWrapper(**vars(self))
+                list_item = re.match(list_prefix, paragraph)
+                if list_item:
+                    wrapper.subsequent_indent += ' ' * len(list_item.group(0))
+                wrapped_lines.extend(wrapper.wrap(paragraph))
+
+        return wrapped_lines
 
 
 class _StatementFinder(ast.NodeVisitor):
@@ -164,9 +201,11 @@ Advice:
     @property
     def advice(self):
         formatted_advice = self._advice.format(**self.locals)
-        return textwrap.fill(formatted_advice, width=72,
-                             break_long_words=False, initial_indent='\t',
-                             subsequent_indent='\t')
+        wrapper = _AdviceWrapper(width=72,
+                                 break_long_words=False,
+                                 initial_indent='\t',
+                                 subsequent_indent='\t')
+        return wrapper.fill(formatted_advice)
 
     @property
     def locals(self):

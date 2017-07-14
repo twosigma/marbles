@@ -92,6 +92,57 @@ cane-cut marble industry. An early example, dated between 1850 and
 Orleans.'''
         self.assertTrue(False, advice=advice)
 
+    def test_multi_paragraphs_in_advice(self):
+        advice = '''
+Onionskins - Although this cane-cut swirl usually has at its center a
+clear glass core, it appears solidly colored because the clear core is
+covered by a thin layer of opaque color and then covered again by a
+thin layer of clear glass. Extremely popular and highly prized,
+onionskins take their name from the layering of glass, like layers of
+an onion.
+
+In contrast to end of day marbles, onion skins have two pontils. The
+base color, usually white or yellow, was applied by rolling clear glass
+marble in powdered glass. Accent colors were added by rolling the
+heated piece over fragments of crashed glass, creating the speckled
+effect.
+
+There are various types of onionskins: single color, speckled, and
+segmented. Sometimes mica was added to the glass, thus increasing its
+value. Onionskins were known to exist from the beginning of the
+cane-cut marble industry. An early example, dated between 1850 and 1860
+was unearthed in the excavation of an old privy in New Orleans.'''
+        self.assertTrue(False, advice=advice)
+
+    def test_list_in_advice(self):
+        advice = '''
+There are various types of onionskins:
+
+    1. single color,
+
+    2. speckled,
+
+    3. and segmented.
+
+    42. Sometimes mica was added to the glass, thus increasing its
+value. Onionskins were known to exist from the beginning of the cane-
+cut marble industry. An early example, dated between 1850 and 1860 was
+unearthed in the excavation of an old privy in New Orleans.
+
+There are various types of onionskins:
+
+    a) single color,
+
+    b) speckled,
+
+    c) and segmented.
+
+    d) Sometimes mica was added to the glass, thus increasing its
+value. Onionskins were known to exist from the beginning of the cane-
+cut marble industry. An early example, dated between 1850 and 1860 was
+unearthed in the excavation of an old privy in New Orleans.'''
+        self.assertTrue(False, advice=advice)
+
     def test_assert_raises_success(self):
         with self.assertRaises(Exception, advice='undead advice'):
             raise Exception()
@@ -483,7 +534,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 40)
+        self.assertEqual(e.linenumber, 41)
 
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
@@ -492,11 +543,11 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 114)
+        self.assertEqual(e.linenumber, 166)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''
-        test_linenumber = 40
+        test_linenumber = 41
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
@@ -541,6 +592,30 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         e = ar.exception
         lines = e.advice.split('\n')
         self.assertTrue(any(len(line) > 75 for line in lines))
+
+        with self.assertRaises(AnnotatedAssertionError) as ar:
+            self.case.test_multi_paragraphs_in_advice()
+        e = ar.exception
+        paragraphs = e.advice.split('\n\n')
+        self.assertGreater(len(paragraphs), 1)
+        for paragraph in paragraphs:
+            for line in paragraph.split('\n'):
+                self.assertLess(len(line), 75)
+                self.assertTrue(line.startswith('\t'))
+
+        with self.assertRaises(AnnotatedAssertionError) as ar:
+            self.case.test_list_in_advice()
+        e = ar.exception
+        lines = e.advice.split('\n')
+        for line in lines:
+            self.assertLess(len(line), 75)
+        list_lines = [2, 4, 6, 8, 16, 18, 20, 22]
+        for list_line in list_lines:
+            self.assertTrue(lines[list_line].startswith('\t    '))
+        #  Hanging indent for both numbered and lettered lists
+        #  with period or parenthesis
+        self.assertTrue(lines[9].startswith('\t       '))
+        self.assertTrue(lines[23].startswith('\t       '))
 
     def test_positional_assert_args(self):
         '''Is annotation captured correctly when using positional arguments?'''
