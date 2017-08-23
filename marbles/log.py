@@ -194,10 +194,11 @@ class AssertionLogger(object):
             return
 
         now = datetime.datetime.now()
-        locals_, filename, lineno = _stack.get_stack_info()
+        locals_, module, filename, lineno = _stack.get_stack_info()
         passed = exc_info[0] is None
         doc = {
             'case': str(case),
+            'module': module,
             'file': filename,
             'line': lineno,
             'assertion': assertion.__name__,

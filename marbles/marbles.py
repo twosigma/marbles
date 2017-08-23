@@ -18,6 +18,7 @@ import itertools
 import linecache
 import logging
 import re
+import sys
 import textwrap
 import unittest
 
@@ -179,7 +180,7 @@ Advice:
         # (e.g., aggregating and formatting output into a consolidated
         # report)
         annotation, standardMsg = args[0]
-        locals_, filename, linenumber = _stack.get_stack_info()
+        locals_, module, filename, linenumber = _stack.get_stack_info()
 
         # When the wrapper in AnnotatedTestCase sees both msg and
         # advice, it bundles msg with advice in order to thread it
@@ -192,6 +193,7 @@ Advice:
         setattr(self, '_advice', annotation['advice'])
         setattr(self, 'standardMsg', msg)
         setattr(self, '_locals', locals_)
+        setattr(self, '_module', module)
         setattr(self, '_filename', filename)
         setattr(self, '_linenumber', linenumber)
 
@@ -219,6 +221,10 @@ Advice:
         return self._locals
 
     @property
+    def module(self):
+        return self._module
+
+    @property
     def filename(self):
         return self._filename
 
@@ -231,9 +237,24 @@ Advice:
         '''Returns a string displaying the whole statement that failed,
         with a '>' indicator on the line starting the expression.
         '''
-        line_range, lineno = self._find_assert_stmt(self.filename,
-                                                    self.linenumber)
-        source = [linecache.getline(self.filename, x) for x in line_range]
+        # This will be used by linecache to read the source of this
+        # module. See the docstring for _find_assert_stmt below which
+        # explains how.
+        #
+        # We don't have a test for this because automating the
+        # creation of an egg, installation into an environment,
+        # running of tests, and verification that marbles found the
+        # right source and was able to print it is a lot of
+        # automation. We have tested manually, and marbles works with
+        # all check installation mechanisms we know of right now
+        # (setup.py install, setup.py develop, pip install, bdist_egg,
+        # bdist_wheel).
+        module_globals = vars(sys.modules[self.module])
+        line_range, lineno = self._find_assert_stmt(
+            self.filename, self.linenumber, module_globals=module_globals)
+        source = [linecache.getline(self.filename, x,
+                                    module_globals=module_globals)
+                  for x in line_range]
 
         # Dedent the source, removing the final newline added by dedent
         dedented_lines = textwrap.dedent(''.join(source)).split('\n')[:-1]
@@ -258,9 +279,10 @@ Advice:
         return '\n'.join('\t{0}={1}'.format(k, v) for k, v in locals_.items())
 
     @staticmethod
-    def _find_assert_stmt(filename, linenumber, leading=1, following=2):
-        '''Given a Python filename and line number, find the lines that
-        are a part of the statement containing that line.
+    def _find_assert_stmt(filename, linenumber, leading=1, following=2,
+                          module_globals=None):
+        '''Given a Python module name, filename and line number, find the
+        lines that are a part of the statement containing that line.
 
         Python stacktraces, when reporting which line they're on, always
         show the last line of the statement. This can be confusing if
@@ -271,8 +293,15 @@ Advice:
         Returns a tuple of the range of lines spanned by the source
         being returned, the number of the line on which the interesting
         statement starts.
+
+        We may need the ``module_globals`` in order to tell
+        :mod:`linecache` how to find the file, if it comes from inside
+        an egg. In that case, ``module_globals`` should contain a key
+        ``__loader__`` which knows how to read from that file.
         '''
-        _source = ''.join(linecache.getlines(filename))
+        lines = linecache.getlines(
+            filename, module_globals=module_globals)
+        _source = ''.join(lines)
         _tree = ast.parse(_source)
 
         finder = _StatementFinder(linenumber)

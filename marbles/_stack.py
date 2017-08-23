@@ -3,8 +3,9 @@ import traceback
 
 
 def get_stack_info():
-    '''Capture locals, filename, and line number from the stacktrace to
-    provide the source of the assertion error and formatted advice.
+    '''Capture locals, module name, filename, and line number from the
+    stacktrace to provide the source of the assertion error and
+    formatted advice.
     '''
     stack = traceback.walk_stack(sys._getframe().f_back)
 
@@ -18,4 +19,5 @@ def get_stack_info():
     for frame, _ in stack:  # pragma: no branch
         code = frame.f_code
         if code.co_name.startswith('test_'):
-            return frame.f_locals.copy(), code.co_filename, frame.f_lineno
+            return (frame.f_locals.copy(), frame.f_globals['__name__'],
+                    code.co_filename, frame.f_lineno)
