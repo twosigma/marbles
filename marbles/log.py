@@ -71,11 +71,11 @@ class AssertionLogger(object):
 
     .. code-block:: py
 
-       from marbles.log import logger
+       from marbles import log
 
        if __name__ == '__main__':
-           logger.configure(logfile='/path/to/marbles.log',
-                            attrs=['filename', 'category'])
+           log.logger.configure(logfile='/path/to/marbles.log',
+                                attrs=['filename', 'category'])
            unittest.main()
     '''
 

@@ -26,11 +26,11 @@ about which :class:`~unittest.TestCase` attributes it should log.
 
 You can do this in your test suite's ``__main__`` module::
 
-   from marbles.log import logger
+   from marbles import log
 
    if __name__ == '__main__':
-       logger.configure(logfile='/path/to/marbles.log',
-                        attrs=['filename', 'category'])
+       log.logger.configure(logfile='/path/to/marbles.log',
+                            attrs=['filename', 'category'])
        unittest.main()
 
 You can also override the logging configuration using environment
