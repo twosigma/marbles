@@ -1,3 +1,14 @@
+#
+#       Copyright (c) 2017 Two Sigma Investments, LP
+#       All Rights Reserved
+#
+#       THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF
+#       Two Sigma Investments, LP.
+#
+#       The copyright notice above does not evidence any
+#       actual or intended publication of such source code.
+#
+
 ''':mod:`marbles` can log information about each assertion called.
 
 If configured, the :data:`marbles.log.logger` will log a json object

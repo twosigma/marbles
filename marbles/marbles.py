@@ -1,3 +1,14 @@
+#
+#       Copyright (c) 2017 Two Sigma Investments, LP
+#       All Rights Reserved
+#
+#       THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF
+#       Two Sigma Investments, LP.
+#
+#       The copyright notice above does not evidence any
+#       actual or intended publication of such source code.
+#
+
 '''Extends :mod:`unittest` functionality by augmenting the way failed
 assertions are handled to provide more actionable failure information
 to the test consumer.
