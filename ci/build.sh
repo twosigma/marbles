@@ -8,3 +8,4 @@ python -m coverage run setup.py test
 python -m coverage html
 python -m coverage xml
 python setup.py build_sphinx
+conda build --python "${PYTHON_VERSION}" recipe

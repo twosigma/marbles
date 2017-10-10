@@ -1,0 +1,32 @@
+package:
+  name: marbles
+  version: {{ environ.get('GIT_DESCRIBE_TAG', '') }}
+
+source:
+  git_url: ../
+
+build:
+  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+  script: python setup.py install --single-version-externally-managed --record installed-files
+
+requirements:
+  build:
+    - coverage
+    - flake8
+    - python
+    - setuptools
+    - sphinx
+    - sphinx_rtd_theme
+  run:
+    - python
+    - pandas
+
+test:
+  imports:
+    - marbles
+    - marbles.mixins
+    - marbles.log
+
+about:
+  home: https://gitlab.twosigma.com/jane/marbles
+  summary: A unittest extension that provides additional information on test failure
