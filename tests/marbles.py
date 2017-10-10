@@ -431,7 +431,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 47)
+        self.assertEqual(e.linenumber, 58)
 
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_locals()
@@ -440,11 +440,11 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 172)
+        self.assertEqual(e.linenumber, 183)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''
-        test_linenumber = 47
+        test_linenumber = 58
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
@@ -463,7 +463,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_assert_stmt_surrounding_lines(self):
         '''Does _find_assert_stmt read surrounding lines from the file?'''
-        test_linenumber = 47
+        test_linenumber = 58
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(AnnotatedAssertionError) as ar:
             self.case.test_failure()
