@@ -1,3 +1,5 @@
+import unittest
+
 import marbles
 import numpy as np
 
@@ -29,3 +31,7 @@ class TestCase(marbles.AnnotatedTestCase):
             self.assertLessEqual(np.abs(mtm_change),
                                  expectation * severity,
                                  advice=advice)
+
+
+if __name__ == '__main__':
+    unittest.main()
