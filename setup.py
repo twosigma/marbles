@@ -14,8 +14,19 @@ setup(
     test_suite='tests',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    setup_requires=['Sphinx', 'sphinx_rtd_theme'],
-    description=('a small unittest extension that provides additional '
+    setup_requires=[
+        'coverage',
+        'flake8',
+        'Sphinx',
+        'sphinx_rtd_theme'
+    ],
+    install_requires=[
+        'pandas<=0.20.3,>=0.19.1'
+    ],
+    tests_require=[
+        'coverage'
+    ],
+    description=('A unittest extension that provides additional '
                  'information on test failure'),
     long_description=readme(),
     author=['Jane Adams', 'Leif Walsh'],
