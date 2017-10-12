@@ -27,6 +27,12 @@ You can also install `marbles` directly from GitLab:
 pip install git+https://gitlab.twosigma.com/jane/marbles@<version tag>
 ```
 
+You can also install `marbles` with conda:
+
+```bash
+conda install marbles
+```
+
 # Developing
 
 Create a conda environment and do a development install into it
@@ -91,6 +97,8 @@ Once this tag exists, future package and documentation builds will automatically
 ```bash
 pip install git+https://gitlab.twosigma.com/jane/marbles@0.6.9
 ```
+
+After tagging, you can release a new conda package with [Jenkins](http://tsmerejenkins.app.twosigma.com:8080/job/Datanomics/job/marbles/job/release/).
 
 Other projects can depend on `marbles` using `dependency_links`:
 
