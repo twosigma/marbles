@@ -91,6 +91,16 @@ class BetweenMixins(abc.ABC):
         This is equivalent to ``self.assertTrue(lower < obj < upper)``
         or ``self.assertTrue(lower <= obj <= upper)``, but with a nicer
         default message.
+
+        Parameters
+        ----------
+        obj
+        lower
+        upper
+        strict : bool
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
         '''
         if strict:
             standardMsg = '%s is not strictly between %s and %s' % (
@@ -112,6 +122,22 @@ class BetweenMixins(abc.ABC):
         This is equivalent to ``self.assertFalse(lower < obj < upper)``
         or ``self.assertFalse(lower <= obj <= upper)``, but with a
         nicer default message.
+
+        Raises
+        ------
+        ValueError
+            If ``lower`` equals ``upper`` and ``strict=True`` is
+            specified.
+
+        Parameters
+        ----------
+        obj
+        lower
+        upper
+        strict : bool
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
         '''
         if strict:
             standardMsg = '%s is between %s and %s' % (obj, lower, upper)
@@ -162,6 +188,19 @@ class MonotonicMixins(abc.ABC):
 
             assert all((i < j) for i, j in zip(sequence, sequence[1:]))
             assert all((i <= j) for i, j in zip(sequence, sequence[1:]))
+
+        Parameters
+        ----------
+        sequence : iterable
+        strict : bool
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -191,6 +230,19 @@ class MonotonicMixins(abc.ABC):
 
             assert not all((i < j) for i, j in zip(sequence, sequence[1:]))
             assert not all((i <= j) for i, j in zip(sequence, sequence[1:]))
+
+        Parameters
+        ----------
+        sequence : iterable
+        strict : bool
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -220,6 +272,19 @@ class MonotonicMixins(abc.ABC):
 
             assert all((i > j) for i, j in zip(sequence, sequence[1:]))
             assert all((i >= j) for i, j in zip(sequence, sequence[1:]))
+
+        Parameters
+        ----------
+        sequence : iterable
+        strict : bool
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -249,6 +314,19 @@ class MonotonicMixins(abc.ABC):
 
             assert not all((i > j) for i, j in zip(sequence, sequence[1:]))
             assert not all((i >= j) for i, j in zip(sequence, sequence[1:]))
+
+        Parameters
+        ----------
+        sequence : iterable
+        strict : bool
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -286,7 +364,20 @@ class UniqueMixins(abc.ABC):
         pass  # pragma: no cover
 
     def assertUnique(self, container, msg=None):
-        '''Fail if elements in ``container`` are not unique.'''
+        '''Fail if elements in ``container`` are not unique.
+
+        Parameters
+        ----------
+        container : iterable
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``container`` is not iterable.
+        '''
         if not isinstance(container, collections.Iterable):
             raise TypeError('First argument is not iterable')
 
@@ -302,7 +393,20 @@ class UniqueMixins(abc.ABC):
                 self.fail(self._formatMessage(msg, standardMsg))
 
     def assertNotUnique(self, container, msg=None):
-        '''Fail if elements in ``container`` are unique.'''
+        '''Fail if elements in ``container`` are unique.
+
+        Parameters
+        ----------
+        container : iterable
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``container`` is not iterable.
+        '''
         if not isinstance(container, collections.Iterable):
             raise TypeError('First argument is not iterable')
 
@@ -522,6 +626,13 @@ class FileMixins(abc.ABC):
     def assertFileExists(self, filename, msg=None):
         '''Fail if ``filename`` does not exist as determined by
         ``os.path.isfile(filename)``.
+
+        Parameters
+        ----------
+        filename : str, bytes
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
         '''
         standardMsg = '%s does not exist' % filename
 
@@ -532,6 +643,13 @@ class FileMixins(abc.ABC):
     def assertFileNotExists(self, filename, msg=None):
         '''Fail if ``filename`` exists as determined by
         ``~os.path.isfile(filename)``.
+
+        Parameters
+        ----------
+        filename : str, bytes
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
         '''
         standardMsg = '%s exists' % filename
 
@@ -541,6 +659,20 @@ class FileMixins(abc.ABC):
     def assertFileNameEqual(self, filename, name, msg=None):
         '''Fail if ``filename`` does not have the given ``name`` as
         determined by the ``==`` operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        name : str, byes
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fname = self._get_file_name(filename)
         self.assertEqual(fname, name, msg=msg)
@@ -548,24 +680,81 @@ class FileMixins(abc.ABC):
     def assertFileNameNotEqual(self, filename, name, msg=None):
         '''Fail if ``filename`` has the given ``name`` as determined
         by the ``!=`` operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        name : str, byes
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fname = self._get_file_name(filename)
         self.assertNotEqual(fname, name, msg=msg)
 
     def assertFileNameRegex(self, filename, expected_regex, msg=None):
         '''Fail unless ``filename`` matches ``expected_regex``.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        expected_regex : str, bytes
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fname = self._get_file_name(filename)
         self.assertRegex(fname, expected_regex, msg=msg)
 
     def assertFileNameNotRegex(self, filename, expected_regex, msg=None):
-        '''Fail if ``filename`` matches ``expected_regex``.'''
+        '''Fail if ``filename`` matches ``expected_regex``.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        expected_regex : str, bytes
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
+        '''
         fname = self._get_file_name(filename)
         self.assertNotRegex(fname, expected_regex, msg=msg)
 
     def assertFileTypeEqual(self, filename, extension, msg=None):
         '''Fail if ``filename`` does not have the given ``extension``
         as determined by the ``==`` operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        extension : str, bytes
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         ftype = self._get_file_type(filename)
         self.assertEqual(ftype, extension, msg=msg)
@@ -573,6 +762,20 @@ class FileMixins(abc.ABC):
     def assertFileTypeNotEqual(self, filename, extension, msg=None):
         '''Fail if ``filename`` has the given ``extension`` as
         determined by the ``!=`` operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        extension : str, bytes
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         ftype = self._get_file_type(filename)
         self.assertNotEqual(ftype, extension, msg=msg)
@@ -582,6 +785,20 @@ class FileMixins(abc.ABC):
     def assertFileEncodingEqual(self, filename, encoding, msg=None):
         '''Fail if ``filename`` is not encoded with the given
         ``encoding`` as determined by the '==' operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        encoding : str, bytes
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fencoding = self._get_file_encoding(filename)
 
@@ -597,6 +814,20 @@ class FileMixins(abc.ABC):
     def assertFileEncodingNotEqual(self, filename, encoding, msg=None):
         '''Fail if ``filename`` is encoded with the given ``encoding``
         as determined by the '!=' operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        encoding : str, bytes
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fencoding = self._get_file_encoding(filename)
 
@@ -610,6 +841,20 @@ class FileMixins(abc.ABC):
     def assertFileSizeEqual(self, filename, size, msg=None):
         '''Fail if ``filename`` does not have the given ``size`` as
         determined by the '==' operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        size : int, float
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fsize = self._get_file_size(filename)
         self.assertEqual(fsize, size, msg=msg)
@@ -617,6 +862,20 @@ class FileMixins(abc.ABC):
     def assertFileSizeNotEqual(self, filename, size, msg=None):
         '''Fail if ``filename`` has the given ``size`` as determined
         by the '!=' operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        size : int, float
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fsize = self._get_file_size(filename)
         self.assertNotEqual(fsize, size, msg=msg)
@@ -627,6 +886,22 @@ class FileMixins(abc.ABC):
         determined by their difference rounded to the given number of
         decimal ``places`` (default 7) and comparing to zero, or if
         their difference is greater than a given ``delta``.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        size : int, float
+        places : int
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+        delta : int, float
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fsize = self._get_file_size(filename)
         self.assertAlmostEqual(
@@ -638,6 +913,22 @@ class FileMixins(abc.ABC):
         as determined by their difference rounded to the given number
         ofdecimal ``places`` (default 7) and comparing to zero, or if
         their difference is greater than a given ``delta``.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        size : int, float
+        places : int
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+        delta : int, float
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fsize = self._get_file_size(filename)
         self.assertNotAlmostEqual(
@@ -646,6 +937,20 @@ class FileMixins(abc.ABC):
     def assertFileSizeGreater(self, filename, size, msg=None):
         '''Fail if ``filename``'s size is not greater than ``size`` as
         determined by the '>' operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        size : int, float
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fsize = self._get_file_size(filename)
         self.assertGreater(fsize, size, msg=msg)
@@ -653,6 +958,20 @@ class FileMixins(abc.ABC):
     def assertFileSizeGreaterEqual(self, filename, size, msg=None):
         '''Fail if ``filename``'s size is not greater than or equal to
         ``size`` as determined by the '>=' operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        size : int, float
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fsize = self._get_file_size(filename)
         self.assertGreaterEqual(fsize, size, msg=msg)
@@ -660,6 +979,20 @@ class FileMixins(abc.ABC):
     def assertFileSizeLess(self, filename, size, msg=None):
         '''Fail if ``filename``'s size is not less than ``size`` as
         determined by the '<' operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        size : int, float
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fsize = self._get_file_size(filename)
         self.assertLess(fsize, size, msg=msg)
@@ -667,6 +1000,20 @@ class FileMixins(abc.ABC):
     def assertFileSizeLessEqual(self, filename, size, msg=None):
         '''Fail if ``filename``'s size is not less than or equal to
         ``size`` as determined by the '<=' operator.
+
+        Parameters
+        ----------
+        filename : str, bytes, file-like
+        size : int, float
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a str or bytes object and is not
+            file-like.
         '''
         fsize = self._get_file_size(filename)
         self.assertLessEqual(fsize, size, msg=msg)
@@ -781,6 +1128,19 @@ class CategoricalMixins(abc.ABC):
     def assertCategoricalLevelsEqual(self, levels1, levels2, msg=None):
         '''Fail if ``levels1`` and ``levels2`` do not have the same
         domain.
+
+        Parameters
+        ----------
+        levels1 : iterable
+        levels2 : iterable
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If either ``levels1`` or ``levels2`` is not iterable.
         '''
         if not isinstance(levels1, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -796,7 +1156,21 @@ class CategoricalMixins(abc.ABC):
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertCategoricalLevelsNotEqual(self, levels1, levels2, msg=None):
-        '''Fail if ``levels1`` and ``levels2`` have the same domain.'''
+        '''Fail if ``levels1`` and ``levels2`` have the same domain.
+
+        Parameters
+        ----------
+        levels1 : iterable
+        levels2 : iterable
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If either ``levels1`` or ``levels2`` is not iterable.
+        '''
         if not isinstance(levels1, collections.Iterable):
             raise TypeError('First argument is not iterable')
         if not isinstance(levels2, collections.Iterable):
@@ -818,6 +1192,19 @@ class CategoricalMixins(abc.ABC):
         '''Fail if ``level`` is not in ``levels``.
 
         This is equivalent to ``self.assertIn(level, levels)``.
+
+        Parameters
+        ----------
+        levels1
+        levels2 : iterable
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``levels2`` is not iterable.
         '''
         if not isinstance(levels, collections.Iterable):
             raise TypeError('Second argument is not iterable')
@@ -828,6 +1215,19 @@ class CategoricalMixins(abc.ABC):
         '''Fail if ``level`` is in ``levels``.
 
         This is equivalent to ``self.assertNotIn(level, levels)``.
+
+        Parameters
+        ----------
+        levels1
+        levels2 : iterable
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``levels2`` is not iterable.
         '''
         if not isinstance(levels, collections.Iterable):
             raise TypeError('Second argument is not iterable')
@@ -867,6 +1267,26 @@ class DateTimeMixins(abc.ABC):
         are strictly less than ``target``. If ``strict=False``, fail
         unless all elements in ``sequence`` are less than or equal to
         ``target``.
+
+        Parameters
+        ----------
+        sequence : iterable
+        target : datetime, date, iterable
+        strict : bool
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
+        ValueError
+            If ``target`` is iterable but does not have the same length
+            as ``sequence``.
+        TypeError
+            If ``target`` is not a datetime or date object and is not
+            iterable.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -907,6 +1327,26 @@ class DateTimeMixins(abc.ABC):
         are strictly greater than ``target``. If ``strict=False``,
         fail unless all elements in ``sequence`` are greater than or
         equal to ``target``.
+
+        Parameters
+        ----------
+        sequence : iterable
+        target : datetime, date, iterable
+        strict : bool
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
+        ValueError
+            If ``target`` is iterable but does not have the same length
+            as ``sequence``.
+        TypeError
+            If ``target`` is not a datetime or date object and is not
+            iterable.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -949,6 +1389,22 @@ class DateTimeMixins(abc.ABC):
         If ``strict=False``, fail unless all elements in ``sequence``
         are less than or equal to ``date.today()`` (or
         ``datetime.now()``).
+
+        Parameters
+        ----------
+        sequence : iterable
+        strict : bool
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
+        TypeError
+            If max element in ``sequence`` is not a datetime or date
+            object.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -976,6 +1432,22 @@ class DateTimeMixins(abc.ABC):
         (or ``datetime.now()``).  If ``strict=False``, fail all
         elements in ``sequence`` are greater than or equal to
         ``date.today()`` (or ``datetime.now()``).
+
+        Parameters
+        ----------
+        sequence : iterable
+        strict : bool
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
+        TypeError
+            If min element in ``sequence`` is not a datetime or date
+            object.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -994,6 +1466,21 @@ class DateTimeMixins(abc.ABC):
     def assertDateTimesFrequencyEqual(self, sequence, frequency, msg=None):
         '''Fail if any elements in ``sequence`` aren't separated by
         the expected ``fequency``.
+
+        Parameters
+        ----------
+        sequence : iterable
+        frequency : timedelta
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
+        TypeError
+            If ``frequency`` is not a timedelta object.
         '''
         # TODO (jsa): check that elements in sequence are dates or
         # datetimes, keeping in mind that sequence may contain null
@@ -1023,6 +1510,24 @@ class DateTimeMixins(abc.ABC):
 
         This is equivalent to
         ``self.assertEqual(present - max(sequence), lag)``.
+
+        Parameters
+        ----------
+        sequence : iterable
+        lag : timedelta
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
+        TypeError
+            If ``lag`` is not a timedelta object.
+        TypeError
+            If max element in ``sequence`` is not a datetime or date
+            object.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -1051,6 +1556,24 @@ class DateTimeMixins(abc.ABC):
 
         This is equivalent to
         ``self.assertLess(present - max(sequence), lag)``.
+
+        Parameters
+        ----------
+        sequence : iterable
+        lag : timedelta
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
+        TypeError
+            If ``lag`` is not a timedelta object.
+        TypeError
+            If max element in ``sequence`` is not a datetime or date
+            object.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -1079,6 +1602,24 @@ class DateTimeMixins(abc.ABC):
 
         This is equivalent to
         ``self.assertLessEqual(present - max(sequence), lag)``.
+
+        Parameters
+        ----------
+        sequence : iterable
+        lag : timedelta
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``sequence`` is not iterable.
+        TypeError
+            If ``lag`` is not a timedelta object.
+        TypeError
+            If max element in ``sequence`` is not a datetime or date
+            object.
         '''
         if not isinstance(sequence, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -1097,14 +1638,40 @@ class DateTimeMixins(abc.ABC):
         self.assertLessEqual(target - max(sequence), lag, msg=msg)
 
     def assertTimeZoneIsNone(self, dt, msg=None):
-        '''Fail if ``dt`` has a non-null ``tzinfo`` attribute.'''
+        '''Fail if ``dt`` has a non-null ``tzinfo`` attribute.
+
+        Parameters
+        ----------
+        dt : datetime
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``dt`` is not a datetime object.
+        '''
         if not isinstance(dt, datetime):
             raise TypeError('First argument is not a datetime object')
 
         self.assertIsNone(dt.tzinfo, msg=msg)
 
     def assertTimeZoneIsNotNone(self, dt, msg=None):
-        '''Fail unless ``dt`` has a non-null ``tzinfo`` attribute.'''
+        '''Fail unless ``dt`` has a non-null ``tzinfo`` attribute.
+
+        Parameters
+        ----------
+        dt : datetime
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``dt`` is not a datetime object.
+        '''
         if not isinstance(dt, datetime):
             raise TypeError('First argument is not a datetime object')
 
@@ -1112,7 +1679,23 @@ class DateTimeMixins(abc.ABC):
 
     def assertTimeZoneEqual(self, dt, tz, msg=None):
         '''Fail unless ``dt``'s ``tzinfo`` attribute equals ``tz`` as
-        determined by the '==' operator.'''
+        determined by the '==' operator.
+
+        Parameters
+        ----------
+        dt : datetime
+        tz : timezone
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``dt`` is not a datetime object.
+        TypeError
+            If ``tz`` is not a timezone object.
+        '''
         if not isinstance(dt, datetime):
             raise TypeError('First argument is not a datetime object')
         if not isinstance(tz, timezone):
@@ -1123,6 +1706,21 @@ class DateTimeMixins(abc.ABC):
     def assertTimeZoneNotEqual(self, dt, tz, msg=None):
         '''Fail if ``dt``'s ``tzinfo`` attribute equals ``tz`` as
         determined by the '!=' operator.
+
+        Parameters
+        ----------
+        dt : datetime
+        tz : timezone
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``dt`` is not a datetime object.
+        TypeError
+            If ``tz`` is not a timezone object.
         '''
         if not isinstance(dt, datetime):
             raise TypeError('First argument is not a datetime object')
@@ -1187,6 +1785,20 @@ class DataFrameMixins(abc.ABC):
         that do not appear the same number of times in the other
         :class:`~pandas:pandas.DataFrame`, they are considered not
         equal.
+
+        Parameters
+        ----------
+        df1 : pandas.DataFrame
+        df2 : pandas.DataFrame
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If either ``df1`` or ``df2`` is not a
+            :class:`~pandas:pandas.DataFrame`.
         '''
         if not isinstance(df1, pd.DataFrame):
             raise TypeError('First argument is not a DataFrame')
@@ -1227,6 +1839,20 @@ class DataFrameMixins(abc.ABC):
         that do not appear the same number of times in the other
         :class:`~pandas:pandas.DataFrame`, they are considered not
         equal.
+
+        Parameters
+        ----------
+        df1 : pandas.DataFrame
+        df2 : pandas.DataFrame
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If either ``df1`` or ``df2`` is not a
+            :class:`~pandas:pandas.DataFrame`.
         '''
         if not isinstance(df1, pd.DataFrame):
             raise TypeError('First argument is not a DataFrame')
@@ -1252,6 +1878,20 @@ class DataFrameMixins(abc.ABC):
 
         If ``df2`` has rows that do not appear in ``df1``, it is
         considered not a subset.
+
+        Parameters
+        ----------
+        df1 : pandas.DataFrame
+        df2 : pandas.DataFrame
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If either ``df1`` or ``df2`` is not a
+            :class:`~pandas:pandas.DataFrame`.
         '''
         if not isinstance(df1, pd.DataFrame):
             raise TypeError('First argument is not a DataFrame')
@@ -1285,6 +1925,21 @@ class DataFrameMixins(abc.ABC):
         If any columns in ``schema`` do not appear in ``df``, this will
         automatically fail. Similarly, if any columns appear in ``df``
         that do not appear in ``schema``, this will automatically fail.
+
+        Parameters
+        ----------
+        df1 : pandas.DataFrame
+        schema : dict
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``df1`` is not a :class:`~pandas:pandas.DataFrame`.
+        TypeError
+            If ``schema`` is not a dict.
         '''
         if not isinstance(df, pd.DataFrame):
             raise TypeError('First argument is not a DataFrame')
@@ -1316,6 +1971,21 @@ class DataFrameMixins(abc.ABC):
 
         If any columns in ``schema`` do not appear in ``df``, this
         will automatically fail.
+
+        Parameters
+        ----------
+        df1 : pandas.DataFrame
+        schema : dict
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``df1`` is not a :class:`~pandas:pandas.DataFrame`.
+        TypeError
+            If ``schema`` is not a dict.
         '''
         if not isinstance(df, pd.DataFrame):
             raise TypeError('First argument is not a DataFrame')
@@ -1359,6 +2029,19 @@ class PanelMixins(abc.ABC):
     def assertPanelMembersEqual(self, panel1, panel2, msg=None):
         '''Fail if ``panel1`` and ``panel2`` do not have the same
         members.
+
+        Parameters
+        ----------
+        panel1 : iterable
+        panel2 : iterable
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If either ``panel1`` or ``panel2`` is not iterable.
         '''
         if not isinstance(panel1, collections.Iterable):
             raise TypeError('First argument is not iterable')
@@ -1374,7 +2057,21 @@ class PanelMixins(abc.ABC):
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertPanelMembersNotEqual(self, panel1, panel2, msg=None):
-        '''Fail if ``panel1`` and ``panel2`` have the same members.'''
+        '''Fail if ``panel1`` and ``panel2`` have the same members.
+
+        Parameters
+        ----------
+        panel1 : iterable
+        panel2 : iterable
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If either ``panel1`` or ``panel2`` is not iterable.
+        '''
         if not isinstance(panel1, collections.Iterable):
             raise TypeError('First argument is not iterable')
         if not isinstance(panel2, collections.Iterable):
@@ -1396,6 +2093,19 @@ class PanelMixins(abc.ABC):
         '''Fail if ``member`` is not in ``panel``.
 
         This is equivalent to ``self.assertIn(member, panel)``.
+
+        Parameters
+        ----------
+        member
+        panel2 : iterable
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``panel2`` is not iterable.
         '''
         if not isinstance(panel, collections.Iterable):
             raise TypeError('Second argument is not iterable')
@@ -1406,6 +2116,19 @@ class PanelMixins(abc.ABC):
         '''Fail if ``member`` is in ``panel``.
 
         This is equivalent to ``self.assertNotIn(member, panel)``.
+
+        Parameters
+        ----------
+        member
+        panel2 : iterable
+        msg : str
+            If not provided, the :mod:`marbles.mixins` or
+            :mod:`unittest` standard message will be used.
+
+        Raises
+        ------
+        TypeError
+            If ``panel2`` is not iterable.
         '''
         if not isinstance(panel, collections.Iterable):
             raise TypeError('Second argument is not iterable')
