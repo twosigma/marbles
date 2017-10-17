@@ -95,22 +95,22 @@ class TestMonotonicMixins(unittest.TestCase):
         delattr(self, 'seqrevstrict')
 
     def test_type_checking(self):
-        '''Is an AssertionError raised if ``sequence`` is not iterable?'''
+        '''Is a TypeError raised if ``sequence`` is not iterable?'''
         typed_asserts = [
             self.kls.assertMonotonicIncreasing,
             self.kls.assertNotMonotonicIncreasing,
             self.kls.assertMonotonicDecreasing,
             self.kls.assertNotMonotonicDecreasing
         ]
-        msg = 'Argument is not iterable'
+        msg = 'First argument is not iterable'
 
         for tassert in typed_asserts:
             with self.subTest(tassert=tassert):
-                with self.assertRaises(AssertionError) as e:
+                with self.assertRaises(TypeError) as e:
                     tassert(10, strict=True)
                 self.assertTrue(e.exception.args[0].endswith(msg))
 
-                with self.assertRaises(AssertionError) as e:
+                with self.assertRaises(TypeError) as e:
                     tassert(10, strict=False)
                 self.assertTrue(e.exception.args[0].endswith(msg))
 
@@ -217,14 +217,14 @@ class TestUniqueMixins(unittest.TestCase):
         delattr(self, 'sequnique')
 
     def test_type_checking(self):
-        '''Is an AssertionError raised if ``container`` is not iterable?'''
-        msg = 'Argument is not iterable'
+        '''Is a TypeError raised if ``container`` is not iterable?'''
+        msg = 'First argument is not iterable'
 
-        with self.assertRaises(AssertionError) as e:
+        with self.assertRaises(TypeError) as e:
             self.kls.assertUnique(10)
         self.assertTrue(e.exception.args[0].endswith(msg))
 
-        with self.assertRaises(AssertionError) as e:
+        with self.assertRaises(TypeError) as e:
             self.kls.assertNotUnique(10)
         self.assertTrue(e.exception.args[0].endswith(msg))
 
@@ -348,7 +348,7 @@ class TestFileMixins(unittest.TestCase):
                     with self.assertRaises(TypeError) as e:
                         method(exp)
                     self.assertEqual(e.exception.args[0],
-                                     'expected file-like object')
+                                     'Expected file-like object')
                     m.assert_called_once_with(exp)
 
                 # file-like object provided
@@ -373,7 +373,7 @@ class TestFileMixins(unittest.TestCase):
                     with self.assertRaises(TypeError) as e:
                         method(filemock)
                     self.assertEqual(e.exception.args[0],
-                                     'expected file-like object')
+                                     'Expected file-like object')
                     m.assert_not_called()
 
         # _get_file_size is a little bit special in that it expects
@@ -396,7 +396,7 @@ class TestFileMixins(unittest.TestCase):
 
             with self.assertRaises(TypeError) as e:
                 self.kls._get_file_size(self.filename)
-            self.assertEqual(e.exception.args[0], 'expected file-like object')
+            self.assertEqual(e.exception.args[0], 'Expected file-like object')
             m.assert_called_once_with(self.filename)
 
         # file-like object provided
@@ -416,7 +416,7 @@ class TestFileMixins(unittest.TestCase):
 
             with self.assertRaises(TypeError) as e:
                 self.kls._get_file_size(filemock)
-            self.assertEqual(e.exception.args[0], 'expected file-like object')
+            self.assertEqual(e.exception.args[0], 'Expected file-like object')
             m.assert_not_called()
 
     @mock.patch.object(os.path, 'isfile')
@@ -764,12 +764,23 @@ class TestCategoricalMixins(unittest.TestCase):
 
         for tassert in typed_asserts:
             with self.subTest(tassert=tassert):
-                with self.assertRaises(AssertionError) as e:
+                with self.assertRaises(TypeError) as e:
                     tassert(10, [1, 2, 3])
                 self.assertTrue(e.exception.args[0].endswith(msg % 'First'))
 
-                with self.assertRaises(AssertionError) as e:
+                with self.assertRaises(TypeError) as e:
                     tassert([1, 2, 3], None)
+                self.assertTrue(e.exception.args[0].endswith(msg % 'Second'))
+
+        typed_asserts = [
+            self.kls.assertCategoricalLevelIn,
+            self.kls.assertCategoricalLevelNotIn
+        ]
+
+        for tassert in typed_asserts:
+            with self.subTest(tassert=tassert):
+                with self.assertRaises(TypeError) as e:
+                    tassert(10, None)
                 self.assertTrue(e.exception.args[0].endswith(msg % 'Second'))
 
     def test_assert_categorical_level_equalities(self):
@@ -859,7 +870,7 @@ class TestDateTimeMixins(unittest.TestCase):
         delattr(self, 'fdates')
 
     def test_type_checking(self):
-        msg = 'expected datetime or date object'
+        msg = 'Expected iterable of datetime or date objects'
         with self.assertRaises(TypeError) as e:
             self.kls.assertDateTimesPast([1, 2, 3])
         self.assertEqual(e.exception.args[0], msg)
@@ -875,13 +886,14 @@ class TestDateTimeMixins(unittest.TestCase):
             self.kls.assertDateTimesLagLessEqual
         ]
 
+        msg = 'Expected iterable of datetime or date objects'
         for method in methods:
             with self.subTest(method=method):
-                msg = 'expected datetime or date object'
                 with self.assertRaises(TypeError) as e:
                     method([1, 2, 3], timedelta(2))
                 self.assertEqual(e.exception.args[0], msg)
 
+        msg = 'Second argument is not a datetime or date object or iterable'
         with self.assertRaises(TypeError) as e:
             self.kls.assertDateTimesBefore(self.pdates, 1)
         self.assertEqual(e.exception.args[0], msg)
@@ -901,40 +913,56 @@ class TestDateTimeMixins(unittest.TestCase):
         for method in methods:
             with self.subTest(method=method):
                 msg = ('First argument is not iterable',
-                       'Second argument is not a timedelta')
-                with self.assertRaises(AssertionError) as e:
+                       'Second argument is not a timedelta object')
+                with self.assertRaises(TypeError) as e:
                     method(1, timedelta(2))
                 self.assertTrue(e.exception.args[0].endswith(msg[0]))
 
-                with self.assertRaises(AssertionError) as e:
+                with self.assertRaises(TypeError) as e:
                     method([1, 2, 3], 2)
                 self.assertTrue(e.exception.args[0].endswith(msg[1]))
 
-        with self.assertRaises(AssertionError) as e:
+        with self.assertRaises(TypeError) as e:
+            self.kls.assertDateTimesPast(1)
+        self.assertTrue(e.exception.args[0].endswith(msg[0]))
+
+        with self.assertRaises(TypeError) as e:
+            self.kls.assertDateTimesFuture(1)
+        self.assertTrue(e.exception.args[0].endswith(msg[0]))
+
+        with self.assertRaises(TypeError) as e:
             self.kls.assertDateTimesBefore(1, [1])
         self.assertTrue(e.exception.args[0].endswith(msg[0]))
 
-        with self.assertRaises(AssertionError) as e:
+        with self.assertRaises(TypeError) as e:
             self.kls.assertDateTimesAfter(1, [1])
         self.assertTrue(e.exception.args[0].endswith(msg[0]))
 
-        msg = '%s is not a datetime'
-        with self.assertRaises(AssertionError) as e:
+        msg = 'First argument is not a datetime object'
+        with self.assertRaises(TypeError) as e:
             self.kls.assertTimeZoneIsNone(10)
-        self.assertTrue(e.exception.args[0].endswith(msg % 10))
+        self.assertTrue(e.exception.args[0].endswith(msg))
 
-        with self.assertRaises(AssertionError) as e:
+        with self.assertRaises(TypeError) as e:
             self.kls.assertTimeZoneIsNotNone(date.today())
-        self.assertTrue(e.exception.args[0].endswith(msg % date.today()))
+        self.assertTrue(e.exception.args[0].endswith(msg))
 
-        msg = ('First argument is not a datetime',
-               'Second argument is not a timezone')
-        with self.assertRaises(AssertionError) as e:
+        msg = ('First argument is not a datetime object',
+               'Second argument is not a timezone object')
+        with self.assertRaises(TypeError) as e:
             self.kls.assertTimeZoneEqual(10, timezone.utc)
         self.assertTrue(e.exception.args[0].endswith(msg[0]))
 
-        with self.assertRaises(AssertionError) as e:
-            self.kls.assertTimeZoneNotEqual(datetime.today(), 'UTC')
+        with self.assertRaises(TypeError) as e:
+            self.kls.assertTimeZoneEqual(datetime.now(), 'UTC')
+        self.assertTrue(e.exception.args[0].endswith(msg[1]))
+
+        with self.assertRaises(TypeError) as e:
+            self.kls.assertTimeZoneNotEqual(10, timezone.utc)
+        self.assertTrue(e.exception.args[0].endswith(msg[0]))
+
+        with self.assertRaises(TypeError) as e:
+            self.kls.assertTimeZoneNotEqual(datetime.now(), 'UTC')
         self.assertTrue(e.exception.args[0].endswith(msg[1]))
 
     def test_before(self):
@@ -945,8 +973,11 @@ class TestDateTimeMixins(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.kls.assertDateTimesBefore(self.pdates, self.pdates)
 
-        msg = 'sequence and target do not have the same length'
-        with self.assertRaises(AssertionError) as e:
+        msg = ('Length mismatch: '
+               'first argument contains %s elements, '
+               'second argument contains %s elements' % (len(self.pdates),
+                                                         len(self.pdates) - 1))
+        with self.assertRaises(ValueError) as e:
             self.kls.assertDateTimesBefore(self.pdates, self.fdates[:-1])
         self.assertTrue(e.exception.args[0].endswith(msg))
 
@@ -1000,8 +1031,11 @@ class TestDateTimeMixins(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.kls.assertDateTimesAfter(self.fdates, self.fdates)
 
-        msg = 'sequence and target do not have the same length'
-        with self.assertRaises(AssertionError) as e:
+        msg = ('Length mismatch: '
+               'first argument contains %s elements, '
+               'second argument contains %s elements' % (len(self.pdates),
+                                                         len(self.pdates) - 1))
+        with self.assertRaises(ValueError) as e:
             self.kls.assertDateTimesAfter(self.fdates, self.pdates[:-1])
         self.assertTrue(e.exception.args[0].endswith(msg))
 
@@ -1212,11 +1246,11 @@ class TestDataFrameMixins(unittest.TestCase):
 
         for tassert in typed_asserts:
             with self.subTest(tassert=tassert):
-                with self.assertRaises(AssertionError) as e:
+                with self.assertRaises(TypeError) as e:
                     tassert(10, self.df1)
                 self.assertTrue(e.exception.args[0].endswith(msg % 'First'))
 
-                with self.assertRaises(AssertionError) as e:
+                with self.assertRaises(TypeError) as e:
                     tassert(self.df1, None)
                 self.assertTrue(e.exception.args[0].endswith(msg % 'Second'))
 
@@ -1224,19 +1258,19 @@ class TestDataFrameMixins(unittest.TestCase):
         msg = ('First argument is not a DataFrame',
                'Second argument is not a dict')
 
-        with self.assertRaises(AssertionError) as e:
+        with self.assertRaises(TypeError) as e:
             self.kls.assertDataFrameSchema('foo', self.schema)
         self.assertTrue(e.exception.args[0].endswith(msg[0]))
 
-        with self.assertRaises(AssertionError) as e:
+        with self.assertRaises(TypeError) as e:
             self.kls.assertDataFrameSchema(self.df1, 'foo')
         self.assertTrue(e.exception.args[0].endswith(msg[1]))
 
-        with self.assertRaises(AssertionError) as e:
+        with self.assertRaises(TypeError) as e:
             self.kls.assertDataFrameCoerceSchema('foo', self.schema)
         self.assertTrue(e.exception.args[0].endswith(msg[0]))
 
-        with self.assertRaises(AssertionError) as e:
+        with self.assertRaises(TypeError) as e:
             self.kls.assertDataFrameCoerceSchema(self.df1, 'foo')
         self.assertTrue(e.exception.args[0].endswith(msg[1]))
 
@@ -1370,12 +1404,23 @@ class TestPanelMixins(unittest.TestCase):
 
         for tassert in typed_asserts:
             with self.subTest(tassert=tassert):
-                with self.assertRaises(AssertionError) as e:
+                with self.assertRaises(TypeError) as e:
                     tassert(10, [1, 2, 3])
                 self.assertTrue(e.exception.args[0].endswith(msg % 'First'))
 
-                with self.assertRaises(AssertionError) as e:
+                with self.assertRaises(TypeError) as e:
                     tassert([1, 2, 3], 10)
+                self.assertTrue(e.exception.args[0].endswith(msg % 'Second'))
+
+        typed_asserts = [
+            self.kls.assertPanelMemberIn,
+            self.kls.assertPanelMemberNotIn
+        ]
+
+        for tassert in typed_asserts:
+            with self.subTest(tassert=tassert):
+                with self.assertRaises(TypeError) as e:
+                    tassert(10, None)
                 self.assertTrue(e.exception.args[0].endswith(msg % 'Second'))
 
     def test_assert_panel_members_equality(self):

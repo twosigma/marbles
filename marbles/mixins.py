@@ -63,6 +63,7 @@ import random
 import string
 from datetime import date, datetime, timedelta, timezone
 
+import numpy as np
 import pandas as pd
 
 # TODO (jsa): override abc TypeError to inform user that they have to
@@ -162,8 +163,8 @@ class MonotonicMixins(abc.ABC):
             assert all((i < j) for i, j in zip(sequence, sequence[1:]))
             assert all((i <= j) for i, j in zip(sequence, sequence[1:]))
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='Argument is not iterable')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
 
         if strict:
             standardMsg = ('Elements in %s are not strictly monotonically '
@@ -191,8 +192,8 @@ class MonotonicMixins(abc.ABC):
             assert not all((i < j) for i, j in zip(sequence, sequence[1:]))
             assert not all((i <= j) for i, j in zip(sequence, sequence[1:]))
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='Argument is not iterable')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
 
         if strict:
             standardMsg = ('Elements in %s are strictly monotonically '
@@ -220,8 +221,8 @@ class MonotonicMixins(abc.ABC):
             assert all((i > j) for i, j in zip(sequence, sequence[1:]))
             assert all((i >= j) for i, j in zip(sequence, sequence[1:]))
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='Argument is not iterable')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
 
         if strict:
             standardMsg = ('Elements in %s are not strictly monotonically '
@@ -249,8 +250,8 @@ class MonotonicMixins(abc.ABC):
             assert not all((i > j) for i, j in zip(sequence, sequence[1:]))
             assert not all((i >= j) for i, j in zip(sequence, sequence[1:]))
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='Argument is not iterable')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
 
         if strict:
             standardMsg = ('Elements in %s are strictly monotonically '
@@ -286,8 +287,8 @@ class UniqueMixins(abc.ABC):
 
     def assertUnique(self, container, msg=None):
         '''Fail if elements in ``container`` are not unique.'''
-        self.assertIsInstance(container, collections.Iterable,
-                              msg='Argument is not iterable')
+        if not isinstance(container, collections.Iterable):
+            raise TypeError('First argument is not iterable')
 
         standardMsg = 'Elements in %s are not unique' % (container,)
 
@@ -302,8 +303,8 @@ class UniqueMixins(abc.ABC):
 
     def assertNotUnique(self, container, msg=None):
         '''Fail if elements in ``container`` are unique.'''
-        self.assertIsInstance(container, collections.Iterable,
-                              msg='Argument is not iterable')
+        if not isinstance(container, collections.Iterable):
+            raise TypeError('First argument is not iterable')
 
         standardMsg = 'Elements in %s are unique' % (container,)
 
@@ -428,16 +429,18 @@ class FileMixins(abc.ABC):
         file-like (i.e., it has 'read' and 'write' attributes, return
         ``filename``.
 
-        Args:
-            ``filename`` (str, bytes, file)
+        Parameters
+        ----------
+        filename : str, bytes, file
 
-        Raises:
-            TypeError
-                If ``filename`` is not a string, bytes, or file-like
-                object.
+        Raises
+        ------
+        TypeError
+            If ``filename`` is not a string, bytes, or file-like
+            object.
 
-                File-likeness is determined by checking for 'read' and
-                'write' attributes.
+            File-likeness is determined by checking for 'read' and
+            'write' attributes.
         '''
         if isinstance(filename, (str, bytes)):
             f = open(filename)
@@ -456,7 +459,7 @@ class FileMixins(abc.ABC):
             # If f doesn't have an name attribute,
             # raise a TypeError
             if e.args == ('name',):
-                raise TypeError('expected file-like object')
+                raise TypeError('Expected file-like object')
             raise e  # pragma: no cover
         finally:
             f.close()
@@ -472,7 +475,7 @@ class FileMixins(abc.ABC):
             # If f doesn't have an name attribute,
             # raise a TypeError
             if e.args == ('name',):
-                raise TypeError('expected file-like object')
+                raise TypeError('Expected file-like object')
             raise e  # pragma: no cover
         else:
             filetype = os.path.splitext(fname)[-1]
@@ -490,7 +493,7 @@ class FileMixins(abc.ABC):
             # If f doesn't have an encoding attribute,
             # raise a TypeError
             if e.args == ('encoding',):
-                raise TypeError('expected file-like object')
+                raise TypeError('Expected file-like object')
             raise e  # pragma: no cover
         finally:
             f.close()
@@ -506,7 +509,7 @@ class FileMixins(abc.ABC):
             # If f doesn't have a seek method,
             # raise a TypeError
             if e.args == ('seek',):
-                raise TypeError('expected file-like object')
+                raise TypeError('Expected file-like object')
             raise e  # pragma: no cover
         else:
             length = f.tell()
@@ -564,15 +567,15 @@ class FileMixins(abc.ABC):
         '''Fail if ``filename`` does not have the given ``extension``
         as determined by the ``==`` operator.
         '''
-        filetype = self._get_file_type(filename)
-        self.assertEqual(filetype, extension, msg=msg)
+        ftype = self._get_file_type(filename)
+        self.assertEqual(ftype, extension, msg=msg)
 
     def assertFileTypeNotEqual(self, filename, extension, msg=None):
         '''Fail if ``filename`` has the given ``extension`` as
         determined by the ``!=`` operator.
         '''
-        filetype = self._get_file_type(filename)
-        self.assertNotEqual(filetype, extension, msg=msg)
+        ftype = self._get_file_type(filename)
+        self.assertNotEqual(ftype, extension, msg=msg)
 
     # TODO (jsa): if _get_file_encoding fails, try opening with
     # codecs.open() before failing?
@@ -580,12 +583,12 @@ class FileMixins(abc.ABC):
         '''Fail if ``filename`` is not encoded with the given
         ``encoding`` as determined by the '==' operator.
         '''
-        fileencoding = self._get_file_encoding(filename)
+        fencoding = self._get_file_encoding(filename)
 
         fname = self._get_file_name(filename)
         standardMsg = '%s is not %s encoded' % (fname, encoding)
 
-        self.assertEqual(fileencoding.lower(),
+        self.assertEqual(fencoding.lower(),
                          encoding.lower(),
                          self._formatMessage(msg, standardMsg))
 
@@ -595,12 +598,12 @@ class FileMixins(abc.ABC):
         '''Fail if ``filename`` is encoded with the given ``encoding``
         as determined by the '!=' operator.
         '''
-        fileencoding = self._get_file_encoding(filename)
+        fencoding = self._get_file_encoding(filename)
 
         fname = self._get_file_name(filename)
         standardMsg = '%s is %s encoded' % (fname, encoding)
 
-        self.assertNotEqual(fileencoding.lower(),
+        self.assertNotEqual(fencoding.lower(),
                             encoding.lower(),
                             self._formatMessage(msg, standardMsg))
 
@@ -608,15 +611,15 @@ class FileMixins(abc.ABC):
         '''Fail if ``filename`` does not have the given ``size`` as
         determined by the '==' operator.
         '''
-        filesize = self._get_file_size(filename)
-        self.assertEqual(filesize, size, msg=msg)
+        fsize = self._get_file_size(filename)
+        self.assertEqual(fsize, size, msg=msg)
 
     def assertFileSizeNotEqual(self, filename, size, msg=None):
         '''Fail if ``filename`` has the given ``size`` as determined
         by the '!=' operator.
         '''
-        filesize = self._get_file_size(filename)
-        self.assertNotEqual(filesize, size, msg=msg)
+        fsize = self._get_file_size(filename)
+        self.assertNotEqual(fsize, size, msg=msg)
 
     def assertFileSizeAlmostEqual(
             self, filename, size, places=None, msg=None, delta=None):
@@ -625,9 +628,9 @@ class FileMixins(abc.ABC):
         decimal ``places`` (default 7) and comparing to zero, or if
         their difference is greater than a given ``delta``.
         '''
-        filesize = self._get_file_size(filename)
+        fsize = self._get_file_size(filename)
         self.assertAlmostEqual(
-                filesize, size, places=places, msg=msg, delta=delta)
+                fsize, size, places=places, msg=msg, delta=delta)
 
     def assertFileSizeNotAlmostEqual(
             self, filename, size, places=None, msg=None, delta=None):
@@ -636,37 +639,37 @@ class FileMixins(abc.ABC):
         ofdecimal ``places`` (default 7) and comparing to zero, or if
         their difference is greater than a given ``delta``.
         '''
-        filesize = self._get_file_size(filename)
+        fsize = self._get_file_size(filename)
         self.assertNotAlmostEqual(
-                filesize, size, places=places, msg=msg, delta=delta)
+                fsize, size, places=places, msg=msg, delta=delta)
 
     def assertFileSizeGreater(self, filename, size, msg=None):
         '''Fail if ``filename``'s size is not greater than ``size`` as
         determined by the '>' operator.
         '''
-        filesize = self._get_file_size(filename)
-        self.assertGreater(filesize, size, msg=msg)
+        fsize = self._get_file_size(filename)
+        self.assertGreater(fsize, size, msg=msg)
 
     def assertFileSizeGreaterEqual(self, filename, size, msg=None):
         '''Fail if ``filename``'s size is not greater than or equal to
         ``size`` as determined by the '>=' operator.
         '''
-        filesize = self._get_file_size(filename)
-        self.assertGreaterEqual(filesize, size, msg=msg)
+        fsize = self._get_file_size(filename)
+        self.assertGreaterEqual(fsize, size, msg=msg)
 
     def assertFileSizeLess(self, filename, size, msg=None):
         '''Fail if ``filename``'s size is not less than ``size`` as
         determined by the '<' operator.
         '''
-        filesize = self._get_file_size(filename)
-        self.assertLess(filesize, size, msg=msg)
+        fsize = self._get_file_size(filename)
+        self.assertLess(fsize, size, msg=msg)
 
     def assertFileSizeLessEqual(self, filename, size, msg=None):
         '''Fail if ``filename``'s size is not less than or equal to
         ``size`` as determined by the '<=' operator.
         '''
-        filesize = self._get_file_size(filename)
-        self.assertLessEqual(filesize, size, msg=msg)
+        fsize = self._get_file_size(filename)
+        self.assertLessEqual(fsize, size, msg=msg)
 
 
 class CategoricalMixins(abc.ABC):
@@ -717,7 +720,7 @@ class CategoricalMixins(abc.ABC):
 
     # TODO (jsa): providing these as pandas Series objects or numpy
     # arrays might make applying transformations (uppercase, lowercase)
-    # nicer
+    # easier
     WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday',
                 'Friday', 'Saturday', 'Sunday']
     WEEKDAYS_ABBR = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -779,10 +782,10 @@ class CategoricalMixins(abc.ABC):
         '''Fail if ``levels1`` and ``levels2`` do not have the same
         domain.
         '''
-        self.assertIsInstance(levels1, collections.Iterable,
-                              msg='First argument is not iterable')
-        self.assertIsInstance(levels2, collections.Iterable,
-                              msg='Second argument is not iterable')
+        if not isinstance(levels1, collections.Iterable):
+            raise TypeError('First argument is not iterable')
+        if not isinstance(levels2, collections.Iterable):
+            raise TypeError('Second argument is not iterable')
 
         standardMsg = '%s levels != %s levels' % (levels1, levels2)
 
@@ -794,10 +797,10 @@ class CategoricalMixins(abc.ABC):
 
     def assertCategoricalLevelsNotEqual(self, levels1, levels2, msg=None):
         '''Fail if ``levels1`` and ``levels2`` have the same domain.'''
-        self.assertIsInstance(levels1, collections.Iterable,
-                              msg='First argument is not iterable')
-        self.assertIsInstance(levels2, collections.Iterable,
-                              msg='Second argument is not iterable')
+        if not isinstance(levels1, collections.Iterable):
+            raise TypeError('First argument is not iterable')
+        if not isinstance(levels2, collections.Iterable):
+            raise TypeError('Second argument is not iterable')
 
         standardMsg = '%s levels == %s levels' % (levels1, levels2)
 
@@ -816,6 +819,9 @@ class CategoricalMixins(abc.ABC):
 
         This is equivalent to ``self.assertIn(level, levels)``.
         '''
+        if not isinstance(levels, collections.Iterable):
+            raise TypeError('Second argument is not iterable')
+
         self.assertIn(level, levels, msg=msg)
 
     def assertCategoricalLevelNotIn(self, level, levels, msg=None):
@@ -823,6 +829,9 @@ class CategoricalMixins(abc.ABC):
 
         This is equivalent to ``self.assertNotIn(level, levels)``.
         '''
+        if not isinstance(levels, collections.Iterable):
+            raise TypeError('Second argument is not iterable')
+
         self.assertNotIn(level, levels, msg=msg)
 
 
@@ -859,8 +868,8 @@ class DateTimeMixins(abc.ABC):
         unless all elements in ``sequence`` are less than or equal to
         ``target``.
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='First argument is not iterable')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
 
         if strict:
             standardMsg = '%s is not strictly less than %s' % (sequence,
@@ -873,16 +882,19 @@ class DateTimeMixins(abc.ABC):
         # Null date(time)s will always compare False, but I think
         # we want to know about null date(time)s
         if isinstance(target, collections.Iterable):
-            self.assertEqual(
-                    len(sequence), len(target),
-                    msg='sequence and target do not have the same length')
+            if len(target) != len(sequence):
+                raise ValueError(('Length mismatch: '
+                                  'first argument contains %s elements, '
+                                  'second argument contains %s elements' % (
+                                      len(sequence), len(target))))
             if not all(op(i, j) for i, j in zip(sequence, target)):
                 self.fail(self._formatMessage(msg, standardMsg))
         elif isinstance(target, (date, datetime)):
             if not all(op(element, target) for element in sequence):
                 self.fail(self._formatMessage(msg, standardMsg))
         else:
-            raise TypeError('expected datetime or date object')
+            raise TypeError(
+                'Second argument is not a datetime or date object or iterable')
 
     def assertDateTimesAfter(self, sequence, target, strict=True, msg=None):
         '''Fail if any elements in ``sequence`` are not after
@@ -896,8 +908,8 @@ class DateTimeMixins(abc.ABC):
         fail unless all elements in ``sequence`` are greater than or
         equal to ``target``.
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='First argument is not iterable')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
 
         if strict:
             standardMsg = '%s is not strictly greater than %s' % (sequence,
@@ -911,16 +923,19 @@ class DateTimeMixins(abc.ABC):
         # Null date(time)s will always compare False, but I think
         # we want to know about null date(time)s
         if isinstance(target, collections.Iterable):
-            self.assertEqual(
-                    len(sequence), len(target),
-                    msg='sequence and target do not have the same length')
+            if len(target) != len(sequence):
+                raise ValueError(('Length mismatch: '
+                                  'first argument contains %s elements, '
+                                  'second argument contains %s elements' % (
+                                      len(sequence), len(target))))
             if not all(op(i, j) for i, j in zip(sequence, target)):
                 self.fail(self._formatMessage(msg, standardMsg))
         elif isinstance(target, (date, datetime)):
             if not all(op(element, target) for element in sequence):
                 self.fail(self._formatMessage(msg, standardMsg))
         else:
-            raise TypeError('expected datetime or date object')
+            raise TypeError(
+                'Second argument is not a datetime or date object or iterable')
 
     def assertDateTimesPast(self, sequence, strict=True, msg=None):
         '''Fail if any elements in ``sequence`` are not in the past.
@@ -935,8 +950,8 @@ class DateTimeMixins(abc.ABC):
         are less than or equal to ``date.today()`` (or
         ``datetime.now()``).
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='First argument is not iterable')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
 
         # Cannot compare datetime to date, so if dates are provided use
         # date.today(), if datetimes are provided use datetime.today()
@@ -945,7 +960,7 @@ class DateTimeMixins(abc.ABC):
         elif isinstance(max(sequence), date):
             target = date.today()
         else:
-            raise TypeError('expected datetime or date object')
+            raise TypeError('Expected iterable of datetime or date objects')
 
         self.assertDateTimesBefore(sequence, target, strict=strict, msg=msg)
 
@@ -962,8 +977,8 @@ class DateTimeMixins(abc.ABC):
         elements in ``sequence`` are greater than or equal to
         ``date.today()`` (or ``datetime.now()``).
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='First argument is not iterable')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
 
         # Cannot compare datetime to date, so if dates are provided use
         # date.today(), if datetimes are provided use datetime.today()
@@ -972,7 +987,7 @@ class DateTimeMixins(abc.ABC):
         elif isinstance(min(sequence), date):
             target = date.today()
         else:
-            raise TypeError('expected datetime or date object')
+            raise TypeError('Expected iterable of datetime or date objects')
 
         self.assertDateTimesAfter(sequence, target, strict=strict, msg=msg)
 
@@ -980,10 +995,13 @@ class DateTimeMixins(abc.ABC):
         '''Fail if any elements in ``sequence`` aren't separated by
         the expected ``fequency``.
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='First argument is not iterable')
-        self.assertIsInstance(frequency, timedelta,
-                              msg='Second argument is not a timedelta')
+        # TODO (jsa): check that elements in sequence are dates or
+        # datetimes, keeping in mind that sequence may contain null
+        # values
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
+        if not isinstance(frequency, timedelta):
+            raise TypeError('Second argument is not a timedelta object')
 
         standardMsg = 'unexpected frequencies found in %s' % sequence
 
@@ -1006,10 +1024,10 @@ class DateTimeMixins(abc.ABC):
         This is equivalent to
         ``self.assertEqual(present - max(sequence), lag)``.
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='First argument is not iterable')
-        self.assertIsInstance(lag, timedelta,
-                              msg='Second argument is not a timedelta')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
+        if not isinstance(lag, timedelta):
+            raise TypeError('Second argument is not a timedelta object')
 
         # Cannot compare datetime to date, so if dates are provided use
         # date.today(), if datetimes are provided use datetime.today()
@@ -1018,7 +1036,7 @@ class DateTimeMixins(abc.ABC):
         elif isinstance(max(sequence), date):
             target = date.today()
         else:
-            raise TypeError('expected datetime or date object')
+            raise TypeError('Expected iterable of datetime or date objects')
 
         self.assertEqual(target - max(sequence), lag, msg=msg)
 
@@ -1034,10 +1052,10 @@ class DateTimeMixins(abc.ABC):
         This is equivalent to
         ``self.assertLess(present - max(sequence), lag)``.
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='First argument is not iterable')
-        self.assertIsInstance(lag, timedelta,
-                              msg='Second argument is not a timedelta')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
+        if not isinstance(lag, timedelta):
+            raise TypeError('Second argument is not a timedelta object')
 
         # Cannot compare datetime to date, so if dates are provided use
         # date.today(), if datetimes are provided use datetime.today()
@@ -1046,7 +1064,7 @@ class DateTimeMixins(abc.ABC):
         elif isinstance(max(sequence), date):
             target = date.today()
         else:
-            raise TypeError('expected datetime or date object')
+            raise TypeError('Expected iterable of datetime or date objects')
 
         self.assertLess(target - max(sequence), lag, msg=msg)
 
@@ -1062,10 +1080,10 @@ class DateTimeMixins(abc.ABC):
         This is equivalent to
         ``self.assertLessEqual(present - max(sequence), lag)``.
         '''
-        self.assertIsInstance(sequence, collections.Iterable,
-                              msg='First argument is not iterable')
-        self.assertIsInstance(lag, timedelta,
-                              msg='Second argument is not a timedelta')
+        if not isinstance(sequence, collections.Iterable):
+            raise TypeError('First argument is not iterable')
+        if not isinstance(lag, timedelta):
+            raise TypeError('Second argument is not a timedelta object')
 
         # Cannot compare datetime to date, so if dates are provided use
         # date.today(), if datetimes are provided use datetime.today()
@@ -1074,30 +1092,31 @@ class DateTimeMixins(abc.ABC):
         elif isinstance(max(sequence), date):
             target = date.today()
         else:
-            raise TypeError('expected datetime or date object')
+            raise TypeError('Expected iterable of datetime or date objects')
 
         self.assertLessEqual(target - max(sequence), lag, msg=msg)
 
     def assertTimeZoneIsNone(self, dt, msg=None):
         '''Fail if ``dt`` has a non-null ``tzinfo`` attribute.'''
-        self.assertIsInstance(dt, datetime, msg='%s is not a datetime' % dt)
+        if not isinstance(dt, datetime):
+            raise TypeError('First argument is not a datetime object')
 
         self.assertIsNone(dt.tzinfo, msg=msg)
 
     def assertTimeZoneIsNotNone(self, dt, msg=None):
         '''Fail unless ``dt`` has a non-null ``tzinfo`` attribute.'''
-        self.assertIsInstance(
-                dt, datetime, msg='%s is not a datetime' % dt)
+        if not isinstance(dt, datetime):
+            raise TypeError('First argument is not a datetime object')
 
         self.assertIsNotNone(dt.tzinfo, msg=msg)
 
     def assertTimeZoneEqual(self, dt, tz, msg=None):
         '''Fail unless ``dt``'s ``tzinfo`` attribute equals ``tz`` as
         determined by the '==' operator.'''
-        self.assertIsInstance(
-                dt, datetime, msg='First argument is not a datetime')
-        self.assertIsInstance(tz, timezone,
-                              msg='Second argument is not a timezone')
+        if not isinstance(dt, datetime):
+            raise TypeError('First argument is not a datetime object')
+        if not isinstance(tz, timezone):
+            raise TypeError('Second argument is not a timezone object')
 
         self.assertEqual(dt.tzinfo, tz, msg=msg)
 
@@ -1105,10 +1124,10 @@ class DateTimeMixins(abc.ABC):
         '''Fail if ``dt``'s ``tzinfo`` attribute equals ``tz`` as
         determined by the '!=' operator.
         '''
-        self.assertIsInstance(
-                dt, datetime, msg='First argument is not a datetime')
-        self.assertIsInstance(tz, timezone,
-                              msg='Second argument is not a timezone')
+        if not isinstance(dt, datetime):
+            raise TypeError('First argument is not a datetime object')
+        if not isinstance(tz, timezone):
+            raise TypeError('Second argument is not a timezone object')
 
         self.assertNotEqual(dt.tzinfo, tz, msg=msg)
 
@@ -1169,10 +1188,10 @@ class DataFrameMixins(abc.ABC):
         :class:`~pandas:pandas.DataFrame`, they are considered not
         equal.
         '''
-        self.assertIsInstance(
-                df1, pd.DataFrame, msg='First argument is not a DataFrame')
-        self.assertIsInstance(
-                df2, pd.DataFrame, msg='Second argument is not a DataFrame')
+        if not isinstance(df1, pd.DataFrame):
+            raise TypeError('First argument is not a DataFrame')
+        if not isinstance(df2, pd.DataFrame):
+            raise TypeError('Second argument is not a DataFrame')
 
         # If DataFrames have different shapes they're not equal
         self.assertEqual(
@@ -1209,10 +1228,10 @@ class DataFrameMixins(abc.ABC):
         :class:`~pandas:pandas.DataFrame`, they are considered not
         equal.
         '''
-        self.assertIsInstance(
-                df1, pd.DataFrame, msg='First argument is not a DataFrame')
-        self.assertIsInstance(
-                df2, pd.DataFrame, msg='Second argument is not a DataFrame')
+        if not isinstance(df1, pd.DataFrame):
+            raise TypeError('First argument is not a DataFrame')
+        if not isinstance(df2, pd.DataFrame):
+            raise TypeError('Second argument is not a DataFrame')
 
         standardMsg = '%s == %s' % (df1, df2)
 
@@ -1234,10 +1253,10 @@ class DataFrameMixins(abc.ABC):
         If ``df2`` has rows that do not appear in ``df1``, it is
         considered not a subset.
         '''
-        self.assertIsInstance(
-                df1, pd.DataFrame, msg='First argument is not a DataFrame')
-        self.assertIsInstance(
-                df2, pd.DataFrame, msg='Second argument is not a DataFrame')
+        if not isinstance(df1, pd.DataFrame):
+            raise TypeError('First argument is not a DataFrame')
+        if not isinstance(df2, pd.DataFrame):
+            raise TypeError('Second argument is not a DataFrame')
 
         # If df2 has columns that are not in df1 then df1 does not contain df2
         self.assertTrue(set(df1.columns).issuperset(set(df2.columns)),
@@ -1267,16 +1286,17 @@ class DataFrameMixins(abc.ABC):
         automatically fail. Similarly, if any columns appear in ``df``
         that do not appear in ``schema``, this will automatically fail.
         '''
-        self.assertIsInstance(
-                df, pd.DataFrame, msg='First argument is not a DataFrame')
-        self.assertIsInstance(
-                schema, dict, msg='Second argument is not a dict')
+        if not isinstance(df, pd.DataFrame):
+            raise TypeError('First argument is not a DataFrame')
+        if not isinstance(schema, dict):
+            raise TypeError('Second argument is not a dict')
 
         for column, dtype in schema.items():
             try:
                 if dtype == str:
-                    continue  # TODO (jsa): deal with this
-                assert df[column].dtype == dtype
+                    assert df[column].dtype == np.dtype('O')
+                else:
+                    assert df[column].dtype == dtype
             except KeyError:
                 standardMsg = '%s does not contain column %s' % (df, column)
                 self.fail(self._formatMessage(msg, standardMsg))
@@ -1292,19 +1312,19 @@ class DataFrameMixins(abc.ABC):
     def assertDataFrameCoerceSchema(self, df, schema, msg=None):
         '''Fail if columns in ``df`` cannot be coerced to the dtypes
         specified in ``schema`` as determined by
-        ``df[key].astype(schema[key], raise_on_error=True)``.
+        ``df[key].astype(schema[key], errors='raise')``.
 
         If any columns in ``schema`` do not appear in ``df``, this
         will automatically fail.
         '''
-        self.assertIsInstance(
-                df, pd.DataFrame, msg='First argument is not a DataFrame')
-        self.assertIsInstance(
-                schema, dict, msg='Second argument is not a dict')
+        if not isinstance(df, pd.DataFrame):
+            raise TypeError('First argument is not a DataFrame')
+        if not isinstance(schema, dict):
+            raise TypeError('Second argument is not a dict')
 
         for column, dtype in schema.items():
             try:
-                df[column].astype(dtype, raise_on_error=True)
+                df[column].astype(dtype, errors='raise')
             except KeyError:
                 standardMsg = '%s does not contain column %s' % (df, column)
                 self.fail(self._formatMessage(msg, standardMsg))
@@ -1340,10 +1360,10 @@ class PanelMixins(abc.ABC):
         '''Fail if ``panel1`` and ``panel2`` do not have the same
         members.
         '''
-        self.assertIsInstance(panel1, collections.Iterable,
-                              msg='First argument is not iterable')
-        self.assertIsInstance(panel2, collections.Iterable,
-                              msg='Second argument is not iterable')
+        if not isinstance(panel1, collections.Iterable):
+            raise TypeError('First argument is not iterable')
+        if not isinstance(panel2, collections.Iterable):
+            raise TypeError('Second argument is not iterable')
 
         standardMsg = '%s panel != %s panel' % (panel1, panel2)
 
@@ -1355,10 +1375,10 @@ class PanelMixins(abc.ABC):
 
     def assertPanelMembersNotEqual(self, panel1, panel2, msg=None):
         '''Fail if ``panel1`` and ``panel2`` have the same members.'''
-        self.assertIsInstance(panel1, collections.Iterable,
-                              msg='First argument is not iterable')
-        self.assertIsInstance(panel2, collections.Iterable,
-                              msg='Second argument is not iterable')
+        if not isinstance(panel1, collections.Iterable):
+            raise TypeError('First argument is not iterable')
+        if not isinstance(panel2, collections.Iterable):
+            raise TypeError('Second argument is not iterable')
 
         standardMsg = '%s panel == %s panel' % (panel1, panel2)
 
@@ -1377,6 +1397,9 @@ class PanelMixins(abc.ABC):
 
         This is equivalent to ``self.assertIn(member, panel)``.
         '''
+        if not isinstance(panel, collections.Iterable):
+            raise TypeError('Second argument is not iterable')
+
         self.assertIn(member, panel, msg=msg)
 
     def assertPanelMemberNotIn(self, member, panel, msg=None):
@@ -1384,4 +1407,7 @@ class PanelMixins(abc.ABC):
 
         This is equivalent to ``self.assertNotIn(member, panel)``.
         '''
+        if not isinstance(panel, collections.Iterable):
+            raise TypeError('Second argument is not iterable')
+
         self.assertNotIn(member, panel, msg=msg)

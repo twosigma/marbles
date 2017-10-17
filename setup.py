@@ -32,7 +32,8 @@ setup(
         'sphinx_rtd_theme'
     ],
     install_requires=[
-        'pandas<=0.20.3,>=0.19.1'
+        'pandas<=0.20.3,>=0.19.1',
+        'numpy==1.13.1'
     ],
     tests_require=[
         'coverage'
