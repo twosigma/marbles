@@ -19,7 +19,8 @@ requirements:
     - sphinx_rtd_theme
   run:
     - python
-    - pandas
+    - pandas <0.21,>=0.19.1
+    - numpy <1.14,>=1.12.1
 
 test:
   imports:
