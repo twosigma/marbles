@@ -40,6 +40,7 @@ import json
 import os
 
 from . import _stack
+from ._version import get_versions
 
 
 # XXX(leif): I don't think it's worth the gymnastics it would take to
@@ -216,6 +217,7 @@ class AssertionLogger(object):
             'args': [str(a) for a in args],
             'kwargs': [{'key': k, 'value': str(v)} for k, v in kwargs.items()],
             'assertion_class': _class_defining_method(assertion),
+            'marbles_version': get_versions()['version'],
             '@timestamp': now.strftime('%Y-%m-%dT%H:%M:%S.%f')
         }
 

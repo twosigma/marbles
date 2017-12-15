@@ -26,6 +26,7 @@ import unittest.util
 
 from marbles import AnnotatedAssertionError
 from marbles import log
+from marbles import __version__
 import tests.marbles as marbles_tests
 
 
@@ -145,6 +146,7 @@ class TestAssertionLogging(LoggingConfigureTestCase):
         expected = {
             'file': marbles_tests.__file__,
             'assertion': 'assertTrue',
+            'marbles_version': __version__,
             'args': ['True'],
             'kwargs': [],
         }
@@ -166,6 +168,7 @@ class TestAssertionLoggingVerboseTrue(LoggingConfigureTestCase):
         expected = {
             'file': marbles_tests.__file__,
             'assertion': 'assertTrue',
+            'marbles_version': __version__,
             'args': ['True'],
             'kwargs': [],
             'locals': [],
@@ -185,6 +188,7 @@ class TestAssertionLoggingVerboseTrue(LoggingConfigureTestCase):
             'file': marbles_tests.__file__,
             'assertion': 'assertReverseEqual',
             'assertion_class': 'tests.marbles.ReversingTestCaseMixin',
+            'marbles_version': __version__,
             'args': ['leif', 'leif'],
             'kwargs': [],
             'locals': [{'key': 's', 'value': 'leif'}],
@@ -207,6 +211,7 @@ class TestAssertionLoggingVerboseFalse(LoggingConfigureTestCase):
         expected = {
             'file': marbles_tests.__file__,
             'assertion': 'assertTrue',
+            'marbles_version': __version__,
             'args': ['True'],
             'kwargs': [],
         }
@@ -225,6 +230,7 @@ class TestAssertionLoggingVerboseFalse(LoggingConfigureTestCase):
             'file': marbles_tests.__file__,
             'assertion': 'assertReverseEqual',
             'assertion_class': 'tests.marbles.ReversingTestCaseMixin',
+            'marbles_version': __version__,
             'args': ['leif', 'leif'],
             'kwargs': [],
             'locals': [{'key': 's', 'value': 'leif'}],
@@ -247,6 +253,7 @@ class TestAssertionLoggingVerboseList(LoggingConfigureTestCase):
         expected = {
             'file': marbles_tests.__file__,
             'assertion': 'assertTrue',
+            'marbles_version': __version__,
             'args': ['True'],
             'kwargs': [],
             'msg': None,
@@ -267,6 +274,7 @@ class TestAssertionLoggingVerboseList(LoggingConfigureTestCase):
             'file': marbles_tests.__file__,
             'assertion': 'assertReverseEqual',
             'assertion_class': 'tests.marbles.ReversingTestCaseMixin',
+            'marbles_version': __version__,
             'args': ['leif', 'leif'],
             'kwargs': [],
             'locals': [{'key': 's', 'value': 'leif'}],
@@ -375,6 +383,7 @@ class TestAssertionLoggingRespectsEnvOverrides(LoggingConfigureTestCase):
         expected = {
             'file': marbles_tests.__file__,
             'assertion': 'assertTrue',
+            'marbles_version': __version__,
             'args': ['True'],
             'kwargs': [],
         }
@@ -393,6 +402,7 @@ class TestAssertionLoggingRespectsEnvOverrides(LoggingConfigureTestCase):
         expected = {
             'file': marbles_tests.__file__,
             'assertion': 'assertTrue',
+            'marbles_version': __version__,
             'args': ['True'],
             'kwargs': [],
             'locals': [],
