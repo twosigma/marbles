@@ -5,7 +5,7 @@ Introduction
 What is marbles?
 ================
 
-marbles is small :py:class:`unittest` extension that allows test authors to write richer tests and expose more actionable information on test failure.
+marbles is a :py:class:`unittest` extension that allows test authors to write richer tests and expose more actionable information on test failure.
 
 When writing marbles assertions, the test author provides actionable information about what to do when the test fails in the form of `advice`_. On test failure, this advice is provided back to the test consumer, along with `locals`_ defined within the test itself. These advice annotations leverage test locals using format strings (see `leveraging locals`_), making it possible to write a single test against multiple resources and/or parametrizations while still providing specific, actionable advice.
 
@@ -185,17 +185,21 @@ What does good advice look like? Let's expand on the advice in the SLA example a
         ...
 
         def test_for_pii(self):
-            advice = '''This test will fail if 1) the vendor provided data
-    containing SSNs, and 2) our internal SSN filtering is unsuccessful. The
-    vendor should not provide data containing PII, and this incident should
-    be reported to Legal & Compliance ({self.lc_contact}) immediately. In
-    your report, please include the vendor ID, {self.vendor_id}, and the
-    name of the file containing the PII, {self.filename}.
+            advice = '''This test will fail if
 
-    Our internal PII filtering algorithm is maintained here:
-    {_ssn_filter}. Create a new issue on that project to report this bug
-    and assign it to {self.data_engineer}, but *do not* include any PII in
-    the issue.
+        1) the vendor provided data containing SSNs, and
+
+        2) our internal SSN filtering is unsuccessful.
+
+    The vendor should not provide data containing PII, and this incident
+    should be reported to Legal & Compliance ({self.lc_contact})
+    immediately. In your report, please include the vendor ID,
+    {self.vendor_id}, and the name of the file containing the PII,
+    {self.filename}.
+
+    Our internal PII filtering algorithm is maintained here: {_ssn_filter}.
+    Create a new issue on that project to report this bug and assign it to
+    {self.data_engineer}, but *do not* include any PII in the issue.
     '''
 
             _ssn_filter = 'http://gitlab.com/group/repo'  # noqa: F481
@@ -212,28 +216,34 @@ This will give the following output on failure:
     FAIL: test_for_pii (__main__.SLATestCase)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "examples/sla.py", line 55, in test_for_pii
+      File "examples/sla.py", line 61, in test_for_pii
         self.assertNotRegex(self.data, ssn_regex, advice=advice)
-      File "/home/jane/Development/marbles/marbles/marbles.py", line 431, in wrapper
+      File "/home/jane/Development/marbles/marbles/marbles.py", line 482, in wrapper
         return attr(*args, msg=annotation, **kwargs)
     marbles.marbles.AnnotatedAssertionError: Regex matched: '123-45-6789' matches '\\d{3}-?\\d{2}-?\\d{4}' in '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
 
     Source:
-         54 ssn_regex = '\d{3}-?\d{2}-?\d{4}'
-     >   55 self.assertNotRegex(self.data, ssn_regex, advice=advice)
-         56 
+         60 ssn_regex = '\d{3}-?\d{2}-?\d{4}'
+     >   61 self.assertNotRegex(self.data, ssn_regex, advice=advice)
+         62
     Locals:
             ssn_regex=\d{3}-?\d{2}-?\d{4}
     Advice:
-            This test will fail if 1) the vendor provided data containing SSNs, and
-            2) our internal SSN filtering is unsuccessful. The vendor should not
-            provide data containing PII, and this incident should be reported to
-            Legal & Compliance (lc@company.com) immediately. In your report,
-            please include the vendor ID, V100, and the name of the file containing
-            the PII, data.csv. Our internal SSN filtering algorithm is maintained
-            here: http://gitlab.com/group/repo. Create a new issue on that project
-            to report this bug and assign it to Jane Doe, but *do not* include any
-            PII in the issue.
+            This test will fail if
+
+                1) the vendor provided data containing SSNs, and
+
+                2) our internal SSN filtering is unsuccessful.
+
+            The vendor should not provide data containing PII, and this incident
+            should be reported to Legal & Compliance (lc@company.com) immediately.
+            In your report, please include the vendor ID, V100, and the name of the
+            file containing the PII, data.csv.
+
+            Our internal PII filtering algorithm is maintained here:
+            'http://gitlab.com/group/repo'. Create a new issue on that project to
+            report this bug and assign it to Jane Doe, but *do not* include any PII
+            in the issue.
 
 This advice provides two specific actions that test consumer needs to take and makes email addresses, links, etc. readily available. Instead of just "please report this to Legal & Compliance", an actual email address is provided as well as the information that needs to be included in the report. Instead of just "please report this bug", a URL to the project repository is provided, as well as the name of the person to assign the issue to.
 
