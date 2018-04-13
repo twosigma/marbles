@@ -9,11 +9,12 @@
 #       actual or intended publication of such source code.
 #
 
-''':mod:`marbles` can log information about each assertion called.
+''':mod:`~marbles.core.marbles` can log information about each
+assertion called.
 
-If configured, the :data:`marbles.log.logger` will log a json object
-for each assertion and its success or failure, as well as any other
-attributes of interest specified by the test author.
+If configured, the :data:`marbles.core.log.logger` will log a json
+object for each assertion and its success or failure, as well as any
+other attributes of interest specified by the test author.
 
 The captured information includes the assertion's args and kwargs,
 msg, advice, local variables (for failed assertions, and also for
@@ -31,7 +32,7 @@ can always be overridden without changing the program.
 
 Note that :class:`AssertionLogger` should not be instantiated
 directly; instead, test authors should import and configure the
-:data:`marbles.log.logger` as needed.
+:data:`marbles.core.log.logger` as needed.
 '''
 
 import datetime
@@ -40,7 +41,8 @@ import json
 import os
 
 from . import _stack
-from ._version import get_versions
+from . import __version__
+
 
 
 # XXX(leif): I don't think it's worth the gymnastics it would take to
@@ -75,7 +77,7 @@ class AssertionLogger(object):
        protected by securing the destination system.
 
     This module exposes a single :class:`AssertionLogger`,
-    :data:`marbles.log.logger`, that is used during a marbles test
+    :data:`marbles.core.log.logger`, that is used during a marbles test
     run. It can be configured with :meth:`configure` before running
     the tests or via environment variables.
 
@@ -83,7 +85,7 @@ class AssertionLogger(object):
 
     .. code-block:: py
 
-       from marbles import log
+       from marbles.core import log
 
        if __name__ == '__main__':
            log.logger.configure(logfile='/path/to/marbles.log',
@@ -220,7 +222,7 @@ class AssertionLogger(object):
             'args': [str(a) for a in args],
             'kwargs': [{'key': k, 'value': str(v)} for k, v in kwargs.items()],
             'assertion_class': _class_defining_method(assertion),
-            'marbles_version': get_versions()['version'],
+            'marbles_version': __version__,
             '@timestamp': now.strftime('%Y-%m-%dT%H:%M:%S.%f')
         }
 

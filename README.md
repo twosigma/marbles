@@ -1,17 +1,10 @@
 # marbles
 
-`marbles` is a small `unittest` extension by [Jane Adams](mailto:jane@twosigma.com) and [Leif Walsh](mailto:leif@twosigma.com) that allows test authors to provide additional information to test consumers on test failure.
-
-## Background
-
-Two Sigma needs to make assertions about different resources, e.g., directories, files, pandas DataFrames, etc. These are generally referred to as "sanity checks". Python's builtin `unittest` package is a natural framework for expressing these assertions. That being said, testing functionality (which is what `unittest` is designed to do) is different than testing data. If an assertion about a piece of functionality fails, you go inspect the code that defines that functionality. If an assertion about data fails, it's usually not as obvious what you should do. It's also not usually as obvious how data should function, i.e., what data failure even looks like. This is where marbles comes in:
-
-1. expose relevant, actionable information when tests fail
-2. improve and codify knowledge, understanding, and expectations of data
-
-By requiring that test authors better understand and codify the ways in which data can fail, marbles helps catch more data failures; by requiring test authors to provide instructions on how to mitigate those failures, marbles helps more people productively respond to those failures.
+`marbles` is a Python `unittest` extension by [Jane Adams](mailto:jane@twosigma.com) and [Leif Walsh](mailto:leif@twosigma.com) that allows test authors to write richer tests that expose more information to test consumers on test failure. These information-rich tests help test consumers respond to failures without having to dig into the test code.
 
 # Installing
+
+The `marbles` namespace package contains two packages: `marbles.core` and `marbles.mixins`. `marbles.core` provides test cases that expose more information on test failure. `marbles.mixins` provides a set of semantically-rich assertions for use in both `marbles` and Python `unittest` tests. You can install the `marbles` package as a whole or install each subpackage individually.
 
 You can install `marbles` directly with `setup.py` or using `pip`:
 
@@ -33,14 +26,32 @@ You can also install `marbles` with conda:
 conda install marbles
 ```
 
-# Developing
-
-Create a conda environment and do a development install into it
+To install the subpackages individually, you can use `setup.py`:
 
 ```bash
-conda create --yes --name marbles-dev --file requirements.txt
+cd marbles/core && python setup.py install
+# -and/or-
+cd marbles/mixins && python setup.py install
+```
+
+You can also install the subpackages with conda:
+
+```bash
+conda install marbles-core
+# -and/or-
+conda install marbles-mixins
+```
+
+Note that you cannot use `pip` to install subpackages individually or install subpackages individually from GitLab.
+
+# Developing
+
+Create an empty conda environment and install from the requirements.txt file. This will install dependencies and do a development ("editable") install of both of the subpackages.
+
+```bash
+conda create --yes --name marbles-dev python
 source activate marbles-dev
-python setup.py develop
+pip install -r requirements.txt
 ```
 
 Now you can edit code and run scripts or a Python shell. Imports of marbles modules and packages will come from the current directory, so your changes will take effect.
@@ -67,7 +78,7 @@ Instead of `coverage report`'s text output you can get an HTML report including 
 ```bash
 coverage run setup.py test
 coverage html
-cd build/coverage/htmls; python -m http.server 8080
+cd build/coverage/html; python -m http.server 8080
 ```
 
 and then visit [http://localhost:8080](http://localhost:8080).

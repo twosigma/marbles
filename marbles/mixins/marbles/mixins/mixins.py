@@ -9,11 +9,12 @@
 #       actual or intended publication of such source code.
 #
 
-'''This module provides custom :py:mod:`unittest`-style assertions for
-common resource (e.g., a dataset) failures. For the most part, marbles
-assertions trivially wrap :py:mod:`unittest` assertions. For example,
-a call to :meth:`FileMixins.assertFileNameRegex` will simply pass
-the provided arguments to :py:meth:`~unittest.TestCase.assertRegex`.
+'''This module provides custom :mod:`unittest`-style assertions for
+common resource (e.g., a dataset) failures. For the most part,
+:mod:`marbles.mixins` assertions trivially wrap :mod:`unittest`
+assertions. For example, a call to
+:meth:`CategoricalMixins.assertCategoricalLevelIn` will simply pass the
+provided arguments to :meth:`~unittest.TestCase.assertIn`.
 
 Custom assertions are provided via mixins so that they can use other
 assertions as building blocks. Using mixins, instead of straight
@@ -23,9 +24,9 @@ a test case with all the assertions that they need.
 .. warning::
 
     :mod:`marbles.mixins` can be mixed into a
-    :py:class:`unittest.TestCase` or a
-    :class:`marbles.AnnotatedTestCase`, or any other class that
-    implements a :py:class:`unittest.TestCase` interface. To enforce
+    :class:`unittest.TestCase`, a :class:`marbles.core.TestCase`,
+    a :class:`marbles.core.AnnotatedTestCase`, or any other class that
+    implements a :class:`unittest.TestCase` interface. To enforce
     this, mixins define `abstract methods <abc>`_. This means that,
     when mixing them into your test case, they must come `after` the
     class(es) that implement those methods instead of appearing first
@@ -39,8 +40,8 @@ Example:
 
     import unittest
 
-    import marbles
-    from marbles import mixins
+    from marbles.core import marbles
+    from marbles.mixins import mixins
 
 
     class MyTestCase(unittest.TestCase, mixins.BetweenMixins):
@@ -49,10 +50,10 @@ Example:
             self.assertBetween(5, lower=0, upper=10)
 
 
-    class MyMarblesTestCase(marbles.AnnotatedTestCase, mixins.BetweenMixins):
+    class MyMarblesTestCase(marbles.TestCase, mixins.BetweenMixins):
 
         def test_me(self):
-            self.assertBetween(5, lower=0, upper=10, advice='do the thing')
+            self.assertBetween(5, lower=0, upper=10)
 '''
 
 import abc
@@ -430,18 +431,18 @@ class FileMixins(abc.ABC):
     With the exception of :meth:`assertFileExists` and
     :meth:`assertFileNotExists`, all custom file assertions take a
     ``filename`` argument which can accept a file name as a
-    :py:class:`str` or :py:class:`bytes` object, or a
-    `file-like object`_. Accepting a file-like object is useful for
-    testing files that are not present locally, e.g., files in HDFS.
+    :class:`str` or :py:class:`bytes` object, or a `file-like object`_.
+    Accepting a file-like object is useful for testing files that are
+    not present locally, e.g., files in HDFS.
 
     .. _file-like object: http://docs.python.org/3.5/glossary.html#term-file-like-object
 
-    .. code-block::python
+    .. code-block:: python
 
         import unittest
 
         import hdfs3
-        from marbles import mixins
+        from marbles.mixins import mixins
 
 
         class MyFileTest(unittest.TestCase, mixins.FileMixins):
@@ -1032,7 +1033,7 @@ class CategoricalMixins(abc.ABC):
     .. code-block:: python
 
         import unittest
-        from marbles import mixins
+        from marbles.mixins import mixins
 
 
         class MyTestCase(unittest.TestCase, mixins.CategoricalMixins):
@@ -1236,8 +1237,8 @@ class CategoricalMixins(abc.ABC):
 
 
 class DateTimeMixins(abc.ABC):
-    '''Built-in assertions for :py:class:`date` s,
-    :py:class:`datetime` s, and :py:class:`time` s.
+    '''Built-in assertions for :class:`date` s, :class:`datetime` s,
+    and :class:`time` s.
     '''
 
     @abc.abstractmethod

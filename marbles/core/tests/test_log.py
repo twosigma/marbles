@@ -24,10 +24,10 @@ import tempfile
 import unittest
 import unittest.util
 
-from marbles import ContextualAssertionError
-from marbles import log
-from marbles import __version__
-import tests.marbles as marbles_tests
+from marbles.core import ContextualAssertionError
+from marbles.core import log
+from marbles.core import __version__
+import tests.test_marbles as marbles_tests
 
 
 class LoggingConfigureTestCase(unittest.TestCase):
@@ -191,7 +191,7 @@ class TestAssertionLoggingVerboseTrue(LoggingConfigureTestCase):
         expected = {
             'file': marbles_tests.__file__,
             'assertion': 'assertReverseEqual',
-            'assertion_class': 'tests.marbles.ReversingTestCaseMixin',
+            'assertion_class': 'tests.test_marbles.ReversingTestCaseMixin',
             'marbles_version': __version__,
             'args': ['leif', 'leif'],
             'kwargs': [],
@@ -233,7 +233,7 @@ class TestAssertionLoggingVerboseFalse(LoggingConfigureTestCase):
         expected = {
             'file': marbles_tests.__file__,
             'assertion': 'assertReverseEqual',
-            'assertion_class': 'tests.marbles.ReversingTestCaseMixin',
+            'assertion_class': 'tests.test_marbles.ReversingTestCaseMixin',
             'marbles_version': __version__,
             'args': ['leif', 'leif'],
             'kwargs': [],
@@ -277,7 +277,7 @@ class TestAssertionLoggingVerboseList(LoggingConfigureTestCase):
         expected = {
             'file': marbles_tests.__file__,
             'assertion': 'assertReverseEqual',
-            'assertion_class': 'tests.marbles.ReversingTestCaseMixin',
+            'assertion_class': 'tests.test_marbles.ReversingTestCaseMixin',
             'marbles_version': __version__,
             'args': ['leif', 'leif'],
             'kwargs': [],

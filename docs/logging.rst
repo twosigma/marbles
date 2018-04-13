@@ -20,13 +20,13 @@ some other value, like a :data:`severity` attribute within your test.
 Setup
 -----
 
-Use :meth:`marbles.log.AssertionLogger.configure` to instruct marbles
-where it should write the logfile. There you can also instruct it
-about which :class:`~unittest.TestCase` attributes it should log.
+Use :meth:`marbles.core.log.AssertionLogger.configure` to instruct
+marbles where it should write the logfile. There you can also instruct
+it about which :class:`~unittest.TestCase` attributes it should log.
 
 You can do this in your test suite's ``__main__`` module::
 
-   from marbles import log
+   from marbles.core import log
 
    if __name__ == '__main__':
        log.logger.configure(logfile='/path/to/marbles.log',

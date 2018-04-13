@@ -1,7 +1,7 @@
 import unittest
 
-import marbles
 import numpy as np
+from marbles.core import marbles
 
 
 class TestCase(marbles.AnnotatedTestCase):

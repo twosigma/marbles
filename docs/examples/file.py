@@ -1,8 +1,8 @@
 import os
 import unittest
 
-import marbles
-from marbles import mixins
+from marbles.core import marbles
+from marbles.mixins import mixins
 
 
 class FileTestCase(marbles.AnnotatedTestCase,
@@ -11,15 +11,18 @@ class FileTestCase(marbles.AnnotatedTestCase,
     '''FileTestCase makes assertions about a file, namely this file.'''
 
     def setUp(self):
-        setattr(self, 'fname', __file__)
+        setattr(self, 'fname', 'examples/file.py')
 
     def tearDown(self):
         delattr(self, 'fname')
 
     def test_that_file_exists(self):
         advice = '''{self.fname} doesn't exist, which is wild because
-the string you're reading right now is written in that file.'''
+the string you're reading right now is written in that file. List the
+contents of the data directory {_data_dir} to see if any other files
+are missing.'''
 
+        _data_dir = os.getcwd()
         self.assertFileExists(self.fname, advice=advice)
 
     def test_that_file_name_matches_regex(self):

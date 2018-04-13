@@ -11,11 +11,21 @@ Welcome to marbles's documentation!
 
    winning
    logging
-   reference
+
+
+API Reference
+-------------
+
+.. toctree::
+   :maxdepth: 2
+
+   marbles
+   mixins
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`search`
+

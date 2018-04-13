@@ -63,7 +63,7 @@ author = 'Jane Adams and Leif Walsh'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 
-from marbles import __version__ as marbles_version
+from marbles.core import __version__ as marbles_version
 
 # The short X.Y version.
 version = '.'.join(marbles_version.split('.')[:2])

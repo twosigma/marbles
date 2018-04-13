@@ -11,37 +11,26 @@
 
 from setuptools import setup
 
-import versioneer
-
-
-def readme():
-    with open('README.md', 'r') as f:
-        return f.read()
-
 
 setup(
     name='marbles',
-    packages=['marbles'],
-    test_suite='tests',
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
+    version='0.1.0',
     setup_requires=[
-        'coverage',
-        'flake8',
         'Sphinx',
         'sphinx_rtd_theme'
     ],
     install_requires=[
-        'pandas<0.21,>=0.19.1',
-        'numpy<1.14,>=1.12.1'
+        'marbles.core',
+        'marbles.mixins'
     ],
-    tests_require=[
-        'coverage'
+    author=[
+        'Jane Adams',
+        'Leif Walsh'
     ],
-    description=('A unittest extension that provides additional '
-                 'information on test failure'),
-    long_description=readme(),
-    author=['Jane Adams', 'Leif Walsh'],
-    author_email=['jane@twosigma.com', 'leif@twosigma.com'],
+    author_email=[
+        'jane@twosigma.com',
+        'leif@twosigma.com'
+    ],
+    description='Write better tests, read better test failures',
     url='https://gitlab.twosigma.com/jane/marbles'
 )

@@ -17,7 +17,7 @@ from datetime import date, datetime, timedelta, timezone
 
 import pandas as pd
 
-from marbles import mixins
+from marbles.mixins import mixins
 
 
 class TestBetweenMixins(unittest.TestCase):
@@ -285,19 +285,19 @@ class TestFileMixins(unittest.TestCase):
         filemock.name = self.filename
 
         # filename provided
-        with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+        with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
             m.return_value = filemock
             self.kls._get_or_open_file(self.filename)
             m.assert_called_once_with(self.filename)
 
         # file-like object provided
-        with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+        with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
             m.return_value = filemock
             self.kls._get_or_open_file(filemock)
             m.assert_not_called()
 
         # file-like object provided but has no read or write attributes
-        with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+        with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
             del filemock.read  # pretend there's no read attribute
             del filemock.write  # pretend there's no write attribute'
             m.return_value = filemock
@@ -333,14 +333,14 @@ class TestFileMixins(unittest.TestCase):
                 filemock.encoding = self.encoding
 
                 # filename provided
-                with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+                with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
                     m.return_value = filemock
                     out = method(exp)
                     self.assertEqual(out, exp)
                     m.assert_called_once_with(exp)
 
                 # filename provided but is missing attributes
-                with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+                with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
                     for attr in attrs:
                         delattr(filemock, attr)
                     m.return_value = filemock
@@ -358,14 +358,14 @@ class TestFileMixins(unittest.TestCase):
                 filemock.name = self.filename
                 filemock.encoding = self.encoding
 
-                with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+                with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
                     m.return_value = filemock
                     out = method(filemock)
                     self.assertEqual(out, exp)
                     m.assert_not_called()
 
                 # missing attributes
-                with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+                with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
                     for attr in attrs:
                         delattr(filemock, attr)
                     m.return_value = filemock
@@ -383,14 +383,14 @@ class TestFileMixins(unittest.TestCase):
         filemock.tell.return_value = self.filesize
 
         # filename provided
-        with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+        with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
             m.return_value = filemock
             out = self.kls._get_file_size(self.filename)
             self.assertEqual(out, self.filesize)
             m.assert_called_once_with(self.filename)
 
         # filename provided but is missing attributes
-        with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+        with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
             del filemock.seek
             m.return_value = filemock
 
@@ -403,14 +403,14 @@ class TestFileMixins(unittest.TestCase):
         filemock = mock.MagicMock()
         filemock.tell.return_value = self.filesize
 
-        with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+        with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
             m.return_value = filemock
             out = self.kls._get_file_size(filemock)
             self.assertEqual(out, self.filesize)
             m.assert_not_called()
 
         # missing attributes
-        with mock.patch('marbles.mixins.open', mock.mock_open()) as m:
+        with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as m:
             del filemock.seek
             m.return_value = filemock
 
@@ -564,7 +564,7 @@ class TestFileMixins(unittest.TestCase):
 
         with mock.patch.object(unittest.TestCase, 'assertEqual') as m:
             # filename provided
-            with mock.patch('marbles.mixins.open', mock.mock_open()) as mo:
+            with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as mo:
                 mo.return_value = filemock
 
                 msg = '%s is not %s encoded' % (self.filename, self.encoding)
@@ -590,7 +590,7 @@ class TestFileMixins(unittest.TestCase):
 
         with mock.patch.object(unittest.TestCase, 'assertNotEqual') as m:
             # filename provided
-            with mock.patch('marbles.mixins.open', mock.mock_open()) as mo:
+            with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as mo:
                 mo.return_value = filemock
 
                 msg = '%s is %s encoded' % (self.filename, self.encoding)
@@ -637,7 +637,7 @@ class TestFileMixins(unittest.TestCase):
                 with mock.patch.object(unittest.TestCase, original) as m:
                     # filename provided
                     with mock.patch(
-                            'marbles.mixins.open', mock.mock_open()) as mo:
+                            'marbles.mixins.mixins.open', mock.mock_open()) as mo:
                         mo.return_value = filemock
 
                         trivial(self.filename, 10)
@@ -657,7 +657,7 @@ class TestFileMixins(unittest.TestCase):
 
         with mock.patch.object(unittest.TestCase, 'assertAlmostEqual') as m:
             # filename provided
-            with mock.patch('marbles.mixins.open', mock.mock_open()) as mo:
+            with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as mo:
                 mo.return_value = filemock
 
                 self.kls.assertFileSizeAlmostEqual(self.filename, 10)
@@ -697,7 +697,7 @@ class TestFileMixins(unittest.TestCase):
 
         with mock.patch.object(unittest.TestCase, 'assertNotAlmostEqual') as m:
             # filename provided
-            with mock.patch('marbles.mixins.open', mock.mock_open()) as mo:
+            with mock.patch('marbles.mixins.mixins.open', mock.mock_open()) as mo:
                 mo.return_value = filemock
 
                 self.kls.assertFileSizeNotAlmostEqual(self.filename, 10)

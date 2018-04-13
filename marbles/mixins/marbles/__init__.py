@@ -8,3 +8,8 @@
 #       The copyright notice above does not evidence any
 #       actual or intended publication of such source code.
 #
+
+import pkgutil
+
+
+__path__ = pkgutil.extend_path(__path__, __name__)

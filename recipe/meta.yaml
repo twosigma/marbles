@@ -1,13 +1,16 @@
+{% set meta_data = load_setup_py_data() %}
+{% set core_data = load_setup_py_data(setup_file='marbles/core/setup.py') %}
+{% set mixins_data = load_setup_py_data(setup_file='marbles/mixins/setup.py') %}
+
 package:
   name: marbles
-  version: {{ environ.get('GIT_DESCRIBE_TAG', '') }}
+  version: {{ meta_data.get('version') }}
 
 source:
   git_url: ../
 
 build:
-  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
-  script: python setup.py install --single-version-externally-managed --record installed-files
+  number: 0
 
 requirements:
   build:
@@ -18,16 +21,28 @@ requirements:
     - sphinx
     - sphinx_rtd_theme
   run:
-    - python
-    - pandas <0.21,>=0.19.1
-    - numpy <1.14,>=1.12.1
+    - marbles-core
+    - marbles-mixins
+  test:
+    imports:
+      - marbles.core
+      - marbles.core.marbles
+      - marbles.core.log
+      - marbles.mixins
 
-test:
-  imports:
-    - marbles
-    - marbles.mixins
-    - marbles.log
+outputs:
+  - name: marbles-core
+    version: {{ core_data.get('version') }}
+    script: marbles-core.sh
+    requirements:
+
+  - name: marbles-mixins
+    version: {{ mixins_data.get('version') }}
+    script: marbles-mixins.sh
+    requirements:
+      - pandas <0.21,>=0.19.1
+      - numpy <1.14,>=1.12.1
 
 about:
   home: https://gitlab.twosigma.com/jane/marbles
-  summary: A unittest extension that provides additional information on test failure
+  summary: Write better tests, read better test failures

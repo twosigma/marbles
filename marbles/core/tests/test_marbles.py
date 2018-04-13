@@ -24,13 +24,13 @@ import os
 import sys
 import unittest
 
-from marbles import (
+from marbles.core import (
     AnnotatedTestCase,
     AnnotationError,
     ContextualAssertionError,
     TestCase
 )
-from marbles import log
+from marbles.core import log
 
 
 class ReversingTestCaseMixin(object):
@@ -421,7 +421,7 @@ class TestAssertionLoggingFailure(MarblesTestCase):
         log.logger.configure(logfile=self.file_handle)
         self.log_buffer = io.StringIO()
         self.handler = logging.StreamHandler(self.log_buffer)
-        self.logger = logging.getLogger('marbles.marbles')
+        self.logger = logging.getLogger('marbles.core.marbles')
         self.logger.addHandler(self.handler)
         self.logger.propagate = False
 

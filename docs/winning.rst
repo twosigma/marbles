@@ -5,29 +5,35 @@ Introduction
 What is marbles?
 ================
 
-marbles is a :py:class:`unittest` extension that allows test authors to write richer tests and expose more actionable information on test failure.
+marbles is a :mod:`unittest` extension that allows test authors to write richer tests that expose more information on test failure. This additional information includes `locals`_ in scope at the time the test failed, the full assertion statement that failed, and a free-form `advice`_ annotation provided by the test author. This additional information helps test consumers respond to test failures without digging into the test code themselves.
 
-When writing marbles assertions, the test author provides actionable information about what to do when the test fails in the form of `advice`_. On test failure, this advice is provided back to the test consumer, along with `locals`_ defined within the test itself. These advice annotations leverage test locals using format strings (see `leveraging locals`_), making it possible to write a single test against multiple resources and/or parametrizations while still providing specific, actionable advice.
-
-marbles also provides a set of semantically rich assertions via `mixins`_ that go beyond the generic predicates available in :py:mod:`unittest`. These richer assertions provide the test consumer with more context about the resource and predicate being tested. For example, while :py:meth:`~unittest.TestCase.assertRegex` doesn't tell the test consumer anything about the string being tested, :meth:`~marbles.mixins.FileMixins.assertFileNameRegex` immediately tells the test consumer that the string being tested is a filename.
+marbles also provides a set of semantically rich assertions via `mixins`_ that go beyond the generic predicates available in :mod:`unittest`. These richer assertions provide the test consumer with more context about the resource and predicate being tested. For example, while :meth:`~unittest.TestCase.assertRegex` doesn't tell the test consumer anything about the string being tested, :meth:`~marbles.mixins.FileMixins.assertFileNameRegex` immediately tells the test consumer that the string being tested is a filename.
 
 Example
 =======
 
-The AnnotatedTestCase
----------------------
+The TestCase
+------------
 
-:class:`marbles.AnnotatedTestCase` s are almost exactly like :py:class:`unittest.TestCase` s. The main difference is that ``assert`` methods on a :class:`marbles.AnnotatedTestCase` take an additional parameter, ``advice``.
+The :class:`marbles.core.TestCase` is a pure drop-in replacement for :class:`unittest.TestCase`. By simply inheriting from :class:`marbles.core.TestCase` instead, your test failures will include the full assertion statement that failed (not just the last line like in a normal Python traceback) and any local variables in scope at the time the test failed.
+
+Assertions on a :class:`marbles.core.TestCase` also accept an optional `advice`_ annotation that will be exposed to the test consumer on test failure. This annotation can contain whatever the test author feels is important, but it is especially useful for communicating their intent and any relevant context about the test. This annotation can be a format string that will be expanded with local variables if/when the test fails.
 
 .. _sla:
 
-.. literalinclude:: ../examples/sla.py
-   :emphasize-lines: 33,40
+.. literalinclude:: examples/sla.py
+
+The AnnotatedTestCase
+---------------------
+
+The :class:`marbles.core.AnnotatedTestCase` s is almost exactly like the :class:`marbles.core.TestCase` except that `advice`_ is required. Calling an assertion without the ``advice`` parameter on a :class:`marbles.core.AnnotatedTestCase` will produce a :class:`marbles.core.AnnotationError`.
+
+.. note:: We've provided ``advice`` to all assertions, so any of the examples will work with either a :class:`marbles.core.TestCase` or a :class:`marbles.core.AnnotatedTestCase`.
 
 Output
 ------
 
-Similarly, marbles output is very similar to :py:mod:`unittest` output, but includes three additional sections:
+Similarly, marbles output is very similar to :mod:`unittest` output, but includes three additional sections:
 
 1. Source: the source line of code containing the assertion that failed
 2. `Locals`_: any public variables defined within the test itself
@@ -40,65 +46,64 @@ This is the output of the example :ref:`SLATestCase <sla>` above:
 
     FF
     ======================================================================
-    FAIL: test_for_pii (__main__.SLATestCase)
+    FAIL: test_for_pii (sla.SLATestCase)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "examples/sla.py", line 40, in test_for_pii
+      File "/home/jane/Development/marbles/docs/examples/sla.py", line 40, in test_for_pii
         self.assertNotRegex(self.data, ssn_regex, advice=advice)
-      File "/home/jane/Development/marbles/marbles/marbles.py", line 431, in wrapper
+      File "/home/jane/Development/marbles/marbles/core/marbles/core/marbles.py", line 482, in wrapper
         return attr(*args, msg=annotation, **kwargs)
-    marbles.marbles.ContextualAssertionError: Regex matched: '123-45-6789' matches '\\d{3}-?\\d{2}-?\\d{4}' in '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
+    marbles.core.marbles.ContextualAssertionError: Regex matched: '123-45-6789' matches '\\d{3}-?\\d{2}-?\\d{4}' in '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
 
     Source:
-         39 ssn_regex = '\d{3}-?\d{2}-?\d{4}'
+         39
      >   40 self.assertNotRegex(self.data, ssn_regex, advice=advice)
          41 
     Locals:
-            ssn_regex=\d{3}-?\d{2}-?\d{4}
+        ssn_regex=\d{3}-?\d{2}-?\d{4}
     Advice:
-            data.csv appears to contain SSN(s). Please report this incident to
-            legal and compliance.
+        data.csv appears to contain SSN(s). Please report this incident to
+        legal and compliance.
         
 
     ======================================================================
-    FAIL: test_on_time_delivery (__main__.SLATestCase)
+    FAIL: test_on_time_delivery (sla.SLATestCase)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "examples/sla.py", line 33, in test_on_time_delivery
+      File "/home/jane/Development/marbles/docs/examples/sla.py", line 33, in test_on_time_delivery
         self.assertGreaterEqual(datadate, on_time_delivery, advice=advice)
-      File "/home/jane/Development/marbles/marbles/marbles.py", line 431, in wrapper
+      File "/home/jane/Development/marbles/marbles/core/marbles/core/marbles.py", line 482, in wrapper
         return attr(*args, msg=annotation, **kwargs)
-    marbles.marbles.ContextualAssertionError: datetime.date(2017, 1, 1) not greater than or equal to datetime.date(2017, 2, 28)
+    marbles.core.marbles.ContextualAssertionError: datetime.date(2017, 1, 1) not greater than or equal to datetime.date(2017, 2, 28)
 
     Source:
          32 
      >   33 self.assertGreaterEqual(datadate, on_time_delivery, advice=advice)
          34 
     Locals:
-            on_time_delivery=2017-02-28
-            datadate=2017-01-01
+        datadate=2017-01-01
+        on_time_delivery=2018-04-12
     Advice:
-            The data in data.csv are out of date. If this is a recurring issue,
-            contact the data provider to negotiate a reimbursement or to re-
-            negotiate the terms of the contract.
+        The data in data.csv are out of date. If this is a recurring issue,
+        contact the data provider to negotiate a reimbursement or to re-
+        negotiate the terms of the contract.
         
 
     ----------------------------------------------------------------------
-    Ran 2 tests in 0.009s
+    Ran 2 tests in 0.006s
 
     FAILED (failures=2)
-
 
 =====================
 How to win at marbles
 =====================
 
-marbles can be used anywhere :py:mod:`unittest` is used. Like :py:mod:`unittest`, and unit testing in general, there are places where marbles works well and places where it doesn't work well. marbles works well when:
+marbles can be used anywhere :mod:`unittest` is used. Like :mod:`unittest`, and unit testing in general, there are places where marbles works well and places where it doesn't work well. marbles works well when:
 
 1. there's a concrete expectation that you can test for, and
 2. it's not obvious what needs to happen when expectations are violated.
 
-If there's no "correct answer" that you know ahead of time, unit testing (using marbles or :py:mod:`unittest`) might not be the right approach. (This is why predictive models, for example, aren't unit tested.) If there is a correct answer that you can test for but it's obvious what needs to happen when you don't get that answer, marbles might be overkill.
+If there's no "correct answer" that you know ahead of time, unit testing (using marbles or :mod:`unittest`) might not be the right approach. (This is why predictive models, for example, aren't unit tested.) If there is a correct answer that you can test for but it's obvious what needs to happen when you don't get that answer, marbles might be overkill.
 
     One scenario in which it might not be obvious what needs to happen when a test fails is if it can fail in the same way for different, well-known reasons. In this scenario, the test consumer first needs to figure out which failure condition(s) apply and then figure out how to respond. This is what `Advice`_ annotations are for, but the "well-known" part is important: if the failure conditions aren't well-known, what advice could you give the test consumer to help them figure out what happened?
 
@@ -109,7 +114,7 @@ Unit Testing Data
 
 marbles was originally built for unit testing data. In the same way that we need to make assertions about how code functions, we need to make assertions about data. These can range from asserting that SLAs are being met and that the data are well-formed to asserting that the fidelity of the signal in a dataset hasn't been lost.
 
-:py:mod:`unittest` is a natural framework for expressing these assertions, which is why :class:`marbles.AnnotatedTestCase` so closely resembles :py:class:`unittest.TestCase`. But, making assertions about data is different than making assertions about code in two main ways:
+:mod:`unittest` is a natural framework for expressing these assertions, which is why :mod:`~marbles.core.marbles` test cases so closely resemble :class:`unittest.TestCase` s. But, making assertions about data is different than making assertions about code in two main ways:
 
     First, it's not always obvious how data should function, i.e., what data failure even looks like.
 
@@ -162,7 +167,9 @@ Advice annotations are intended to tell the test consumer what to do when the te
 Good Advice
 -----------
 
-Advice annotations can be as general or as specific as needed, but the best annotations contain the following:
+Advice annotations can contain whatever the test author feels is important, but they are especially useful for communicating the test author's intent and any relevant context about the test.
+
+When writing unit tests for data, the best advice annotations contain the following:
 
 1. condition(s) under which the test will or could fail
 2. instructions for determining which failure condition(s) hold
@@ -172,7 +179,7 @@ What does good advice look like? Let's expand on the advice in the SLA example a
 
 .. code-block:: python
 
-    class SLATestCase(AnnotatedTestCase):
+    class SLATestCase(TestCase):
         '''SLATestCase ensures that SLAs are being met.'''
 
         # Class attributes are helpful for storing information that
@@ -203,8 +210,8 @@ What does good advice look like? Let's expand on the advice in the SLA example a
     '''
 
             _ssn_filter = 'http://gitlab.com/group/repo'  # noqa: F481
-
             ssn_regex = '\d{3}-?\d{2}-?\d{4}'
+
             self.assertNotRegex(self.data, ssn_regex, advice=advice)
 
 This will give the following output on failure:
@@ -213,37 +220,37 @@ This will give the following output on failure:
 
     F
     ======================================================================
-    FAIL: test_for_pii (__main__.SLATestCase)
+    FAIL: test_for_pii (sla.SLATestCase)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "examples/sla.py", line 61, in test_for_pii
+      File "/home/jane/Development/marbles/docs/examples/sla.py", line 63, in test_for_pii
         self.assertNotRegex(self.data, ssn_regex, advice=advice)
-      File "/home/jane/Development/marbles/marbles/marbles.py", line 482, in wrapper
+      File "/home/jane/Development/marbles/marbles/core/marbles/core/marbles.py", line 482, in wrapper
         return attr(*args, msg=annotation, **kwargs)
-    marbles.marbles.ContextualAssertionError: Regex matched: '123-45-6789' matches '\\d{3}-?\\d{2}-?\\d{4}' in '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
+    marbles.core.marbles.ContextualAssertionError: Regex matched: '123-45-6789' matches '\\d{3}-?\\d{2}-?\\d{4}' in '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
 
     Source:
-         60 ssn_regex = '\d{3}-?\d{2}-?\d{4}'
-     >   61 self.assertNotRegex(self.data, ssn_regex, advice=advice)
          62
+     >   63 self.assertNotRegex(self.data, ssn_regex, advice=advice)
+         64 
     Locals:
-            ssn_regex=\d{3}-?\d{2}-?\d{4}
+        ssn_regex=\d{3}-?\d{2}-?\d{4}
     Advice:
-            This test will fail if
+        This test will fail if
 
-                1) the vendor provided data containing SSNs, and
+            1) the vendor provided data containing SSNs, and
 
-                2) our internal SSN filtering is unsuccessful.
+            2) our internal SSN filtering is unsuccessful.
 
-            The vendor should not provide data containing PII, and this incident
-            should be reported to Legal & Compliance (lc@company.com) immediately.
-            In your report, please include the vendor ID, V100, and the name of the
-            file containing the PII, data.csv.
+        The vendor should not provide data containing PII, and this incident
+        should be reported to Legal & Compliance (lc@company.com) immediately.
+        In your report, please include the vendor ID, V100, and the name of the
+        file containing the PII, data.csv.
 
-            Our internal PII filtering algorithm is maintained here:
-            'http://gitlab.com/group/repo'. Create a new issue on that project to
-            report this bug and assign it to Jane Doe, but *do not* include any PII
-            in the issue.
+        Our internal PII filtering algorithm is maintained here:
+        http://gitlab.com/group/repo. Create a new issue on that project to
+        report this bug and assign it to Jane Doe, but *do not* include any PII
+        in the issue.
 
 This advice provides two specific actions that test consumer needs to take and makes email addresses, links, etc. readily available. Instead of just "please report this to Legal & Compliance", an actual email address is provided as well as the information that needs to be included in the report. Instead of just "please report this bug", a URL to the project repository is provided, as well as the name of the person to assign the issue to.
 
@@ -276,8 +283,8 @@ What does bad advice look like? Let's use a `file`_ example. This example uses a
 
     import os
 
-    import marbles
-    from marlbes import mixins
+    from marbles.core import marbles
+    from marlbes.mixins import mixins
 
 
     class FileTestCase(marbles.AnnotatedTestCase, mixins.FileMixins):
@@ -300,30 +307,30 @@ This will give the following output on failure:
 
     F
     ======================================================================
-    FAIL: test_that_file_exists (__main__.FileTestCase)
+    FAIL: test_that_file_exists (file.FileTestCase)
     ----------------------------------------------------------------------
     Traceback (most recent call last):
-      File "examples/file.py", line 23, in test_that_file_exists
-        self.assertFileNotExists(self.fname, advice=advice)
-      File "/home/jane/Development/marbles/marbles/marbles.py", line 431, in wrapper
+      File "/home/jane/Development/marbles/docs/examples/file.py", line 26, in test_that_file_exists
+        self.assertFileExists(self.fname, advice=advice)
+      File "/home/jane/Development/marbles/marbles/core/marbles/core/marbles.py", line 482, in wrapper
         return attr(*args, msg=annotation, **kwargs)
-      File "/home/jane/Development/marbles/marbles/mixins.py", line 519, in assertFileNotExists
+      File "/home/jane/Development/marbles/marbles/mixins/marbles/mixins/mixins.py", line 640, in assertFileExists
         self.fail(self._formatMessage(msg, standardMsg))
-      File "/home/jane/Development/marbles/marbles/marbles.py", line 460, in wrapper
+      File "/home/jane/Development/marbles/marbles/core/marbles/core/marbles.py", line 511, in wrapper
         return attr(*args, msg=msg, **kwargs)
-    marbles.marbles.ContextualAssertionError: examples/file.py does not exist
+    marbles.core.marbles.ContextualAssertionError: examples/file.py does not exist
 
     Source:
-         22 _data_dir = os.getcwd()
-     >   23 self.assertFileExists(self.fname, advice=advice)
-         24 
+         25 _data_dir = os.getcwd()
+     >   26 self.assertFileExists(self.fname, advice=advice)
+         27 
     Locals:
 
     Advice:
-            examples/file.py doesn't exist, which is wild because the string you're
-            reading right now is written in that file. List the contents of the
-            data directory /home/user/data/ to see if any other files
-            are missing.
+        examples/file.py doesn't exist, which is wild because the string you're
+        reading right now is written in that file. List the contents of the
+        data directory /home/jane/Development/marbles/docs/examples to see if
+        any other files are missing.
 
 Firstly, the beginning of the advice just restates the standard message and so is a waste of the test consumer's time. Also, the recommended action contains the path to the data directory `on the test author's machine`; the relevant directory might be somewhere completely different on the test consumer's machine, so this information won't help them find the missing file.
 
@@ -362,7 +369,7 @@ These assertions would accept different advice annotations, each of which would 
 In this example, we'd want to test for the most severe failure first; 2 and 3 would also fail if 1 fails, but the correct action to take is the action specified in the advice provided to the 1st assertion, so that is the advice that we want the test consumer to see.
 
 
-.. literalinclude:: ../examples/severity.py
+.. literalinclude:: examples/severity.py
 
 
 If you want the test consumer to have the advice for each severity level (i.e., you've written advice that builds naturally on itself with severity), you could loop through the severity assertions using :ref:`subtests <python:subtests>` instead of a ``for`` loop.
@@ -370,16 +377,15 @@ If you want the test consumer to have the advice for each severity level (i.e., 
 Mixins
 ======
 
-The :mod:`marbles.mixins` module provides custom :py:mod:`unittest`-style assertions for common data failures. For the most part, marbles assertions trivially wrap :py:mod:`unittest` assertions. For example, a call to :meth:`~marbles.mixins.FileMixins.assertFileNameRegex` will simply forward the arguments to :py:meth:`~unittest.TestCase.assertRegex`.
+The :mod:`marbles.mixins` module provides custom :mod:`unittest`-style assertions for common data failures. For the most part, marbles assertions trivially wrap :mod:`unittest` assertions. For example, a call to :meth:`~marbles.mixins.FileMixins.assertFileNameRegex` will simply forward the arguments to :py:meth:`~unittest.TestCase.assertRegex`.
 
-These assertions, because they're more detailed, can provide the test consumer with additional information about the expected relationship between the thing being tested and what it's being tested against. :py:meth:`~unittest.TestCase.assertRegex` doesn't tell the test consumer anything about the string being tested; :meth:`~marbles.mixins.FileMixins.assertFileNameRegex` immediately tells the test consumer that the string being tested is a filename.
+These assertions, because they're more detailed, can provide the test consumer with additional information about the expected relationship between the thing being tested and what it's being tested against. :meth:`~unittest.TestCase.assertRegex` doesn't tell the test consumer anything about the string being tested; :meth:`~marbles.mixins.FileMixins.assertFileNameRegex` immediately tells the test consumer that the string being tested is a filename.
 
 In addition, providing these more specific assertions can alert test authors of what they `should` be testing for when they're testing data. For instance, having a :meth:`~marbles.mixins.DateTimeMixins.assertDateTimesPast` assertion can inspire a eureka! moment for a test author that, yes, they expect all dates to be in the past.
 
 .. warning::
 
-    :mod:`marbles.mixins` can be mixed into a :py:class:`unittest.TestCase` or a :class:`marbles.AnnotatedTestCase`, or any other class that implements a :py:class:`unittest.TestCase` interface. To enforce this, mixins define `abstract methods <abc>`_. This means that, when mixing them into your test case, they must come `after` the class(es) that implement those methods instead of appearing first in the inheritance list like normal mixins.
-
+    :mod:`marbles.mixins` can be mixed into a :class:`unittest.TestCase`, a :class:`marbles.core.TestCase`, a :class:`marbles.core.AnnotatedTestCase`, or any other class that implements a :class:`unittest.TestCase` interface. To enforce this, mixins define `abstract methods <abc>`_. This means that, when mixing them into your test case, they must come `after` the class(es) that implement those methods instead of appearing first in the inheritance list like normal mixins.
     .. _abc: https://docs.python.org/3.5/library/abc.html#abc.abstractmethod
 
 Example
@@ -389,7 +395,7 @@ Example
 
 .. _file:
 
-.. literalinclude:: ../examples/file.py
+.. literalinclude:: examples/file.py
    :emphasize-lines: 8,9,10
 
 Available Mixins

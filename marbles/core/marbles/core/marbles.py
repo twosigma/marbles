@@ -10,24 +10,33 @@
 #
 
 '''Extends :mod:`unittest` to provide more information to the test
-consumer on test failure.
+consumer on test failure. This additional information includes local
+variables defined within the test at the time it failed, the full
+assertion statement that failed, and a free-form annotation provided
+by the test author. This additional information helps test consumers
+respond to test failures without digging into the test code themselves.
 
-A :class:`marbles.TestCase` can be used anywhere a
-:class:`unittest.TestCase` is used. By simply inheriting from
-:class:`marbles.TestCase` instead, test failures will have better
-error messages that include the full assertion statement highlighting
-the error and any local variables defined within the test at the time
-it failed. All assertion methods on a :class:`marbles.TestCase` accept
-an additional ``advice`` annotation which complements the traditional
-``msg`` parameter, containing additional information about the test
-that will be exposed to the test consumer on test failure. This
-annotation can be a format string that will be expanded with local
-variables that are defined at the time the test fails.
+To get this additional information in your tests, you can inherit
+from :class:`marbles.core.TestCase` anywhere you would normally
+inherit from :class:`unittest.TestCase`. By simply inheriting from
+:class:`marbles.core.TestCase` instead, your test failures will
+include the full assertion statement that failed and any local
+variables in scope at the time the test failed.
 
-The :class:`marbles.AnnotatedTestCase` goes one step further than the
-:class:`marbles.TestCase` and requires the test author to provide an
-advice annotation. Calling an assertion in this context without the
-``advice`` parameter produces an error.
+Assertions on a :class:`marbles.core.TestCase` also accept an optional
+``advice`` string that will be exposed to the test consumer on test
+failure. This annotation can contain whatever the test author feels is
+important, but it is especially useful for communicating their intent
+and any relevant context about the test. This annotation can be a
+format string that will be expanded with local variables if/when the
+test fails.
+
+You can also inherit from :class:`marbles.core.AnnotatedTestCase`.
+The only difference is that, if you inherit from
+:class:`marbles.core.AnnotatedTestCase`, you must provide ``advice``
+annotations to all assertions. Calling an assertion without the
+``advice`` parameter on a :class:`marbles.core.AnnotatedTestCase`
+will produce a :class:`marbles.core.AnnotationError`.
 '''
 
 import ast
@@ -144,18 +153,19 @@ class AnnotationError(Exception):
 
 
 class ContextualAssertionError(AssertionError):
-    '''ContextualAssertionError is an :class:`AssertionError` that
-    expects a dictionary or tuple of additionional information beyond
-    the static message string accepted by :class:`AssertionError`.
+    '''Extends :class:`AssertionError` to accept and display
+    additional information beyond the static ``msg`` parameter
+    provided by :mod:`unittest` assertions.
 
-    The additional information provided is formatted with the context
-    of the locals where the assertion error is raised. Annotated
-    assertions may also include an 'advice' key describing what to do
-    if/when the assertion fails.
-
-    This information includes the full assertion statement highlighting
-    the error and any local variables in scope at the time the test
+    This additional information includes the full assertion statement
+    that failed and any local variables in scope at the time the test
     failed.
+
+    This additional information may also include an ``advice`` string
+    that can explain the intent of the test, provide any relevant
+    context, and/or describe what to do if/when the assertion fails.
+    This string is formatted with the local context where the assertion
+    error is raised.
     '''
 
     _META_FORMAT_STRING = '''{standardMsg}
@@ -177,22 +187,22 @@ Locals:
 
     def __init__(self, *args):
         '''Assume args contains a tuple of two arguments:
-            1. the annotation provided by the test author, and
+            1. the "advice" annotation provided by the test author, and
             2. the "standardMsg" from :mod:`unittest` which is the
-               string representation of the asserted fact that wasn't
-               true
+               static string representation of the asserted fact that
+               wasn't true.
 
-        Annotation is a dictionary containing at least the key 'advice'.
         See the documentation for :class:`AnnotatedTestCase` to see
         what the user API looks like.
 
         Parameters
         ----------
         advice : str
-            This string is meant to inform the test consumer of what
-            to do when the test fails. It can contain format string
-            fields that will be formatted with local variables
-            defined within the test itself.
+            This string is meant to contain useful information for the
+            test consumer about what to do when the test fails. It can
+            contain format string fields that will be expanded with
+            local variables defined within the test itself when the
+            assertion fails.
         '''
         # These attributes are publicly exposed as properties below to
         # facilitate programmatic interactions with test failures
@@ -314,7 +324,7 @@ Locals:
         show the last line of the statement. This can be confusing if
         the statement spans multiple lines. This function helps
         reconstruct the whole statement, and is used by
-        :meth:`marbles.ContextualAssertionError.assert_stmt`.
+        :meth:`marbles.core.ContextualAssertionError.assert_stmt`.
 
         Returns a tuple of the range of lines spanned by the source
         being returned, the number of the line on which the interesting
@@ -337,15 +347,15 @@ Locals:
 
 
 class AnnotationContext(object):
-    '''Validates and packs msg and advice, and stashes advice for use
-    down the stack.
+    '''Validates and packs ``msg`` and ``advice``, and stashes
+    ``advice`` for use down the stack.
 
     Within this context manager, if another assertion is called
     without passing advice, we use the advice from the earlier call
     rather than raising an error about missing advice. This allows
     e.g. :meth:`unittest.TestCase.assertMultiLineEqual` to make some
-    additional assertions and pass its own msg without advice, without
-    causing an error there.
+    additional assertions and pass its own ``msg`` without ``advice``,
+    without causing an error there.
     '''
 
     def __init__(self, case, assertion, required_keys,
@@ -393,9 +403,9 @@ class AnnotationContext(object):
 
 
 def _find_msg_argument(signature):
-    '''Locates the msg argument in a function signature.
+    '''Locates the ``msg`` argument in a function signature.
 
-    We need to determine where we expect to find msg if it's passed
+    We need to determine where we expect to find ``msg`` if it's passed
     positionally, so we can extract it if the user passed it.
 
     Returns
@@ -434,7 +444,7 @@ def _find_msg_argument(signature):
 
 
 def _extract_msg(args, kwargs, msg_idx, default_msg, non_msg_params):
-    '''Extracts the msg argument from the passed args.
+    '''Extracts the ``msg`` argument from the passed ``args``.
 
     Returns
     -------
@@ -456,22 +466,32 @@ def _extract_msg(args, kwargs, msg_idx, default_msg, non_msg_params):
 
 
 class TestCase(unittest.TestCase):
-    '''The marbles TestCase is an extension of :class:`unittest.TestCase`.
+    '''An extension of :class:`unittest.TestCase`.
 
-    When writing a test class based on
-    :class:`marbles.AnnotatedTestCase`, all assert statements, e.g.
-    :meth:`unittest.TestCase.assertEqual`, in addition to accepting an
-    optional final string parameter ``msg``, also accept a keyword
-    parameter ``advice``, which should provide more context about the
-    test and describe what to do if/when the test fails.
+    Failure messages from :class:`marbles.core.TestCase` tests
+    contain more information than :class:`unittest.TestCase` tests,
+    including local variables defined within the test at the time the
+    test failed and the full assertion statement that failed.
 
-    The advice string (and the ``msg`` parameter, if provided) are
-    formatted with :meth:`str.format` given the local variables
-    defined within the test itself.
+    All assert statements, e.g., :meth:`unittest.TestCase.assertEqual`,
+    in addition to accepting the optional final string parameter
+    ``msg``, also accept a free-form ``advice`` annotation provided
+    by the test author. This annotation can contain whatever the test
+    author feels is important, but it is especially useful for
+    communicating their intent and any relevant context about the test
+    that will help the test consumer understand and debug the failure.
+    For example, this annotation can be used to provide context on
+    a specific edge case that a test exercises, without sacrificing
+    the ``msg`` or trying to embed that context into the test method
+    name.
+
+    The ``advice`` string, if provided, is formatted with
+    :meth:`str.format` given the local variables defined within the
+    test itself.
 
     Example:
 
-    .. literalinclude:: ../examples/sla.py
+    .. literalinclude:: examples/sla.py
     '''
 
     failureException = ContextualAssertionError
@@ -538,7 +558,7 @@ class TestCase(unittest.TestCase):
     def __getattribute__(self, key):
         '''Keyword argument support for assertions.
 
-        We want AnnotatedTestCases to be able to call assertions with
+        We want (Annotated)TestCases to be able to call assertions with
         syntax like this:
 
             self.assertTrue(True, msg='message', advice='advice')
@@ -567,17 +587,16 @@ class TestCase(unittest.TestCase):
 
 
 class AnnotatedTestCase(TestCase):
-    '''AnnotatedTestCase is an extension of :class:`marbles.TestCase`.
+    '''An extension of :class:`marbles.core.TestCase`.
 
-    An :class:`~marbles.AnnotatedTestCase` is only different from a
-    :class:`marbles.TestCase` in that it enforces that advice is
-    provided for every assertion.
+    An :class:`~marbles.core.AnnotatedTestCase` is only different from
+    a :class:`marbles.core.TestCase` in that it enforces that
+    ``advice`` is provided for every assertion. Calling an assertion
+    without the ``advice`` parameter on a
+    :class:`marbles.core.AnnotatedTestCase` will produce a
+    :class:`marbles.core.AnnotationError`.
 
-    For other details, see :class:`marbles.TestCase`.
-
-    Assertion methods on this TestCase may raise
-    :class:`AnnotationError`. Every assertion checks to make sure that
-    both message and advice are provided and raises that error if not.
+    For other details, see :class:`marbles.core.TestCase`.
     '''
 
     _REQUIRED_KEYS = ['advice']

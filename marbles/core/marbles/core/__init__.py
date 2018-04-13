@@ -9,16 +9,15 @@
 #       actual or intended publication of such source code.
 #
 
+from ._version import __version__
+from .marbles import __doc__
 from .marbles import (
     AnnotatedTestCase,
     AnnotationError,
     ContextualAssertionError,
     TestCase
 )
-from .marbles import __doc__ as marbles_doc
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
+
 
 __all__ = (
     'AnnotatedTestCase',
@@ -26,4 +25,3 @@ __all__ = (
     'ContextualAssertionError',
     'TestCase',
 )
-__doc__ = marbles_doc
