@@ -113,7 +113,7 @@ marbles was originally built for unit testing data. In the same way that we need
 
     First, it's not always obvious how data should function, i.e., what data failure even looks like.
 
-    Second, when a unit test about a function fails, you go look at the source code for the function to figure out what went wrong. (It can get more complex than that, but the point is that generally you know where to start.) When a unit test about data fails, it's not as obvious what you're supposed to do. A reasonble place to start might be looking at the data, but that only makes sense for some of the things we might be testing for. What if the failure is that you didn't even get the data?
+    Second, when a unit test about a function fails, you go look at the source code for the function to figure out what went wrong. (It can get more complex than that, but the point is that generally you know where to start.) When a unit test about data fails, it's not as obvious what you're supposed to do. A reasonable place to start might be looking at the data, but that only makes sense for some of the things we might be testing for. What if the failure is that you didn't even get the data?
 
 This is where marbles comes in:
 
