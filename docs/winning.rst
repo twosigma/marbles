@@ -47,7 +47,7 @@ This is the output of the example :ref:`SLATestCase <sla>` above:
         self.assertNotRegex(self.data, ssn_regex, advice=advice)
       File "/home/jane/Development/marbles/marbles/marbles.py", line 431, in wrapper
         return attr(*args, msg=annotation, **kwargs)
-    marbles.marbles.AnnotatedAssertionError: Regex matched: '123-45-6789' matches '\\d{3}-?\\d{2}-?\\d{4}' in '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
+    marbles.marbles.ContextualAssertionError: Regex matched: '123-45-6789' matches '\\d{3}-?\\d{2}-?\\d{4}' in '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
 
     Source:
          39 ssn_regex = '\d{3}-?\d{2}-?\d{4}'
@@ -68,7 +68,7 @@ This is the output of the example :ref:`SLATestCase <sla>` above:
         self.assertGreaterEqual(datadate, on_time_delivery, advice=advice)
       File "/home/jane/Development/marbles/marbles/marbles.py", line 431, in wrapper
         return attr(*args, msg=annotation, **kwargs)
-    marbles.marbles.AnnotatedAssertionError: datetime.date(2017, 1, 1) not greater than or equal to datetime.date(2017, 2, 28)
+    marbles.marbles.ContextualAssertionError: datetime.date(2017, 1, 1) not greater than or equal to datetime.date(2017, 2, 28)
 
     Source:
          32 
@@ -220,7 +220,7 @@ This will give the following output on failure:
         self.assertNotRegex(self.data, ssn_regex, advice=advice)
       File "/home/jane/Development/marbles/marbles/marbles.py", line 482, in wrapper
         return attr(*args, msg=annotation, **kwargs)
-    marbles.marbles.AnnotatedAssertionError: Regex matched: '123-45-6789' matches '\\d{3}-?\\d{2}-?\\d{4}' in '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
+    marbles.marbles.ContextualAssertionError: Regex matched: '123-45-6789' matches '\\d{3}-?\\d{2}-?\\d{4}' in '12345,2017-01-01,iPhone 7,649.00,123-45-6789'
 
     Source:
          60 ssn_regex = '\d{3}-?\d{2}-?\d{4}'
@@ -311,7 +311,7 @@ This will give the following output on failure:
         self.fail(self._formatMessage(msg, standardMsg))
       File "/home/jane/Development/marbles/marbles/marbles.py", line 460, in wrapper
         return attr(*args, msg=msg, **kwargs)
-    marbles.marbles.AnnotatedAssertionError: examples/file.py does not exist
+    marbles.marbles.ContextualAssertionError: examples/file.py does not exist
 
     Source:
          22 _data_dir = os.getcwd()

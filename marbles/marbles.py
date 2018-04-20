@@ -9,16 +9,25 @@
 #       actual or intended publication of such source code.
 #
 
-'''Extends :mod:`unittest` functionality by augmenting the way failed
-assertions are handled to provide more actionable failure information
-to the test consumer.
+'''Extends :mod:`unittest` to provide more information to the test
+consumer on test failure.
 
-Briefly, by inheriting from :class:`marbles.AnnotatedTestCase` rather
-than :class:`unittest.TestCase`, the test author gains the ability to
-provide richer failure messages in their assert statements. These
-messages can be format strings which are expanded using local
-variables defined within the test itself. The inclusion of this
-additional information is enforced within the class.
+A :class:`marbles.TestCase` can be used anywhere a
+:class:`unittest.TestCase` is used. By simply inheriting from
+:class:`marbles.TestCase` instead, test failures will have better
+error messages that include the full assertion statement highlighting
+the error and any local variables defined within the test at the time
+it failed. All assertion methods on a :class:`marbles.TestCase` accept
+an additional ``advice`` annotation which complements the traditional
+``msg`` parameter, containing additional information about the test
+that will be exposed to the test consumer on test failure. This
+annotation can be a format string that will be expanded with local
+variables that are defined at the time the test fails.
+
+The :class:`marbles.AnnotatedTestCase` goes one step further than the
+:class:`marbles.TestCase` and requires the test author to provide an
+advice annotation. Calling an assertion in this context without the
+``advice`` parameter produces an error.
 '''
 
 import ast
@@ -83,15 +92,15 @@ class _StatementFinder(ast.NodeVisitor):
     traverse depth-first (which we want), you have to implement a
     :class:`ast.NodeVisitor`.
 
-    Startlingly, :meth:`ast.walk`'s documentation says that it traverses
-    "in no particular order". While I respect the decision to document
-    the fact that the order should not be relied on as it might change
-    in the future, to claim that it traverses "in no particular order"
-    is simply a lie.
+    Startlingly, :meth:`ast.walk`'s documentation says that it
+    traverses "in no particular order". While I respect the decision
+    to document the fact that the order should not be relied on as it
+    might change in the future, to claim that it traverses "in no
+    particular order" is simply a lie.
 
     In any case, this visitor will traverse the tree, and when it finds
-    a node on the target line, it sets ``self.found`` to the line number
-    of the innermost ancestor which is a Statement.
+    a node on the target line, it sets ``self.found`` to the line
+    number of the innermost ancestor which is a Statement.
 
     Example::
 
@@ -134,20 +143,19 @@ class AnnotationError(Exception):
     pass
 
 
-class AnnotatedAssertionError(AssertionError):
-    '''AnnotatedAssertionError is an :class:`AssertionError` that
+class ContextualAssertionError(AssertionError):
+    '''ContextualAssertionError is an :class:`AssertionError` that
     expects a dictionary or tuple of additionional information beyond
     the static message string accepted by :class:`AssertionError`.
 
     The additional information provided is formatted with the context
     of the locals where the assertion error is raised. Annotated
-    assertions expect an 'advice' key describing what to do if/when
-    the assertion fails.
+    assertions may also include an 'advice' key describing what to do
+    if/when the assertion fails.
 
-    See :class:`marbles.AnnotatedTestCase` for example usage. To make
-    annotated assertions in your tests, your tests should inherit from
-    :class:`marbles.AnnotatedTestCase` instead of
-    :class:`unittest.TestCase`.
+    This information includes the full assertion statement highlighting
+    the error and any local variables in scope at the time the test
+    failed.
     '''
 
     _META_FORMAT_STRING = '''{standardMsg}
@@ -156,10 +164,10 @@ Source:
 {assert_stmt}
 Locals:
 {locals}
-Advice:
+'''
+    _ADVICE_META_FORMAT_STRING = _META_FORMAT_STRING + '''Advice:
 {advice}
-    '''
-    REQUIRED_KEYS = ['advice']
+'''
     # If msg and/or advice are declared in the test's scope and passed
     # as variables to the assert statement, instead of being declared
     # directly in the assert statement, we don't want to display them
@@ -208,16 +216,19 @@ Advice:
         setattr(self, '_filename', filename)
         setattr(self, '_linenumber', linenumber)
 
-        super(AnnotatedAssertionError, self).__init__(self.formattedMsg)
+        super(ContextualAssertionError, self).__init__(self.formattedMsg)
 
     @property
     def advice(self):
-        formatted_advice = self._advice.format(**self.locals)
-        wrapper = _AdviceWrapper(width=72,
-                                 break_long_words=False,
-                                 initial_indent='\t',
-                                 subsequent_indent='\t')
-        return wrapper.fill(formatted_advice)
+        if self._advice is None:
+            return None
+        else:
+            formatted_advice = self._advice.format(**self.locals)
+            wrapper = _AdviceWrapper(width=72,
+                                     break_long_words=False,
+                                     initial_indent='\t',
+                                     subsequent_indent='\t')
+            return wrapper.fill(formatted_advice)
 
     @property
     def locals(self):
@@ -226,8 +237,8 @@ Advice:
 
         .. note:
 
-           The public local variables ``self`` and ``advice`` are
-           also excluded.
+           The public local variables ``self``, ``advice``, and
+           ``msg``, if present, are excluded.
         '''
         return self._locals
 
@@ -279,7 +290,11 @@ Advice:
 
     @property
     def formattedMsg(self):  # mimic unittest's name for standardMsg
-        return self._META_FORMAT_STRING.format(
+        if self.advice is not None:
+            fmt = self._ADVICE_META_FORMAT_STRING
+        else:
+            fmt = self._META_FORMAT_STRING
+        return fmt.format(
             standardMsg=self.standardMsg, assert_stmt=self.assert_stmt,
             advice=self.advice, locals=self._format_locals(self.locals))
 
@@ -292,14 +307,14 @@ Advice:
     @staticmethod
     def _find_assert_stmt(filename, linenumber, leading=1, following=2,
                           module_globals=None):
-        '''Given a Python module name, filename and line number, find the
-        lines that are a part of the statement containing that line.
+        '''Given a Python module name, filename and line number, find
+        the lines that are part of the statement containing that line.
 
         Python stacktraces, when reporting which line they're on, always
         show the last line of the statement. This can be confusing if
         the statement spans multiple lines. This function helps
         reconstruct the whole statement, and is used by
-        :meth:`marbles.AnnotatedAssertionError.assert_stmt`.
+        :meth:`marbles.ContextualAssertionError.assert_stmt`.
 
         Returns a tuple of the range of lines spanned by the source
         being returned, the number of the line on which the interesting
@@ -333,22 +348,24 @@ class AnnotationContext(object):
     causing an error there.
     '''
 
-    def __init__(self, case, assertion, msg, advice, args, kwargs):
+    def __init__(self, case, assertion, required_keys,
+                 msg, advice, args, kwargs):
         setattr(self, '_case', case)
         setattr(self, '_assertion', assertion)
+        setattr(self, '_required_keys', required_keys)
         setattr(self, '_msg', msg)
         setattr(self, '_advice', advice)
         setattr(self, '_args', args)
         setattr(self, '_kwargs', kwargs)
 
-    @staticmethod
-    def _validate_annotation(annotation):
+    def _validate_annotation(self, annotation):
         '''Ensures that the annotation has the right fields.'''
-        required = set(AnnotatedAssertionError.REQUIRED_KEYS)
-        present = set(key for key, val in annotation.items() if val)
-        missing = required.difference(present)
-        if missing:
-            error = 'Annotation missing required fields: {0}'.format(missing)
+        required_keys = set(self._required_keys)
+        keys = set(key for key, val in annotation.items() if val)
+        missing_keys = required_keys.difference(keys)
+        if missing_keys:
+            error = 'Annotation missing required fields: {0}'.format(
+                missing_keys)
             raise AnnotationError(error)
 
     def __enter__(self):
@@ -438,28 +455,28 @@ def _extract_msg(args, kwargs, msg_idx, default_msg, non_msg_params):
     return msg, args, rem_args, kwargs
 
 
-class AnnotatedTestCase(unittest.TestCase):
-    '''AnnotatedTestCase is an extension of :class:`unittest.TestCase`.
+class TestCase(unittest.TestCase):
+    '''The marbles TestCase is an extension of :class:`unittest.TestCase`.
 
-    When writing a test class based on :class:`AnnotatedTestCase`, all
-    assert statements like :meth:`unittest.TestCase.assertEqual`, in
-    addition to accepting an optional final string parameter ``msg``,
-    expect a keyword parameter ``advice``, which should describe what
-    steps should be taken when the test fails.
+    When writing a test class based on
+    :class:`marbles.AnnotatedTestCase`, all assert statements, e.g.
+    :meth:`unittest.TestCase.assertEqual`, in addition to accepting an
+    optional final string parameter ``msg``, also accept a keyword
+    parameter ``advice``, which should provide more context about the
+    test and describe what to do if/when the test fails.
 
     The advice string (and the ``msg`` parameter, if provided) are
     formatted with :meth:`str.format` given the local variables
     defined within the test itself.
-
-    Every assertion checks to make sure both message and advice are
-    provided, and if not, raises an :class:`AnnotationError`.
 
     Example:
 
     .. literalinclude:: ../examples/sla.py
     '''
 
-    failureException = AnnotatedAssertionError
+    failureException = ContextualAssertionError
+
+    _REQUIRED_KEYS = []
 
     def _formatMessage(self, msg, standardMsg):
         return (msg, standardMsg)
@@ -475,8 +492,9 @@ class AnnotatedTestCase(unittest.TestCase):
 
             advice = kwargs.pop('advice', None)
 
-            with AnnotationContext(self, attr, msg, advice,
-                                   list(args) + list(rem_args), kwargs) as annotation:
+            with AnnotationContext(
+                    self, attr, self._REQUIRED_KEYS, msg, advice,
+                    list(args) + list(rem_args), kwargs) as annotation:
                 if rem_args:
                     return attr(*args, annotation, *rem_args, **kwargs)
                 return attr(*args, msg=annotation, **kwargs)
@@ -488,7 +506,7 @@ class AnnotatedTestCase(unittest.TestCase):
 
         # For TestCase.fail, we're not going to call _formatMessage,
         # so we need to call the real TestCase.fail function with the
-        # thing we want passed to AnnotatedAssertionError. Thus, we
+        # thing we want passed to ContextualAssertionError. Thus, we
         # extract msg and advice as usual, but when we call the
         # wrapped function, we do what our _formatMessage would do and
         # pass the tuple directly.
@@ -497,12 +515,16 @@ class AnnotatedTestCase(unittest.TestCase):
             msg, args, rem_args, kwargs = _extract_msg(
                 args, kwargs, msg_idx, default_msg, non_msg_params)
             # TestCase.fail doesn't have args after msg
-            assert len(rem_args) == 0
+            if rem_args:
+                raise ValueError(
+                    'TestCase.fail() received extra args: {}'.format(rem_args)
+                )
 
             advice = kwargs.pop('advice', None)
 
-            with AnnotationContext(self, attr, msg, advice,
-                                   list(args) + list(rem_args), kwargs) as annotation:
+            with AnnotationContext(
+                    self, attr, self._REQUIRED_KEYS, msg, advice,
+                    list(args) + list(rem_args), kwargs) as annotation:
                 # Some builtin assertions (like assertIsNotNone)
                 # have already called _formatMessage and pass that
                 # to TestCase.fail, so if what we get is already a
@@ -531,7 +553,7 @@ class AnnotatedTestCase(unittest.TestCase):
         To add other keyword arguments in the future, you have to make
         sure that the way the underlying assertion gets called is
         going to work with _formatMessage above, and the unpacking of
-        args in AnnotatedAssertionError.__init__, and you should watch
+        args in ContextualAssertionError.__init__, and you should watch
         out for backwards compatibility with existing usage.
         '''
         attr = object.__getattribute__(self, key)
@@ -542,3 +564,20 @@ class AnnotatedTestCase(unittest.TestCase):
             attr = self.__wrap_fail(attr)
 
         return attr
+
+
+class AnnotatedTestCase(TestCase):
+    '''AnnotatedTestCase is an extension of :class:`marbles.TestCase`.
+
+    An :class:`~marbles.AnnotatedTestCase` is only different from a
+    :class:`marbles.TestCase` in that it enforces that advice is
+    provided for every assertion.
+
+    For other details, see :class:`marbles.TestCase`.
+
+    Assertion methods on this TestCase may raise
+    :class:`AnnotationError`. Every assertion checks to make sure that
+    both message and advice are provided and raises that error if not.
+    '''
+
+    _REQUIRED_KEYS = ['advice']

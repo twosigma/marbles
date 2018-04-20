@@ -3,7 +3,7 @@ marbles
 =======
 
 .. automodule:: marbles
-   :members: AnnotatedTestCase, AnnotatedAssertionError
+   :members: TestCase, AnnotatedTestCase, ContextualAssertionError
 
 :mod:`marbles.log`
 ------------------

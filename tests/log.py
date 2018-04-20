@@ -24,7 +24,7 @@ import tempfile
 import unittest
 import unittest.util
 
-from marbles import AnnotatedAssertionError
+from marbles import ContextualAssertionError
 from marbles import log
 from marbles import __version__
 import tests.marbles as marbles_tests
@@ -47,15 +47,16 @@ class LoggingConfigureTestCase(unittest.TestCase):
     }
 
     def __init__(self, methodName='runTest', *, use_env=False, use_file=False,
-                 **kwargs):
+                 use_annotated_test_case=False, **kwargs):
         super().__init__(methodName=methodName, **kwargs)
         self._use_env = use_env
         self._use_file = use_file
+        self._use_annotated_test_case = use_annotated_test_case
 
     def __str__(self):
         params = ', '.join(
             '{}={!r}'.format(name, getattr(self, '_{}'.format(name)))
-            for name in ('use_env', 'use_file'))
+            for name in ('use_env', 'use_file', 'use_annotated_test_case'))
         return '{} ({}) ({})'.format(
             self._testMethodName,
             unittest.util.strclass(self.__class__),
@@ -95,7 +96,10 @@ class LoggingConfigureTestCase(unittest.TestCase):
 
     def setUp(self):
         super().setUp()
-        self.case = marbles_tests.ExampleAnnotatedTestCase()
+        if self._use_annotated_test_case:
+            self.case = marbles_tests.ExampleAnnotatedTestCase()
+        else:
+            self.case = marbles_tests.ExampleTestCase()
         self.__old_logger = log.logger
         log.logger = log.AssertionLogger()
         log.logger.configure()
@@ -180,7 +184,7 @@ class TestAssertionLoggingVerboseTrue(LoggingConfigureTestCase):
 
     def test_failure(self):
         '''On a failed assertion, do we log information?'''
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_reverse_equality_positional_msg()
         logs = self.assertion_logs()
         self.assertEqual(len(logs), 1)
@@ -222,7 +226,7 @@ class TestAssertionLoggingVerboseFalse(LoggingConfigureTestCase):
 
     def test_failure(self):
         '''On a failed assertion, do we log information?'''
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_reverse_equality_positional_msg()
         logs = self.assertion_logs()
         self.assertEqual(len(logs), 1)
@@ -266,7 +270,7 @@ class TestAssertionLoggingVerboseList(LoggingConfigureTestCase):
 
     def test_failure(self):
         '''On a failed assertion, do we log information?'''
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_reverse_equality_positional_msg()
         logs = self.assertion_logs()
         self.assertEqual(len(logs), 1)
@@ -303,7 +307,7 @@ class TestAssertionLoggingAttributeCapture(LoggingConfigureTestCase):
 
     def test_capture_test_case_attributes_on_failure(self):
         '''Can we capture other attributes of a TestCase on failure?'''
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_failure()
         logs = self.assertion_logs()
         self.assertEqual(len(logs), 1)
@@ -333,7 +337,7 @@ class TestAssertionLoggingVerboseAttributeCapture(LoggingConfigureTestCase):
 
     def test_capture_test_case_attributes_on_failure(self):
         '''Can we capture other attributes of a TestCase on failure?'''
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_failure()
         logs = self.assertion_logs()
         self.assertEqual(len(logs), 1)
@@ -421,14 +425,36 @@ def load_tests(loader, tests, pattern):
                     if (isinstance(obj, type)
                         and issubclass(obj, unittest.TestCase))]
 
-    for cls in test_classes:
-        for name in loader.getTestCaseNames(cls):
-            suite.addTest(cls(methodName=name, use_env=False, use_file=False))
-    for cls in test_classes:
-        for name in loader.getTestCaseNames(cls):
-            suite.addTest(cls(methodName=name, use_env=False, use_file=True))
-    for cls in test_classes:
-        for name in loader.getTestCaseNames(cls):
-            suite.addTest(cls(methodName=name, use_env=True, use_file=True))
+    for use_annotated_test_case in (True, False):
+        for cls in test_classes:
+            for name in loader.getTestCaseNames(cls):
+                suite.addTest(
+                    cls(
+                        methodName=name,
+                        use_env=False,
+                        use_file=False,
+                        use_annotated_test_case=use_annotated_test_case
+                    )
+                )
+        for cls in test_classes:
+            for name in loader.getTestCaseNames(cls):
+                suite.addTest(
+                    cls(
+                        methodName=name,
+                        use_env=False,
+                        use_file=True,
+                        use_annotated_test_case=use_annotated_test_case
+                    )
+                )
+        for cls in test_classes:
+            for name in loader.getTestCaseNames(cls):
+                suite.addTest(
+                    cls(
+                        methodName=name,
+                        use_env=True,
+                        use_file=True,
+                        use_annotated_test_case=use_annotated_test_case
+                    )
+                )
 
     return suite

@@ -12,7 +12,7 @@
 '''Tests about marbles assertions.
 
 Generally, we set up a fake AnnotatedTestCase, run its tests, and
-check whether it responds by raising the right AnnotatedAssertionError
+check whether it responds by raising the right ContextualAssertionError
 with fields filled in.
 '''
 
@@ -21,12 +21,14 @@ import io
 import linecache
 import logging
 import os
+import sys
 import unittest
 
 from marbles import (
     AnnotatedTestCase,
-    AnnotatedAssertionError,
-    AnnotationError
+    AnnotationError,
+    ContextualAssertionError,
+    TestCase
 )
 from marbles import log
 
@@ -43,11 +45,17 @@ class OddArgumentOrderTestCaseMixin(object):
         self.assertEqual(left, right, msg=msg)
 
 
+# We write our example test case as a mixin, then mix it into both
+# AnnotatedTestCase and TestCase below.  We inherit from
+# unittest.TestCase here so that editors and tools that check for
+# member existence don't get confused, we enforce that the marbles
+# TestCase subclasses are earlier in the method resolution order than
+# unittest.TestCase.
 @unittest.skip('This is the TestCase being tested')
-class ExampleAnnotatedTestCase(
+class ExampleTestCaseMixin(
         ReversingTestCaseMixin,
         OddArgumentOrderTestCaseMixin,
-        AnnotatedTestCase):
+        unittest.TestCase):
 
     longMessage = 'This is a long message'
 
@@ -267,36 +275,73 @@ unearthed in the excavation of an old privy in New Orleans.'''
         self.assertTrue(False, advice=advice)
 
 
-class TestAnnotatedTestCase(unittest.TestCase):
+@unittest.skip('This is the TestCase being tested')
+class ExampleTestCase(TestCase, ExampleTestCaseMixin):
+    pass
+
+
+@unittest.skip('This is the TestCase being tested')
+class ExampleAnnotatedTestCase(AnnotatedTestCase, ExampleTestCaseMixin):
+    pass
+
+
+class MarblesTestCase(unittest.TestCase):
+    '''Common setUp/tearDown for tests that should run against both
+    TestCase and AnnotatedTestCase.
+    '''
+
+    def __init__(self, methodName='runTest', *, use_annotated_test_case=False,
+                 **kwargs):
+        super().__init__(methodName=methodName, **kwargs)
+        self._use_annotated_test_case = use_annotated_test_case
+
+    def __str__(self):
+        params = ', '.join(
+            '{}={!r}'.format(name, getattr(self, '_{}'.format(name)))
+            for name in ('use_annotated_test_case',))
+        return '{} ({}) ({})'.format(
+            self._testMethodName,
+            unittest.util.strclass(self.__class__),
+            params)
 
     def setUp(self):
-        self.case = ExampleAnnotatedTestCase()
+        if self._use_annotated_test_case:
+            self.case = ExampleAnnotatedTestCase()
+        else:
+            self.case = ExampleTestCase()
 
     def tearDown(self):
         delattr(self, 'case')
+
+
+class InterfaceTestCase(MarblesTestCase):
 
     def test_annotated_assertion_error_not_raised(self):
         '''Is no error raised if a test succeeds?'''
         self.case.test_success()
 
     def test_annotated_assertion_error_raised(self):
-        '''Is an AnnotatedAssertionError raised if a test fails?'''
-        with self.assertRaises(AnnotatedAssertionError):
+        '''Is an ContextualAssertionError raised if a test fails?'''
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_failure()
 
     def test_fail_handles_advice_properly(self):
         '''Does TestCase.fail() deal with advice the right way?'''
-        with self.assertRaises(AnnotationError):
-            self.case.test_fail_without_msg_without_advice()
-        with self.assertRaises(AnnotatedAssertionError):
+        if self._use_annotated_test_case:
+            with self.assertRaises(AnnotationError):
+                self.case.test_fail_without_msg_without_advice()
+        else:
+            with self.assertRaises(ContextualAssertionError):
+                self.case.test_fail_without_msg_without_advice()
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_fail_without_msg_kwargs_advice()
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_fail_positional_msg_kwargs_advice()
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_fail_kwargs_msg_kwargs_advice()
 
     def test_fail_works_when_invoked_by_builtin_assertions(self):
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_fail_after_calling_formatMessage()
 
     def test_assert_raises_success(self):
@@ -305,12 +350,15 @@ class TestAnnotatedTestCase(unittest.TestCase):
 
     def test_assert_raises_failure(self):
         '''Does assertRaises work correctly when the test fails?'''
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_assert_raises_failure()
 
     def test_assert_raises_missing_advice(self):
         '''Do we notice missing advice for assertRaises?'''
-        with self.assertRaises(AnnotationError):
+        if self._use_annotated_test_case:
+            with self.assertRaises(AnnotationError):
+                self.case.test_assert_raises_missing_advice()
+        else:
             self.case.test_assert_raises_missing_advice()
 
     def test_string_equality(self):
@@ -324,33 +372,41 @@ class TestAnnotatedTestCase(unittest.TestCase):
 
     def test_missing_advice_dict(self):
         '''When passing a dict as msg, do we still check for advice?'''
-        with self.assertRaises(AnnotationError):
+        if self._use_annotated_test_case:
+            with self.assertRaises(AnnotationError):
+                self.case.test_missing_advice_dict()
+        else:
             self.case.test_missing_advice_dict()
 
     def test_missing_msg_ok(self):
         '''Is it ok to provide only advice?'''
         self.case.test_missing_msg_kwargs_advice_success()
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_missing_msg_kwargs_advice_failure()
 
     def test_odd_argument_order_ok(self):
         '''Does marbles handle a msg argument before the last position?'''
         self.case.test_odd_argument_order_success()
-        with self.assertRaises(AnnotatedAssertionError):
+        with self.assertRaises(ContextualAssertionError):
             self.case.test_odd_argument_order_failure()
 
     def test_missing_annotation(self):
         '''Does marbles check for missing annotations?'''
-        with self.assertRaises(AnnotationError, msg='for a passing test'):
+        if self._use_annotated_test_case:
+            with self.assertRaises(AnnotationError, msg='for a passing test'):
+                self.case.test_missing_annotation_pass()
+            with self.assertRaises(AnnotationError, msg='for a failing test'):
+                self.case.test_missing_annotation_fail()
+        else:
             self.case.test_missing_annotation_pass()
-        with self.assertRaises(AnnotationError, msg='for a failing test'):
-            self.case.test_missing_annotation_fail()
+            with self.assertRaises(AssertionError):
+                self.case.test_missing_annotation_fail()
 
 
-class TestAssertionLoggingFailure(unittest.TestCase):
+class TestAssertionLoggingFailure(MarblesTestCase):
 
     def setUp(self):
-        self.case = ExampleAnnotatedTestCase()
+        super().setUp()
         self.file_handle = object()
         self.old_logger = log.logger
         log.logger = log.AssertionLogger()
@@ -371,7 +427,7 @@ class TestAssertionLoggingFailure(unittest.TestCase):
         delattr(self, 'log_buffer')
         log.logger.configure(logfile=None)
         delattr(self, 'file_handle')
-        delattr(self, 'case')
+        super().tearDown()
 
     def test_success(self):
         '''When logging fails, do we allow the test to proceed?'''
@@ -380,34 +436,28 @@ class TestAssertionLoggingFailure(unittest.TestCase):
                       self.log_buffer.getvalue())
 
 
-class TestAnnotatedAssertionError(unittest.TestCase):
-
-    def setUp(self):
-        self.case = ExampleAnnotatedTestCase()
-
-    def tearDown(self):
-        delattr(self, 'case')
+class TestContextualAssertionError(MarblesTestCase):
 
     def test_verify_annotation_dict_missing_keys(self):
         '''Is an Exception raised if annotation is missing expected keys?'''
         with self.assertRaises(Exception):
-            AnnotatedAssertionError(({'foo': 'bar'}, 'standard message'))
+            ContextualAssertionError(({'foo': 'bar'}, 'standard message'))
 
     def test_verify_annotation_none(self):
         '''Is an Exception raised if no annotation is provided?'''
         with self.assertRaises(Exception):
-            AnnotatedAssertionError(())
+            ContextualAssertionError(())
 
     def test_verify_annotation_locals(self):
         '''Are locals in the test definition formatted into annotations?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_locals()
         e = ar.exception
         self.assertEqual(e.advice.strip(), "some advice about 'bar'")
 
     def test_assert_raises_without_msg(self):
         '''Do we capture annotations properly for assertRaises?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_assert_raises_failure()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'Exception not raised')
@@ -415,7 +465,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_assert_raises_kwargs_msg(self):
         '''Do we capture kwargs annotations properly for assertRaises?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_assert_raises_kwargs_msg()
         e = ar.exception
         expected_msg = 'undead message'
@@ -424,29 +474,29 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_get_stack(self):
         '''Does _get_stack() find the stack level with the test definition?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_failure()
         e = ar.exception
         self.assertCountEqual(list(e._locals.keys()), ['self'])
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 58)
+        self.assertEqual(e.linenumber, 66)
 
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_locals()
         e = ar.exception
         self.assertCountEqual(list(e._locals.keys()), ['foo', 'self'])
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 183)
+        self.assertEqual(e.linenumber, 191)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''
-        test_linenumber = 58
+        test_linenumber = 66
         test_filename = os.path.abspath(__file__)
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_failure()
         e = ar.exception
         lines = e.assert_stmt.split('\n')
@@ -465,18 +515,18 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         '''Does _find_assert_stmt read surrounding lines from the file?'''
         test_linenumber = 58
         test_filename = os.path.abspath(__file__)
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_failure()
         e = ar.exception
         lines = e._find_assert_stmt(test_filename, test_linenumber)[0]
-        self.assertEqual(len(lines), 3)
+        self.assertEqual(len(lines), 7)
         more_lines = e._find_assert_stmt(
             test_filename, test_linenumber, 2, 5)[0]
-        self.assertEqual(len(more_lines), 7)
+        self.assertEqual(len(more_lines), 11)
 
     def test_advice_wrapping(self):
         '''Do we wrap the advice properly?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_long_advice()
         e = ar.exception
         lines = e.advice.split('\n')
@@ -484,13 +534,13 @@ class TestAnnotatedAssertionError(unittest.TestCase):
             self.assertLess(len(line), 75)
             self.assertTrue(line.startswith('\t'))
 
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_long_line_in_advice()
         e = ar.exception
         lines = e.advice.split('\n')
         self.assertTrue(any(len(line) > 75 for line in lines))
 
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_multi_paragraphs_in_advice()
         e = ar.exception
         paragraphs = e.advice.split('\n\n')
@@ -500,7 +550,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
                 self.assertLess(len(line), 75)
                 self.assertTrue(line.startswith('\t'))
 
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_list_in_advice()
         e = ar.exception
         lines = e.advice.split('\n')
@@ -516,7 +566,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_positional_assert_args(self):
         '''Is annotation captured correctly when using positional arguments?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_positional_assert_args()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'some message')
@@ -524,7 +574,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_named_assert_args(self):
         '''Is annotation captured correctly if named arguments are provided?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_named_assert_args()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'some message')
@@ -532,7 +582,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_use_kwargs_form(self):
         '''Does the kwargs form of an assertion work?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_kwargs()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'kwargs message')
@@ -542,12 +592,15 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         '''Does the kwargs form of an assertion enforce that message and
         advice must both be present?
         '''
-        with self.assertRaises(AnnotationError):
+        if self._use_annotated_test_case:
+            with self.assertRaises(AnnotationError):
+                self.case.test_kwargs_advice_missing()
+        else:
             self.case.test_kwargs_advice_missing()
 
     def test_positional_msg_kwargs_advice(self):
         '''Is annotation captured correctly when using a positional msg?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_positional_msg_kwargs_advice()
         e = ar.exception
         expected_msg = 'positional message'
@@ -556,7 +609,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_missing_msg_kwargs_advice(self):
         '''Is the default msg properly displayed?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_missing_msg_kwargs_advice_failure()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'False is not true')
@@ -564,7 +617,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_missing_msg_dict(self):
         '''Is the default msg properly displayed when advice is in a dict?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_missing_msg_dict()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'False is not true')
@@ -572,7 +625,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_custom_assertions(self):
         '''Does the marbles advice work with custom-defined assertions?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_reverse_equality_positional_msg()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'some message')
@@ -580,7 +633,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_custom_assertions_kwargs(self):
         '''Does the marbles kwargs advice work with custom assertions?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_reverse_equality_kwargs()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'some message')
@@ -588,7 +641,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_odd_argument_order(self):
         '''Does marbles handle a msg argument before the last position?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_odd_argument_order_failure()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'message')
@@ -596,7 +649,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_exclude_ignored_locals(self):
         '''Are ignored variables excluded from output?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_locals()
         e = ar.exception
         locals_section = e._format_locals(e.locals).split('\n')
@@ -608,7 +661,7 @@ class TestAnnotatedAssertionError(unittest.TestCase):
 
     def test_exclude_internal_mangled_locals(self):
         '''Are internal/mangled variables excluded from the "Locals"?'''
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_internal_mangled_locals()
         e = ar.exception
         locals_section = e._format_locals(e.locals).split('\n')
@@ -621,25 +674,47 @@ class TestAnnotatedAssertionError(unittest.TestCase):
         self.assertEqual(e.advice.strip(), "some advice about 'bar'")
 
     def test_advice_rich_format_strings(self):
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_advice_format_strings_attribute_access()
         e = ar.exception
         self.assertEqual('the answer is 42', e.advice.strip())
 
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_advice_format_strings_list_getitem()
         e = ar.exception
         self.assertEqual('the answer is 42', e.advice.strip())
 
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_advice_format_strings_dict_getitem()
         e = ar.exception
         self.assertEqual('the answer is 42', e.advice.strip())
 
-        with self.assertRaises(AnnotatedAssertionError) as ar:
+        with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_advice_format_strings_custom_format()
         e = ar.exception
         self.assertEqual('the date is 20170812', e.advice.strip())
+
+
+def load_tests(loader, tests, pattern):
+    suite = unittest.TestSuite()
+    module = sys.modules[__name__]
+    objs = [getattr(module, name) for name in dir(module)]
+    test_classes = [obj for obj in objs
+                    if (isinstance(obj, type)
+                        and issubclass(obj, unittest.TestCase)
+                        and not getattr(obj, '__unittest_skip__', False))]
+
+    for use_annotated_test_case in (True, False):
+        for cls in test_classes:
+            for name in loader.getTestCaseNames(cls):
+                suite.addTest(
+                    cls(
+                        methodName=name,
+                        use_annotated_test_case=use_annotated_test_case
+                    )
+                )
+
+    return suite
 
 
 if __name__ == '__main__':
