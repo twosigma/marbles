@@ -516,7 +516,7 @@ class TestCase(unittest.TestCase):
                 args, kwargs, msg_idx, default_msg, non_msg_params)
             # TestCase.fail doesn't have args after msg
             if rem_args:
-                raise ValueError(
+                raise TypeError(
                     'TestCase.fail() received extra args: {}'.format(rem_args)
                 )
 

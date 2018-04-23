@@ -77,6 +77,9 @@ class ExampleTestCaseMixin(
     def test_fail_kwargs_msg_kwargs_advice(self):
         self.fail(msg='some message', advice='some advice')
 
+    def test_fail_extra_arg_positional_msg_kwargs_advice(self):
+        self.fail('some message', 'foo', advice='some advice')
+
     def test_fail_after_calling_formatMessage(self):
         self.assertIsNotNone(None, advice='some advice')
 
@@ -340,6 +343,11 @@ class InterfaceTestCase(MarblesTestCase):
         with self.assertRaises(ContextualAssertionError):
             self.case.test_fail_kwargs_msg_kwargs_advice()
 
+    def test_fail_rejects_extra_args(self):
+        '''Does TestCase.fail() reject extra arguments?'''
+        with self.assertRaises(TypeError):
+            self.case.test_fail_extra_arg_positional_msg_kwargs_advice()
+
     def test_fail_works_when_invoked_by_builtin_assertions(self):
         with self.assertRaises(ContextualAssertionError):
             self.case.test_fail_after_calling_formatMessage()
@@ -490,7 +498,7 @@ class TestContextualAssertionError(MarblesTestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 191)
+        self.assertEqual(e.linenumber, 194)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''
