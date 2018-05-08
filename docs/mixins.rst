@@ -1,55 +1,16 @@
-======
-mixins
-======
+marbles.mixins
+--------------
+
+.. autosummary:: marbles.mixins
+
+   marbles.mixins.BetweenMixins
+   marbles.mixins.MonotonicMixins
+   marbles.mixins.UniqueMixins
+   marbles.mixins.FileMixins
+   marbles.mixins.CategoricalMixins
+   marbles.mixins.DateTimeMixins
+   marbles.mixins.DataFrameMixins
+   marbles.mixins.PanelMixins
 
 .. automodule:: marbles.mixins
-
-.. Sections are used, instead of :members:, to make the page easier to navigate
-
-BetweenMixins
-=============
-
-.. autoclass:: BetweenMixins
-   :members:
-
-MonotonicMixins
-===============
-
-.. autoclass:: MonotonicMixins
-   :members:
-
-UniqueMixins
-============
-
-.. autoclass:: UniqueMixins
-   :members:
-
-FileMixins
-==========
-
-.. autoclass:: FileMixins
-   :members:
-
-CategoricalMixins
-=================
-
-.. autoclass:: CategoricalMixins
-   :members:
-
-DateTimeMixins
-==============
-
-.. autoclass:: DateTimeMixins
-   :members:
-
-DataFrameMixins
-===============
-
-.. autoclass:: DataFrameMixins
-   :members:
-
-PanelMixins
-===========
-
-.. autoclass:: PanelMixins
    :members:

@@ -1,0 +1,14 @@
+$ python -m unittest docs/examples/getting_started.py
+F
+======================================================================
+FAIL: test_create_resource (docs.examples.getting_started.ResponseTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/docs/examples/getting_started.py", line 42, in test_create_resource
+    201
+AssertionError: 409 != 201
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (failures=1)

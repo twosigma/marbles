@@ -17,7 +17,7 @@ object for each assertion and its success or failure, as well as any
 other attributes of interest specified by the test author.
 
 The captured information includes the assertion's args and kwargs,
-msg, advice, local variables (for failed assertions, and also for
+msg, note, local variables (for failed assertions, and also for
 passing assertions if verbose logging is turned on), and the result of
 the assertion.
 
@@ -85,12 +85,13 @@ class AssertionLogger(object):
 
     .. code-block:: py
 
+       import marbles.core
        from marbles.core import log
 
        if __name__ == '__main__':
            log.logger.configure(logfile='/path/to/marbles.log',
-                                attrs=['filename', 'category'])
-           unittest.main()
+                                attrs=['filename', 'date'])
+           marbles.core.main()
     '''
 
     def __init__(self):
@@ -131,7 +132,7 @@ class AssertionLogger(object):
             Similar to attrs, but these attrs are captured even on
             success.
         verbose : bool or list of str
-            Fields (within the set {msg, advice, locals}) to capture
+            Fields (within the set {msg, note, locals}) to capture
             even when the test is successful. By default, those three
             fields are only captured on failure.
         '''
@@ -189,7 +190,7 @@ class AssertionLogger(object):
     def verbose(self):
         verbose = os.environ.get('MARBLES_LOG_VERBOSE', self._verbose)
 
-        verbose_attrs = ('msg', 'advice', 'locals')
+        verbose_attrs = ('msg', 'note', 'locals')
         if isinstance(verbose, str):
             if verbose.lower() == 'false':
                 return ()
@@ -202,7 +203,7 @@ class AssertionLogger(object):
         else:
             return verbose or ()
 
-    def _log_assertion(self, case, assertion, args, kwargs, msg, advice,
+    def _log_assertion(self, case, assertion, args, kwargs, msg, note,
                        *exc_info):
         if not self.log_enabled:
             return
@@ -228,9 +229,9 @@ class AssertionLogger(object):
 
         verbose_elements = {
             'msg': msg,
-            'advice': advice.format(**locals_) if advice else None,
+            'note': note.format(**locals_) if note else None,
             'locals': [{'key': k, 'value': str(v)} for k, v in locals_.items()
-                       if (k not in ('msg', 'advice', 'self')
+                       if (k not in ('msg', 'note', 'self')
                            and not k.startswith('_'))]
         }
         if not passed:

@@ -156,7 +156,7 @@ class TestAssertionLogging(LoggingConfigureTestCase):
         }
         self.assertEqual({k: v for k, v in logs[0].items() if k in expected},
                          expected)
-        for unexpected_key in ('locals', 'msg', 'advice'):
+        for unexpected_key in ('locals', 'msg', 'note'):
             self.assertNotIn(unexpected_key, logs[0])
 
 
@@ -177,7 +177,7 @@ class TestAssertionLoggingVerboseTrue(LoggingConfigureTestCase):
             'kwargs': [],
             'locals': [],
             'msg': None,
-            'advice': 'some advice',
+            'note': 'some note',
         }
         self.assertEqual({k: v for k, v in logs[0].items() if k in expected},
                          expected)
@@ -197,7 +197,7 @@ class TestAssertionLoggingVerboseTrue(LoggingConfigureTestCase):
             'kwargs': [],
             'locals': [{'key': 's', 'value': 'leif'}],
             'msg': 'some message',
-            'advice': 'some advice',
+            'note': 'some note',
         }
         self.assertEqual({k: v for k, v in logs[0].items() if k in expected},
                          expected)
@@ -221,7 +221,7 @@ class TestAssertionLoggingVerboseFalse(LoggingConfigureTestCase):
         }
         self.assertEqual({k: v for k, v in logs[0].items() if k in expected},
                          expected)
-        for unexpected_key in ('locals', 'msg', 'advice'):
+        for unexpected_key in ('locals', 'msg', 'note'):
             self.assertNotIn(unexpected_key, logs[0])
 
     def test_failure(self):
@@ -239,7 +239,7 @@ class TestAssertionLoggingVerboseFalse(LoggingConfigureTestCase):
             'kwargs': [],
             'locals': [{'key': 's', 'value': 'leif'}],
             'msg': 'some message',
-            'advice': 'some advice',
+            'note': 'some note',
         }
         self.assertEqual({k: v for k, v in logs[0].items() if k in expected},
                          expected)
@@ -247,7 +247,7 @@ class TestAssertionLoggingVerboseFalse(LoggingConfigureTestCase):
 
 class TestAssertionLoggingVerboseList(LoggingConfigureTestCase):
 
-    log_config = {'verbose': ['msg', 'advice']}
+    log_config = {'verbose': ['msg', 'note']}
 
     def test_success(self):
         '''On a successful assertion, do we respect a verbose list?'''
@@ -261,7 +261,7 @@ class TestAssertionLoggingVerboseList(LoggingConfigureTestCase):
             'args': ['True'],
             'kwargs': [],
             'msg': None,
-            'advice': 'some advice',
+            'note': 'some note',
         }
         self.assertEqual({k: v for k, v in logs[0].items() if k in expected},
                          expected)
@@ -283,7 +283,7 @@ class TestAssertionLoggingVerboseList(LoggingConfigureTestCase):
             'kwargs': [],
             'locals': [{'key': 's', 'value': 'leif'}],
             'msg': 'some message',
-            'advice': 'some advice',
+            'note': 'some note',
         }
         self.assertEqual({k: v for k, v in logs[0].items() if k in expected},
                          expected)
@@ -393,7 +393,7 @@ class TestAssertionLoggingRespectsEnvOverrides(LoggingConfigureTestCase):
         }
         self.assertEqual({k: v for k, v in logs[0].items() if k in expected},
                          expected)
-        for unexpected_key in ('locals', 'msg', 'advice'):
+        for unexpected_key in ('locals', 'msg', 'note'):
             self.assertNotIn(unexpected_key, logs[0])
 
     def test_verbose_override(self):
@@ -411,7 +411,7 @@ class TestAssertionLoggingRespectsEnvOverrides(LoggingConfigureTestCase):
             'kwargs': [],
             'locals': [],
             'msg': None,
-            'advice': 'some advice',
+            'note': 'some note',
         }
         self.assertEqual({k: v for k, v in logs[0].items() if k in expected},
                          expected)

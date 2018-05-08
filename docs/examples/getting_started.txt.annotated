@@ -1,0 +1,26 @@
+$ python -m marbles docs/examples/getting_started.py
+F
+======================================================================
+FAIL: test_create_resource (docs.examples.getting_started.ResponseTestCase)
+----------------------------------------------------------------------
+marbles.core.marbles.ContextualAssertionError: 409 != 201
+
+Source (/path/to/docs/examples/getting_started.py):
+     39 res = requests.put(endpoint, data=data)
+ >   40 self.assertEqual(
+     41     res.status_code,
+     42     201,
+     43     note=res.reason
+     44 )
+Locals:
+        endpoint=http://example.com/api/v1/resource
+        data={'name': 'Little Bobby Tables', 'id': 1}
+Note:
+        The request could not be completed due to a conflict with the current
+        state of the target resource.
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (failures=1)

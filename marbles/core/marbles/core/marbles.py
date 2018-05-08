@@ -24,7 +24,7 @@ include the full assertion statement that failed and any local
 variables in scope at the time the test failed.
 
 Assertions on a :class:`marbles.core.TestCase` also accept an optional
-``advice`` string that will be exposed to the test consumer on test
+``note`` string that will be exposed to the test consumer on test
 failure. This annotation can contain whatever the test author feels is
 important, but it is especially useful for communicating their intent
 and any relevant context about the test. This annotation can be a
@@ -33,9 +33,9 @@ test fails.
 
 You can also inherit from :class:`marbles.core.AnnotatedTestCase`.
 The only difference is that, if you inherit from
-:class:`marbles.core.AnnotatedTestCase`, you must provide ``advice``
+:class:`marbles.core.AnnotatedTestCase`, you must provide ``note``
 annotations to all assertions. Calling an assertion without the
-``advice`` parameter on a :class:`marbles.core.AnnotatedTestCase`
+``note`` parameter on a :class:`marbles.core.AnnotatedTestCase`
 will produce a :class:`marbles.core.AnnotationError`.
 '''
 
@@ -60,8 +60,8 @@ _log = logging.getLogger(__name__)
 
 # We subclass TextWrapper (instead of just writing a wrap()
 # function) because we ultimately use TextWrapper.fill() to
-# return the advice as a wrapped string.
-class _AdviceWrapper(textwrap.TextWrapper):
+# return the note as a wrapped string.
+class _NoteWrapper(textwrap.TextWrapper):
 
     def wrap(self, text, **kwargs):
         '''Wraps each paragraph in ``text`` individually.
@@ -153,19 +153,19 @@ class AnnotationError(Exception):
 
 
 class ContextualAssertionError(AssertionError):
-    '''Extends :class:`AssertionError` to accept and display
-    additional information beyond the static ``msg`` parameter
-    provided by :mod:`unittest` assertions.
+    '''Extends :class:`AssertionError` to accept and display additiona
+    information beyond the static ``msg`` parameter provided by
+    :mod:`unittest` assertions.
 
     This additional information includes the full assertion statement
     that failed and any local variables in scope at the time the test
     failed.
 
-    This additional information may also include an ``advice`` string
-    that can explain the intent of the test, provide any relevant
-    context, and/or describe what to do if/when the assertion fails.
-    This string is formatted with the local context where the assertion
-    error is raised.
+    This additional information may also include a ``note`` string that
+    can explain the intent of the test, provide any relevant context,
+    and/or describe what to do if/when the assertion fails. This string
+    is formatted with the local context where the assertion error is
+    raised.
     '''
 
     _META_FORMAT_STRING = '''{standardMsg}
@@ -175,19 +175,19 @@ Source ({filename}):
 Locals:
 {locals}
 '''
-    _ADVICE_META_FORMAT_STRING = _META_FORMAT_STRING + '''Advice:
-{advice}
+    _NOTE_META_FORMAT_STRING = _META_FORMAT_STRING + '''Note:
+{note}
 '''
-    # If msg and/or advice are declared in the test's scope and passed
+    # If msg and/or note are declared in the test's scope and passed
     # as variables to the assert statement, instead of being declared
     # directly in the assert statement, we don't want to display them
     # in the Locals section of the test output because both the msg
-    # and the advice will be displayed elsewhere in the output anyway
-    _IGNORE_LOCALS = ['msg', 'advice', 'self']
+    # and the note will be displayed elsewhere in the output anyway
+    _IGNORE_LOCALS = ['msg', 'note', 'self']
 
     def __init__(self, *args):
         '''Assume args contains a tuple of two arguments:
-            1. the "advice" annotation provided by the test author, and
+            1. the "note" annotation provided by the test author, and
             2. the "standardMsg" from :mod:`unittest` which is the
                static string representation of the asserted fact that
                wasn't true.
@@ -197,7 +197,7 @@ Locals:
 
         Parameters
         ----------
-        advice : str
+        note : str
             This string is meant to contain useful information for the
             test consumer about what to do when the test fails. It can
             contain format string fields that will be expanded with
@@ -212,14 +212,14 @@ Locals:
         locals_, module, filename, linenumber = _stack.get_stack_info()
 
         # When the wrapper in AnnotatedTestCase sees both msg and
-        # advice, it bundles msg with advice in order to thread it
+        # note, it bundles msg with note in order to thread it
         # down the stack. So if the user was trying to override the
         # standard message, their value would actually be here.
         msg = annotation.pop('msg', None)
         if not msg:
             msg = standardMsg
 
-        setattr(self, '_advice', annotation['advice'])
+        setattr(self, '_note', annotation['note'])
         setattr(self, 'standardMsg', msg)
         setattr(self, '_locals', locals_)
         setattr(self, '_module', module)
@@ -229,16 +229,16 @@ Locals:
         super(ContextualAssertionError, self).__init__(self.formattedMsg)
 
     @property
-    def advice(self):
-        if self._advice is None:
+    def note(self):
+        if self._note is None:
             return None
         else:
-            formatted_advice = self._advice.format(**self.locals)
-            wrapper = _AdviceWrapper(width=72,
+            formatted_note = self._note.format(**self.locals)
+            wrapper = _NoteWrapper(width=72,
                                      break_long_words=False,
                                      initial_indent='\t',
                                      subsequent_indent='\t')
-            return wrapper.fill(formatted_advice)
+            return wrapper.fill(formatted_note)
 
     @property
     def locals(self):
@@ -247,7 +247,7 @@ Locals:
 
         .. note:
 
-           The public local variables ``self``, ``advice``, and
+           The public local variables ``self``, ``note``, and
            ``msg``, if present, are excluded.
         '''
         return self._locals
@@ -300,13 +300,13 @@ Locals:
 
     @property
     def formattedMsg(self):  # mimic unittest's name for standardMsg
-        if self.advice is not None:
-            fmt = self._ADVICE_META_FORMAT_STRING
+        if self.note is not None:
+            fmt = self._NOTE_META_FORMAT_STRING
         else:
             fmt = self._META_FORMAT_STRING
         return fmt.format(
             standardMsg=self.standardMsg, assert_stmt=self.assert_stmt,
-            advice=self.advice, locals=self._format_locals(self.locals),
+            note=self.note, locals=self._format_locals(self.locals),
             filename=self.filename)
 
     @classmethod
@@ -348,24 +348,24 @@ Locals:
 
 
 class AnnotationContext(object):
-    '''Validates and packs ``msg`` and ``advice``, and stashes
-    ``advice`` for use down the stack.
+    '''Validates and packs ``msg`` and ``note``, and stashes
+    ``note`` for use down the stack.
 
     Within this context manager, if another assertion is called
-    without passing advice, we use the advice from the earlier call
-    rather than raising an error about missing advice. This allows
+    without passing note, we use the note from the earlier call
+    rather than raising an error about missing note. This allows
     e.g. :meth:`unittest.TestCase.assertMultiLineEqual` to make some
-    additional assertions and pass its own ``msg`` without ``advice``,
+    additional assertions and pass its own ``msg`` without ``note``,
     without causing an error there.
     '''
 
     def __init__(self, case, assertion, required_keys,
-                 msg, advice, args, kwargs):
+                 msg, note, args, kwargs):
         setattr(self, '_case', case)
         setattr(self, '_assertion', assertion)
         setattr(self, '_required_keys', required_keys)
         setattr(self, '_msg', msg)
-        setattr(self, '_advice', advice)
+        setattr(self, '_note', note)
         setattr(self, '_args', args)
         setattr(self, '_kwargs', kwargs)
 
@@ -380,25 +380,25 @@ class AnnotationContext(object):
             raise AnnotationError(error)
 
     def __enter__(self):
-        current_advice = getattr(self._case, '__current_advice', None)
-        advice = self._advice or current_advice
+        current_note = getattr(self._case, '__current_note', None)
+        note = self._note or current_note
         if isinstance(self._msg, collections.abc.Mapping):
             annotation = self._msg
         else:
-            annotation = {'msg': self._msg, 'advice': advice}
-        if not current_advice:
+            annotation = {'msg': self._msg, 'note': note}
+        if not current_note:
             self._validate_annotation(annotation)
-        setattr(self, '_old_advice', current_advice)
-        setattr(self._case, '__current_advice', advice)
+        setattr(self, '_old_note', current_note)
+        setattr(self._case, '__current_note', note)
         return annotation
 
     def __exit__(self, *exc_info):
-        setattr(self._case, '__current_advice', self._old_advice)
-        if self._old_advice is None:
+        setattr(self._case, '__current_note', self._old_note)
+        if self._old_note is None:
             try:
                 log.logger._log_assertion(self._case, self._assertion,
                                           self._args, self._kwargs, self._msg,
-                                          self._advice, *exc_info)
+                                          self._note, *exc_info)
             except Exception:
                 _log.exception('Failed to log assertion')
 
@@ -476,7 +476,7 @@ class TestCase(unittest.TestCase):
 
     All assert statements, e.g., :meth:`unittest.TestCase.assertEqual`,
     in addition to accepting the optional final string parameter
-    ``msg``, also accept a free-form ``advice`` annotation provided
+    ``msg``, also accept a free-form ``note`` annotation provided
     by the test author. This annotation can contain whatever the test
     author feels is important, but it is especially useful for
     communicating their intent and any relevant context about the test
@@ -486,13 +486,14 @@ class TestCase(unittest.TestCase):
     the ``msg`` or trying to embed that context into the test method
     name.
 
-    The ``advice`` string, if provided, is formatted with
+    The ``note`` string, if provided, is formatted with
     :meth:`str.format` given the local variables defined within the
     test itself.
 
     Example:
 
-    .. literalinclude:: examples/sla.py
+    .. literalinclude:: examples/getting_started.py.annotated
+       :lines: 1-4,26-43
     '''
 
     failureException = ContextualAssertionError
@@ -511,10 +512,10 @@ class TestCase(unittest.TestCase):
             msg, args, rem_args, kwargs = _extract_msg(
                 args, kwargs, msg_idx, default_msg, non_msg_params)
 
-            advice = kwargs.pop('advice', None)
+            note = kwargs.pop('note', None)
 
             with AnnotationContext(
-                    self, attr, self._REQUIRED_KEYS, msg, advice,
+                    self, attr, self._REQUIRED_KEYS, msg, note,
                     list(args) + list(rem_args), kwargs) as annotation:
                 if rem_args:
                     return attr(*args, annotation, *rem_args, **kwargs)
@@ -528,7 +529,7 @@ class TestCase(unittest.TestCase):
         # For TestCase.fail, we're not going to call _formatMessage,
         # so we need to call the real TestCase.fail function with the
         # thing we want passed to ContextualAssertionError. Thus, we
-        # extract msg and advice as usual, but when we call the
+        # extract msg and note as usual, but when we call the
         # wrapped function, we do what our _formatMessage would do and
         # pass the tuple directly.
         @functools.wraps(attr)
@@ -541,10 +542,10 @@ class TestCase(unittest.TestCase):
                     'TestCase.fail() received extra args: {}'.format(rem_args)
                 )
 
-            advice = kwargs.pop('advice', None)
+            note = kwargs.pop('note', None)
 
             with AnnotationContext(
-                    self, attr, self._REQUIRED_KEYS, msg, advice,
+                    self, attr, self._REQUIRED_KEYS, msg, note,
                     list(args) + list(rem_args), kwargs) as annotation:
                 # Some builtin assertions (like assertIsNotNone)
                 # have already called _formatMessage and pass that
@@ -562,8 +563,8 @@ class TestCase(unittest.TestCase):
         We want (Annotated)TestCases to be able to call assertions with
         syntax like this:
 
-            self.assertTrue(True, msg='message', advice='advice')
-            self.assertTrue(True, 'message', advice='advice')
+            self.assertTrue(True, msg='message', note='note')
+            self.assertTrue(True, 'message', note='note')
 
         To do so, we override __getattribute__ so that any method that
         gets looked up and starts with 'assert' gets wrapped so that
@@ -592,12 +593,12 @@ class AnnotatedTestCase(TestCase):
 
     An :class:`~marbles.core.AnnotatedTestCase` is only different from
     a :class:`marbles.core.TestCase` in that it enforces that
-    ``advice`` is provided for every assertion. Calling an assertion
-    without the ``advice`` parameter on a
+    ``note`` is provided for every assertion. Calling an assertion
+    without the ``note`` parameter on a
     :class:`marbles.core.AnnotatedTestCase` will produce a
     :class:`marbles.core.AnnotationError`.
 
     For other details, see :class:`marbles.core.TestCase`.
     '''
 
-    _REQUIRED_KEYS = ['advice']
+    _REQUIRED_KEYS = ['note']

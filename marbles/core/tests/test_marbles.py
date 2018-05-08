@@ -60,31 +60,31 @@ class ExampleTestCaseMixin(
     longMessage = 'This is a long message'
 
     def test_success(self):
-        self.assertTrue(True, advice='some advice')
+        self.assertTrue(True, note='some note')
 
     def test_failure(self):
-        self.assertTrue(False, advice='some advice')
+        self.assertTrue(False, note='some note')
 
-    def test_fail_without_msg_without_advice(self):
+    def test_fail_without_msg_without_note(self):
         self.fail()
 
-    def test_fail_without_msg_kwargs_advice(self):
-        self.fail(advice='some advice')
+    def test_fail_without_msg_kwargs_note(self):
+        self.fail(note='some note')
 
-    def test_fail_positional_msg_kwargs_advice(self):
-        self.fail('some message', advice='some advice')
+    def test_fail_positional_msg_kwargs_note(self):
+        self.fail('some message', note='some note')
 
-    def test_fail_kwargs_msg_kwargs_advice(self):
-        self.fail(msg='some message', advice='some advice')
+    def test_fail_kwargs_msg_kwargs_note(self):
+        self.fail(msg='some message', note='some note')
 
-    def test_fail_extra_arg_positional_msg_kwargs_advice(self):
-        self.fail('some message', 'foo', advice='some advice')
+    def test_fail_extra_arg_positional_msg_kwargs_note(self):
+        self.fail('some message', 'foo', note='some note')
 
     def test_fail_after_calling_formatMessage(self):
-        self.assertIsNotNone(None, advice='some advice')
+        self.assertIsNotNone(None, note='some note')
 
-    def test_long_advice(self):
-        advice = '''
+    def test_long_note(self):
+        note = '''
 Onionskins - Although this cane-cut swirl usually has at its center a
 clear glass core, it appears solidly colored because the clear core is
 covered by a thin layer of opaque color and then covered again by a
@@ -100,10 +100,10 @@ thus increasing its value. Onionskins were known to exist from the
 beginning of the cane-cut marble industry. An early example, dated
 between 1850 and 1860 was unearthed in the excavation of an old privy
 in New Orleans.'''
-        self.assertTrue(False, advice=advice)
+        self.assertTrue(False, note=note)
 
-    def test_long_line_in_advice(self):
-        advice = '''
+    def test_long_line_in_note(self):
+        note = '''
 OnionskinsAlthoughthiscanecutswirlusuallyhasatitscenteraclearglasscoreitappears
 solidly colored because the clear core is covered by a thin layer of
 opaque color and then covered again by a thin layer of clear
@@ -119,10 +119,10 @@ value. Onionskins were known to exist from the beginning of the
 cane-cut marble industry. An early example, dated between 1850 and
 1860 was unearthed in the excavation of an old privy in New
 Orleans.'''
-        self.assertTrue(False, advice=advice)
+        self.assertTrue(False, note=note)
 
-    def test_multi_paragraphs_in_advice(self):
-        advice = '''
+    def test_multi_paragraphs_in_note(self):
+        note = '''
 Onionskins - Although this cane-cut swirl usually has at its center a
 clear glass core, it appears solidly colored because the clear core is
 covered by a thin layer of opaque color and then covered again by a
@@ -141,10 +141,10 @@ segmented. Sometimes mica was added to the glass, thus increasing its
 value. Onionskins were known to exist from the beginning of the
 cane-cut marble industry. An early example, dated between 1850 and 1860
 was unearthed in the excavation of an old privy in New Orleans.'''
-        self.assertTrue(False, advice=advice)
+        self.assertTrue(False, note=note)
 
-    def test_list_in_advice(self):
-        advice = '''
+    def test_list_in_note(self):
+        note = '''
 There are various types of onionskins:
 
     1. single color,
@@ -170,32 +170,32 @@ There are various types of onionskins:
 value. Onionskins were known to exist from the beginning of the cane-
 cut marble industry. An early example, dated between 1850 and 1860 was
 unearthed in the excavation of an old privy in New Orleans.'''
-        self.assertTrue(False, advice=advice)
+        self.assertTrue(False, note=note)
 
     def test_assert_raises_success(self):
-        with self.assertRaises(Exception, advice='undead advice'):
+        with self.assertRaises(Exception, note='undead note'):
             raise Exception()
 
     def test_assert_raises_failure(self):
-        with self.assertRaises(Exception, advice='undead advice'):
+        with self.assertRaises(Exception, note='undead note'):
             pass
 
-    def test_assert_raises_missing_advice(self):
+    def test_assert_raises_missing_note(self):
         with self.assertRaises(Exception):
             raise Exception()
 
     def test_assert_raises_kwargs_msg(self):
         with self.assertRaises(Exception, msg='undead message',
-                               advice='undead advice'):
+                               note='undead note'):
             pass
 
     def test_locals(self):
         foo = 'bar'  # noqa: F841
-        self.assertTrue(False, advice='some advice about {foo!r}')
+        self.assertTrue(False, note='some note about {foo!r}')
 
     def test_string_equality(self):
         s = ''
-        self.assertEqual(s, s, advice='some advice')
+        self.assertEqual(s, s, note='some note')
 
     def test_missing_annotation_pass(self):
         self.assertTrue(True)
@@ -203,79 +203,79 @@ unearthed in the excavation of an old privy in New Orleans.'''
     def test_missing_annotation_fail(self):
         self.assertTrue(False)
 
-    def test_missing_advice_dict(self):
+    def test_missing_note_dict(self):
         self.assertTrue(True, {'msg': 'message'})
 
     def test_missing_msg_dict(self):
-        self.assertTrue(False, {'advice': 'advice'})
+        self.assertTrue(False, {'note': 'note'})
 
     def test_kwargs(self):
-        self.assertTrue(False, msg='kwargs message', advice='kwargs advice')
+        self.assertTrue(False, msg='kwargs message', note='kwargs note')
 
-    def test_kwargs_advice_missing(self):
+    def test_kwargs_note_missing(self):
         self.assertTrue(True, msg='kwargs message')
 
-    def test_positional_msg_kwargs_advice(self):
-        self.assertTrue(False, 'positional message', advice='kwargs advice')
+    def test_positional_msg_kwargs_note(self):
+        self.assertTrue(False, 'positional message', note='kwargs note')
 
-    def test_missing_msg_kwargs_advice_success(self):
-        self.assertTrue(True, advice='kwargs advice')
+    def test_missing_msg_kwargs_note_success(self):
+        self.assertTrue(True, note='kwargs note')
 
-    def test_missing_msg_kwargs_advice_failure(self):
-        self.assertTrue(False, advice='kwargs advice')
+    def test_missing_msg_kwargs_note_failure(self):
+        self.assertTrue(False, note='kwargs note')
 
     def test_reverse_equality_positional_msg(self):
         s = 'leif'
-        self.assertReverseEqual(s, s, 'some message', advice='some advice')
+        self.assertReverseEqual(s, s, 'some message', note='some note')
 
     def test_reverse_equality_kwargs(self):
         s = 'leif'
         self.assertReverseEqual(s, s,
-                                msg='some message', advice='some advice')
+                                msg='some message', note='some note')
 
     def test_odd_argument_order_success(self):
         s = 'leif'
-        self.assertEqualWithMessageInOddPlace(s, 'message', s, advice='advice')
+        self.assertEqualWithMessageInOddPlace(s, 'message', s, note='note')
 
     def test_odd_argument_order_failure(self):
         s = 'leif'
         self.assertEqualWithMessageInOddPlace(s, 'message', reversed(s),
-                                              advice='advice')
+                                              note='note')
 
     def test_internal_mangled_locals(self):
         _foo = 'bar'  # noqa: F841
         __bar = 'baz'  # noqa: F841
-        self.assertTrue(False, advice='some advice about {_foo!r}')
+        self.assertTrue(False, note='some note about {_foo!r}')
 
     def test_positional_assert_args(self):
-        self.assertAlmostEqual(1, 2, 1, 'some message', advice='some advice')
+        self.assertAlmostEqual(1, 2, 1, 'some message', note='some note')
 
     def test_named_assert_args(self):
         self.assertAlmostEqual(1, 2, places=1, msg='some message',
-                               advice='some advice')
+                               note='some note')
 
-    def test_advice_format_strings_list_getitem(self):
+    def test_note_format_strings_list_getitem(self):
         l = [1, 42, 2]
-        advice = 'the answer is {l[1]}'
-        self.assertTrue(False, advice=advice)
+        note = 'the answer is {l[1]}'
+        self.assertTrue(False, note=note)
 
-    def test_advice_format_strings_dict_getitem(self):
+    def test_note_format_strings_dict_getitem(self):
         l = {'answer': 42,
              'query': 'the answer to life, the universe, and everything'}
-        advice = 'the answer is {l[answer]}'
-        self.assertTrue(False, advice=advice)
+        note = 'the answer is {l[answer]}'
+        self.assertTrue(False, note=note)
 
-    def test_advice_format_strings_attribute_access(self):
+    def test_note_format_strings_attribute_access(self):
         class Foo(object):
             answer = 42
         obj = Foo()
-        advice = 'the answer is {obj.answer}'
-        self.assertTrue(False, advice=advice)
+        note = 'the answer is {obj.answer}'
+        self.assertTrue(False, note=note)
 
-    def test_advice_format_strings_custom_format(self):
+    def test_note_format_strings_custom_format(self):
         date = datetime.date(2017, 8, 12)
-        advice = 'the date is {date:%Y%m%d}'
-        self.assertTrue(False, advice=advice)
+        note = 'the date is {date:%Y%m%d}'
+        self.assertTrue(False, note=note)
 
 
 @unittest.skip('This is the TestCase being tested')
@@ -328,25 +328,25 @@ class InterfaceTestCase(MarblesTestCase):
         with self.assertRaises(ContextualAssertionError):
             self.case.test_failure()
 
-    def test_fail_handles_advice_properly(self):
-        '''Does TestCase.fail() deal with advice the right way?'''
+    def test_fail_handles_note_properly(self):
+        '''Does TestCase.fail() deal with note the right way?'''
         if self._use_annotated_test_case:
             with self.assertRaises(AnnotationError):
-                self.case.test_fail_without_msg_without_advice()
+                self.case.test_fail_without_msg_without_note()
         else:
             with self.assertRaises(ContextualAssertionError):
-                self.case.test_fail_without_msg_without_advice()
+                self.case.test_fail_without_msg_without_note()
         with self.assertRaises(ContextualAssertionError):
-            self.case.test_fail_without_msg_kwargs_advice()
+            self.case.test_fail_without_msg_kwargs_note()
         with self.assertRaises(ContextualAssertionError):
-            self.case.test_fail_positional_msg_kwargs_advice()
+            self.case.test_fail_positional_msg_kwargs_note()
         with self.assertRaises(ContextualAssertionError):
-            self.case.test_fail_kwargs_msg_kwargs_advice()
+            self.case.test_fail_kwargs_msg_kwargs_note()
 
     def test_fail_rejects_extra_args(self):
         '''Does TestCase.fail() reject extra arguments?'''
         with self.assertRaises(TypeError):
-            self.case.test_fail_extra_arg_positional_msg_kwargs_advice()
+            self.case.test_fail_extra_arg_positional_msg_kwargs_note()
 
     def test_fail_works_when_invoked_by_builtin_assertions(self):
         with self.assertRaises(ContextualAssertionError):
@@ -361,13 +361,13 @@ class InterfaceTestCase(MarblesTestCase):
         with self.assertRaises(ContextualAssertionError):
             self.case.test_assert_raises_failure()
 
-    def test_assert_raises_missing_advice(self):
-        '''Do we notice missing advice for assertRaises?'''
+    def test_assert_raises_missing_note(self):
+        '''Do we notice missing note for assertRaises?'''
         if self._use_annotated_test_case:
             with self.assertRaises(AnnotationError):
-                self.case.test_assert_raises_missing_advice()
+                self.case.test_assert_raises_missing_note()
         else:
-            self.case.test_assert_raises_missing_advice()
+            self.case.test_assert_raises_missing_note()
 
     def test_string_equality(self):
         '''Can we use assertEqual on strings?
@@ -378,19 +378,19 @@ class InterfaceTestCase(MarblesTestCase):
         '''
         self.case.test_string_equality()
 
-    def test_missing_advice_dict(self):
-        '''When passing a dict as msg, do we still check for advice?'''
+    def test_missing_note_dict(self):
+        '''When passing a dict as msg, do we still check for note?'''
         if self._use_annotated_test_case:
             with self.assertRaises(AnnotationError):
-                self.case.test_missing_advice_dict()
+                self.case.test_missing_note_dict()
         else:
-            self.case.test_missing_advice_dict()
+            self.case.test_missing_note_dict()
 
     def test_missing_msg_ok(self):
-        '''Is it ok to provide only advice?'''
-        self.case.test_missing_msg_kwargs_advice_success()
+        '''Is it ok to provide only note?'''
+        self.case.test_missing_msg_kwargs_note_success()
         with self.assertRaises(ContextualAssertionError):
-            self.case.test_missing_msg_kwargs_advice_failure()
+            self.case.test_missing_msg_kwargs_note_failure()
 
     def test_odd_argument_order_ok(self):
         '''Does marbles handle a msg argument before the last position?'''
@@ -461,7 +461,7 @@ class TestContextualAssertionError(MarblesTestCase):
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_locals()
         e = ar.exception
-        self.assertEqual(e.advice.strip(), "some advice about 'bar'")
+        self.assertEqual(e.note.strip(), "some note about 'bar'")
 
     def test_assert_raises_without_msg(self):
         '''Do we capture annotations properly for assertRaises?'''
@@ -469,7 +469,7 @@ class TestContextualAssertionError(MarblesTestCase):
             self.case.test_assert_raises_failure()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'Exception not raised')
-        self.assertEqual(e.advice.strip(), 'undead advice')
+        self.assertEqual(e.note.strip(), 'undead note')
 
     def test_assert_raises_kwargs_msg(self):
         '''Do we capture kwargs annotations properly for assertRaises?'''
@@ -478,7 +478,7 @@ class TestContextualAssertionError(MarblesTestCase):
         e = ar.exception
         expected_msg = 'undead message'
         self.assertEqual(e.standardMsg, expected_msg)
-        self.assertEqual(e.advice.strip(), 'undead advice')
+        self.assertEqual(e.note.strip(), 'undead note')
 
     def test_get_stack(self):
         '''Does _get_stack() find the stack level with the test definition?'''
@@ -532,26 +532,26 @@ class TestContextualAssertionError(MarblesTestCase):
             test_filename, test_linenumber, 2, 5)[0]
         self.assertEqual(len(more_lines), 11)
 
-    def test_advice_wrapping(self):
-        '''Do we wrap the advice properly?'''
+    def test_note_wrapping(self):
+        '''Do we wrap the note properly?'''
         with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_long_advice()
+            self.case.test_long_note()
         e = ar.exception
-        lines = e.advice.split('\n')
+        lines = e.note.split('\n')
         for line in lines:
             self.assertLess(len(line), 75)
             self.assertTrue(line.startswith('\t'))
 
         with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_long_line_in_advice()
+            self.case.test_long_line_in_note()
         e = ar.exception
-        lines = e.advice.split('\n')
+        lines = e.note.split('\n')
         self.assertTrue(any(len(line) > 75 for line in lines))
 
         with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_multi_paragraphs_in_advice()
+            self.case.test_multi_paragraphs_in_note()
         e = ar.exception
-        paragraphs = e.advice.split('\n\n')
+        paragraphs = e.note.split('\n\n')
         self.assertGreater(len(paragraphs), 1)
         for paragraph in paragraphs:
             for line in paragraph.split('\n'):
@@ -559,9 +559,9 @@ class TestContextualAssertionError(MarblesTestCase):
                 self.assertTrue(line.startswith('\t'))
 
         with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_list_in_advice()
+            self.case.test_list_in_note()
         e = ar.exception
-        lines = e.advice.split('\n')
+        lines = e.note.split('\n')
         for line in lines:
             self.assertLess(len(line), 75)
         list_lines = [2, 4, 6, 8, 16, 18, 20, 22]
@@ -578,7 +578,7 @@ class TestContextualAssertionError(MarblesTestCase):
             self.case.test_positional_assert_args()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'some message')
-        self.assertEqual(e.advice.strip(), 'some advice')
+        self.assertEqual(e.note.strip(), 'some note')
 
     def test_named_assert_args(self):
         '''Is annotation captured correctly if named arguments are provided?'''
@@ -586,7 +586,7 @@ class TestContextualAssertionError(MarblesTestCase):
             self.case.test_named_assert_args()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'some message')
-        self.assertEqual(e.advice.strip(), 'some advice')
+        self.assertEqual(e.note.strip(), 'some note')
 
     def test_use_kwargs_form(self):
         '''Does the kwargs form of an assertion work?'''
@@ -594,58 +594,58 @@ class TestContextualAssertionError(MarblesTestCase):
             self.case.test_kwargs()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'kwargs message')
-        self.assertEqual(e.advice.strip(), 'kwargs advice')
+        self.assertEqual(e.note.strip(), 'kwargs note')
 
     def test_kwargs_stick_together(self):
         '''Does the kwargs form of an assertion enforce that message and
-        advice must both be present?
+        note must both be present?
         '''
         if self._use_annotated_test_case:
             with self.assertRaises(AnnotationError):
-                self.case.test_kwargs_advice_missing()
+                self.case.test_kwargs_note_missing()
         else:
-            self.case.test_kwargs_advice_missing()
+            self.case.test_kwargs_note_missing()
 
-    def test_positional_msg_kwargs_advice(self):
+    def test_positional_msg_kwargs_note(self):
         '''Is annotation captured correctly when using a positional msg?'''
         with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_positional_msg_kwargs_advice()
+            self.case.test_positional_msg_kwargs_note()
         e = ar.exception
         expected_msg = 'positional message'
         self.assertEqual(e.standardMsg, expected_msg)
-        self.assertEqual(e.advice.strip(), 'kwargs advice')
+        self.assertEqual(e.note.strip(), 'kwargs note')
 
-    def test_missing_msg_kwargs_advice(self):
+    def test_missing_msg_kwargs_note(self):
         '''Is the default msg properly displayed?'''
         with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_missing_msg_kwargs_advice_failure()
+            self.case.test_missing_msg_kwargs_note_failure()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'False is not true')
-        self.assertEqual(e.advice.strip(), 'kwargs advice')
+        self.assertEqual(e.note.strip(), 'kwargs note')
 
     def test_missing_msg_dict(self):
-        '''Is the default msg properly displayed when advice is in a dict?'''
+        '''Is the default msg properly displayed when note is in a dict?'''
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_missing_msg_dict()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'False is not true')
-        self.assertEqual(e.advice.strip(), 'advice')
+        self.assertEqual(e.note.strip(), 'note')
 
     def test_custom_assertions(self):
-        '''Does the marbles advice work with custom-defined assertions?'''
+        '''Does the marbles note work with custom-defined assertions?'''
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_reverse_equality_positional_msg()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'some message')
-        self.assertEqual(e.advice.strip(), 'some advice')
+        self.assertEqual(e.note.strip(), 'some note')
 
     def test_custom_assertions_kwargs(self):
-        '''Does the marbles kwargs advice work with custom assertions?'''
+        '''Does the marbles kwargs note work with custom assertions?'''
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_reverse_equality_kwargs()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'some message')
-        self.assertEqual(e.advice.strip(), 'some advice')
+        self.assertEqual(e.note.strip(), 'some note')
 
     def test_odd_argument_order(self):
         '''Does marbles handle a msg argument before the last position?'''
@@ -653,7 +653,7 @@ class TestContextualAssertionError(MarblesTestCase):
             self.case.test_odd_argument_order_failure()
         e = ar.exception
         self.assertEqual(e.standardMsg, 'message')
-        self.assertEqual(e.advice.strip(), 'advice')
+        self.assertEqual(e.note.strip(), 'note')
 
     def test_exclude_ignored_locals(self):
         '''Are ignored variables excluded from output?'''
@@ -679,28 +679,28 @@ class TestContextualAssertionError(MarblesTestCase):
             local = local.strip()
             self.assertNotIn(local, ['_foo', '__bar'])
             self.assertFalse(local.startswith('_'))
-        self.assertEqual(e.advice.strip(), "some advice about 'bar'")
+        self.assertEqual(e.note.strip(), "some note about 'bar'")
 
-    def test_advice_rich_format_strings(self):
+    def test_note_rich_format_strings(self):
         with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_advice_format_strings_attribute_access()
+            self.case.test_note_format_strings_attribute_access()
         e = ar.exception
-        self.assertEqual('the answer is 42', e.advice.strip())
-
-        with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_advice_format_strings_list_getitem()
-        e = ar.exception
-        self.assertEqual('the answer is 42', e.advice.strip())
+        self.assertEqual('the answer is 42', e.note.strip())
 
         with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_advice_format_strings_dict_getitem()
+            self.case.test_note_format_strings_list_getitem()
         e = ar.exception
-        self.assertEqual('the answer is 42', e.advice.strip())
+        self.assertEqual('the answer is 42', e.note.strip())
 
         with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_advice_format_strings_custom_format()
+            self.case.test_note_format_strings_dict_getitem()
         e = ar.exception
-        self.assertEqual('the date is 20170812', e.advice.strip())
+        self.assertEqual('the answer is 42', e.note.strip())
+
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_note_format_strings_custom_format()
+        e = ar.exception
+        self.assertEqual('the date is 20170812', e.note.strip())
 
 
 def load_tests(loader, tests, pattern):

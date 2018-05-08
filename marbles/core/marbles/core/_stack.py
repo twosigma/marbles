@@ -16,7 +16,7 @@ import traceback
 def get_stack_info():
     '''Capture locals, module name, filename, and line number from the
     stacktrace to provide the source of the assertion error and
-    formatted advice.
+    formatted note.
     '''
     stack = traceback.walk_stack(sys._getframe().f_back)
 

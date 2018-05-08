@@ -1,0 +1,19 @@
+$ python -m marbles docs/examples/extra_locals.py 
+F
+======================================================================
+FAIL: test_file_size (docs.examples.extra_locals.FileTestCase)
+----------------------------------------------------------------------
+marbles.core.marbles.ContextualAssertionError: 288 != 0
+
+Source (/path/to/docs/examples/extra_locals.py):
+      9
+ >   10 self.assertEqual(os.path.getsize(__file__), 0)
+     11 
+Locals:
+        file_name=/path/to/docs/examples/extra_locals.py
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

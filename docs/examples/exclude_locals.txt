@@ -1,0 +1,20 @@
+$ python -m marbles docs/examples/exclude_locals.py 
+F
+======================================================================
+FAIL: test_string_case (docs.examples.exclude_locals.IntermediateStateTestCase)
+----------------------------------------------------------------------
+marbles.core.marbles.ContextualAssertionError: 'foo' == 'foo'
+
+Source (/path/to/docs/examples/exclude_locals.py):
+     14 
+ >   15 self.assertNotEqual(start_str, stop_str)
+     16 
+Locals:
+        start_str=foo
+        stop_str=foo
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
