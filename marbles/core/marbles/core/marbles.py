@@ -170,7 +170,7 @@ class ContextualAssertionError(AssertionError):
 
     _META_FORMAT_STRING = '''{standardMsg}
 
-Source:
+Source ({filename}):
 {assert_stmt}
 Locals:
 {locals}
@@ -306,7 +306,8 @@ Locals:
             fmt = self._META_FORMAT_STRING
         return fmt.format(
             standardMsg=self.standardMsg, assert_stmt=self.assert_stmt,
-            advice=self.advice, locals=self._format_locals(self.locals))
+            advice=self.advice, locals=self._format_locals(self.locals),
+            filename=self.filename)
 
     @classmethod
     def _format_locals(cls, locals_):

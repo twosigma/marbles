@@ -37,6 +37,7 @@ setup(
         'marbles'
     ],
     packages=[
+        'marbles',
         'marbles.core'
     ],
     package_dir={

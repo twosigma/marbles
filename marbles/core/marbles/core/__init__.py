@@ -17,6 +17,7 @@ from .marbles import (
     ContextualAssertionError,
     TestCase
 )
+from .main import main
 
 
 __all__ = (
@@ -24,4 +25,5 @@ __all__ = (
     'AnnotationError',
     'ContextualAssertionError',
     'TestCase',
+    'main'
 )
