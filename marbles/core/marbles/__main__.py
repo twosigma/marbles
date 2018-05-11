@@ -16,7 +16,9 @@
 '''Main entry point'''
 
 import sys
-if sys.argv[0].endswith('__main__.py'):
+# I don't think it's possible to cover the fact that we never skip
+# this branch.
+if sys.argv[0].endswith('__main__.py'):  # pragma: no branch
     import os.path
     # We change sys.argv[0] to make help message more useful
     # use executable without path, unquoted

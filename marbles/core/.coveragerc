@@ -1,6 +1,7 @@
-[coverage:run]
+[run]
 branch = True
 source = marbles
 omit =
     tests/*
     marbles/__init__.py
+parallel = True

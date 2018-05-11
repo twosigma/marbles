@@ -7,7 +7,7 @@ pip install -r requirements.txt
 (cd marbles/core && python -m coverage run setup.py test)
 (cd marbles/mixins && python -m coverage run setup.py test)
 # Combine coverage reports for reporting
-python -m coverage combine marbles/core/.coverage marbles/mixins/.coverage
+python -m coverage combine marbles/core marbles/mixins/.coverage
 python -m coverage html
 python -m coverage xml
 python setup.py build_sphinx
