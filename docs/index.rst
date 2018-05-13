@@ -55,6 +55,13 @@ User Guide
    quickstart
    winning
 
+Developer Guide
+"""""""""""""""
+.. toctree::
+   :maxdepth: 3
+
+   contributing
+
 Reference
 """""""""
 .. toctree::

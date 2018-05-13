@@ -26,6 +26,17 @@ if sys.argv[0].endswith('__main__.py'):
     sys.argv[0] = executable + ' -m marbles'
     del os
 
+if len(sys.argv) > 1 and sys.argv[1] == '--version':
+    import marbles.core
+    print('marbles.core version: {}'.format(marbles.core.__version__))
+    try:
+        import marbles.mixins
+    except ImportError:
+        print('marbles.mixins not installed')
+    else:
+        print('marbles.mixins version: {}'.format(marbles.mixins.__version__))
+    sys.exit(0)
+
 __unittest = True
 
 from marbles.core.main import main
