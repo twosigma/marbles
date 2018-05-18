@@ -140,6 +140,8 @@ html_theme = 'sphinx_rtd_theme'
 
 html_context = {'logo': 'logo.png', 'theme_logo_only': True}
 
+html_favicon = '_static/favicon.png'
+
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
 
