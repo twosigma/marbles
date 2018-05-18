@@ -272,7 +272,7 @@ Locals:
         # This will be used by linecache to read the source of this
         # module. See the docstring for _find_assert_stmt below which
         # explains how.
-        #
+
         # We don't have a test for this because automating the
         # creation of an egg, installation into an environment,
         # running of tests, and verification that marbles found the

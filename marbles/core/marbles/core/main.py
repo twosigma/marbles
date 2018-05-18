@@ -86,7 +86,7 @@ class MarblesTestRunner(unittest.TextTestRunner):
 def main(**kwargs):
     # Override this so that when unittest loads our test modules,
     # those test modules will actually subclass marbles.TestCase.
-    #
+
     # But, we can't do this at the module level because
     # marbles.core.main is imported into marbles.core.__init__ so that
     # marbles users can run marbles.core.main(). Since our __init__

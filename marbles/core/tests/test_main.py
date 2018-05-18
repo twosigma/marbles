@@ -101,11 +101,11 @@ class TestScriptRunningTestCase(unittest.TestCase):
         # to a .coveragerc, and trick the python interpreter into
         # calling coverage.process_startup() before doing anything
         # else.
-        #
+
         # This is documented here, though it doesn't say what
         # COVERAGE_PROCESS_START needs to contain:
         # http://coverage.readthedocs.io/en/coverage-4.2/subprocess.html
-        #
+
         # The way we're tricking python into running
         # coverage.process_startup() is by putting it in the .pth file
         # in site-packages. This may not work on all environments, for
