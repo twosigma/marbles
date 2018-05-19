@@ -1,0 +1,13 @@
+[html]
+directory = build/coverage/html
+
+[run]
+branch = True
+source =
+    marbles/core/marbles
+    marbles/mixins/marbles
+omit =
+    */tests/*
+    marbles/__init__.py
+    marbles/core/marbles/__init__.py
+    marbles/mixins/marbles/__init__.py

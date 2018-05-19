@@ -99,6 +99,7 @@ class TestScriptRunningTestCase(unittest.TestCase):
             Standard output and error produced by the test.
         '''
         test_dir = os.path.dirname(__file__)
+        core_dir = os.path.dirname(test_dir)
         test_path = os.path.join(test_dir, 'examples', self.test_file)
         if self.runner == 'script':
             cmd = [sys.executable, test_path]
@@ -146,7 +147,7 @@ class TestScriptRunningTestCase(unittest.TestCase):
         try:
             proc = subprocess.run(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                env=env)
+                env=env, cwd=core_dir)
         finally:
             if to_remove:
                 os.remove(to_remove)

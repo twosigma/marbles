@@ -2,6 +2,8 @@ build/
 dist/
 *.egg-info/
 .coverage
+.coverage.*
 coverage.xml
 *.pyc
 .eggs
+.tox/
