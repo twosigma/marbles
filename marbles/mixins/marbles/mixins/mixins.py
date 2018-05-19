@@ -20,10 +20,9 @@
 #  IN THE SOFTWARE.
 #
 
-'''This module provides custom :mod:`unittest`-style assertions for
-common resource (e.g., a dataset) failures. For the most part,
-:mod:`marbles.mixins` assertions trivially wrap :mod:`unittest`
-assertions. For example, a call to
+'''This module provides custom :mod:`unittest`-style assertions. For
+the most part, :mod:`marbles.mixins` assertions trivially wrap
+:mod:`unittest` assertions. For example, a call to
 :meth:`CategoricalMixins.assertCategoricalLevelIn` will simply pass the
 provided arguments to :meth:`~unittest.TestCase.assertIn`.
 
@@ -534,7 +533,6 @@ class FileMixins(abc.ABC):
     def _formatMessage(self, msg, standardMsg):
         pass  # pragma: no cover
 
-    # TODO (jsa): rename this method
     @staticmethod
     def _get_or_open_file(filename):
         '''If ``filename`` is a string or bytes object, open the
@@ -631,7 +629,6 @@ class FileMixins(abc.ABC):
 
         return length
 
-    # TODO (jsa): this could accept alternative/UD exists functions
     def assertFileExists(self, filename, msg=None):
         '''Fail if ``filename`` does not exist as determined by
         ``os.path.isfile(filename)``.
@@ -648,7 +645,6 @@ class FileMixins(abc.ABC):
         if not os.path.isfile(filename):
             self.fail(self._formatMessage(msg, standardMsg))
 
-    # TODO (jsa): this could accept alternative/UD exists functions
     def assertFileNotExists(self, filename, msg=None):
         '''Fail if ``filename`` exists as determined by
         ``~os.path.isfile(filename)``.
@@ -789,8 +785,6 @@ class FileMixins(abc.ABC):
         ftype = self._get_file_type(filename)
         self.assertNotEqual(ftype, extension, msg=msg)
 
-    # TODO (jsa): if _get_file_encoding fails, try opening with
-    # codecs.open() before failing?
     def assertFileEncodingEqual(self, filename, encoding, msg=None):
         '''Fail if ``filename`` is not encoded with the given
         ``encoding`` as determined by the '==' operator.
@@ -818,8 +812,6 @@ class FileMixins(abc.ABC):
                          encoding.lower(),
                          self._formatMessage(msg, standardMsg))
 
-    # TODO (jsa): if _get_file_encoding fails, try opening with
-    # codecs.open() before failing?
     def assertFileEncodingNotEqual(self, filename, encoding, msg=None):
         '''Fail if ``filename`` is encoded with the given ``encoding``
         as determined by the '!=' operator.
@@ -1308,7 +1300,7 @@ class DateTimeMixins(abc.ABC):
             standardMsg = '%s is not less than %s' % (sequence, target)
             op = operator.le
 
-        # Null date(time)s will always compare False, but I think
+        # Null date(time)s will always compare False, but
         # we want to know about null date(time)s
         if isinstance(target, collections.Iterable):
             if len(target) != len(sequence):
@@ -1369,7 +1361,7 @@ class DateTimeMixins(abc.ABC):
                                                          target)
             op = operator.ge
 
-        # Null date(time)s will always compare False, but I think
+        # Null date(time)s will always compare False, but
         # we want to know about null date(time)s
         if isinstance(target, collections.Iterable):
             if len(target) != len(sequence):

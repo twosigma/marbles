@@ -80,12 +80,6 @@ def _class_defining_method(meth):  # pragma: no cover
 class AssertionLogger(object):
     '''The :class:`AssertionLogger` logs json about each assertion.
 
-    .. warning::
-
-       If you are uploading these logs somewhere like Elasticsearch,
-       be sure that the information in your locals and arguments is
-       protected by securing the destination system.
-
     This module exposes a single :class:`AssertionLogger`,
     :data:`marbles.core.log.logger`, that is used during a marbles test
     run. It can be configured with :meth:`configure` before running
