@@ -291,7 +291,7 @@ unearthed in the excavation of an old privy in New Orleans.'''
 
     def test_note_format_strings_custom_format(self):
         dt = datetime.date(2017, 8, 12)  # noqa: F841
-        note = 'the dt is {dt:%Y%m%d}'
+        note = 'the date is {dt:%Y%m%d}'
         self.assertTrue(False, note=note)
 
 
