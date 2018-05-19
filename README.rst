@@ -1,3 +1,8 @@
+.. image:: marbles.svg
+   :height: 150px
+   :width: 150px
+   :align: right
+
 =======
 marbles
 =======
