@@ -43,5 +43,5 @@ setup(
         'leif@twosigma.com'
     ],
     description='Read better test failures',
-    url='https://gitlab.twosigma.com/jane/marbles'
+    url='https://github.com/twosigma/marbles'
 )

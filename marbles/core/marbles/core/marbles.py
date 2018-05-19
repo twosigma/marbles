@@ -222,10 +222,10 @@ Locals:
         annotation, standardMsg = args[0]
         locals_, module, filename, linenumber = _stack.get_stack_info()
 
-        # When the wrapper in AnnotatedTestCase sees both msg and
-        # note, it bundles msg with note in order to thread it
-        # down the stack. So if the user was trying to override the
-        # standard message, their value would actually be here.
+        # When the wrapper in TestCase sees both msg and note, it
+        # bundles msg with note in order to thread it down the stack.
+        # So if the user was trying to override the standard message,
+        # their value would actually be here.
         msg = annotation.pop('msg', None)
         if not msg:
             msg = standardMsg
@@ -444,8 +444,7 @@ def _find_msg_argument(signature):
     # we can help it. Therefore, we leave the default msg if there are
     # fewer than this many args passed. We stop counting at a
     # parameter named 'msg' or when we hit a varargs or keyword-only
-    # parameter. See
-    # https://gitlab.twosigma.com/jane/marbles/issues/10.
+    # parameter.
     kinds = (inspect.Parameter.POSITIONAL_ONLY,
              inspect.Parameter.POSITIONAL_OR_KEYWORD)
     non_msg_params = itertools.takewhile(

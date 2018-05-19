@@ -44,5 +44,5 @@ outputs:
       - numpy <1.14,>=1.12.1
 
 about:
-  home: https://gitlab.twosigma.com/jane/marbles
+  home: https://github.com/twosigma/marbles
   summary: Write better tests, read better test failures
