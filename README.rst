@@ -38,10 +38,12 @@ Features
 
 * Drop-in `unittest` replacement
 * Information-rich failure messages
-** The full statement that failed (instead of just the last line)
-** Local variables in scope at the time the test failed
-** Optional annotation provided by the test author with details about the test
-** Ability to toggle traceback
+
+  * The full statement that failed (instead of just the last line)
+  * Local variables in scope at the time the test failed
+  * Optional annotation provided by the test author with details about the test
+  * Ability to toggle traceback
+
 * Semantically-rich assertion methods
 
 Demo
@@ -50,10 +52,7 @@ Demo
 You can run the example tests provided to see what a `marbles` failure message
 looks like
 
-.. literalinclude:: examples/getting_started.py
-   :lines: 1-4,33-
-
-.. literalinclude:: examples/getting_started.txt
+.. include:: docs/examples/getting_started.txt
 
 You can also run your existing `unittest` tests with `marbles` in two steps
 
