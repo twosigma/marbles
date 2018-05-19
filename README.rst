@@ -12,10 +12,6 @@ marbles
         :target: https://marbles.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/twosigma/marbles/shield.svg
-        :target: https://pyup.io/repos/github/twosigma/marbles/
-        :alt: Updates
-
 Read better test failures.
 
 * Free software: MIT license
