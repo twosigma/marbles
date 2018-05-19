@@ -20,8 +20,8 @@
 #  IN THE SOFTWARE.
 #
 
-from ._version import __version__
-from .mixins import __doc__
+from ._version import __version__  # noqa: F401
+from .mixins import __doc__  # noqa: F401
 from .mixins import (
     BetweenMixins,
     CategoricalMixins,

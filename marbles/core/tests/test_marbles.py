@@ -272,26 +272,26 @@ unearthed in the excavation of an old privy in New Orleans.'''
                                note='some note')
 
     def test_note_format_strings_list_getitem(self):
-        l = [1, 42, 2]
-        note = 'the answer is {l[1]}'
+        ls = [1, 42, 2]  # noqa: F841
+        note = 'the answer is {ls[1]}'
         self.assertTrue(False, note=note)
 
     def test_note_format_strings_dict_getitem(self):
-        l = {'answer': 42,
-             'query': 'the answer to life, the universe, and everything'}
-        note = 'the answer is {l[answer]}'
+        ls = {'answer': 42,  # noqa: F841
+              'query': 'the answer to life, the universe, and everything'}
+        note = 'the answer is {ls[answer]}'
         self.assertTrue(False, note=note)
 
     def test_note_format_strings_attribute_access(self):
         class Foo(object):
             answer = 42
-        obj = Foo()
+        obj = Foo()  # noqa: F841
         note = 'the answer is {obj.answer}'
         self.assertTrue(False, note=note)
 
     def test_note_format_strings_custom_format(self):
-        date = datetime.date(2017, 8, 12)
-        note = 'the date is {date:%Y%m%d}'
+        dt = datetime.date(2017, 8, 12)  # noqa: F841
+        note = 'the dt is {dt:%Y%m%d}'
         self.assertTrue(False, note=note)
 
 
