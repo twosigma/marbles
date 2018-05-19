@@ -97,13 +97,13 @@ Ready to contribute? Here's how to set up marbles for local development.
     $ pipenv install --dev
     $ pipenv shell
 
-   This will install all of ``marbles``\'s development dependencies,
+   This will install all of the ``marbles`` development dependencies,
    install ``marbles`` in development mode, so your changes to the
    files in your clone will take effect immediately, and put you in a
    shell where you can run the tests, build the docs, etc.
 
-   If you don't use pipenv, you can get the same effect with any other
-   virtualenv by running::
+   If you don't use pipenv, you can get the same effect inside any
+   other virtualenv by running::
 
     $ pip install -r requirements.txt
 
