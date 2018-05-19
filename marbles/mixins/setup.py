@@ -48,8 +48,7 @@ setup(
     test_suite='tests',
     setup_requires=setup_requires,
     install_requires=[
-        'pandas<0.21,>=0.19.1',
-        'numpy<1.14,>=1.12.1'
+        'pandas<0.21,>=0.19.1'
     ],
     tests_require=tests_require,
     extras_require=extras_require,
