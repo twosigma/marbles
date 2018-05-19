@@ -50,7 +50,7 @@ class ResponseTestCase(unittest.TestCase):
 
     def test_create_resource(self):
         endpoint = 'http://example.com/api/v1/resource'
-        data = {'id': '1', 'name': 'Jane'}
+        data = {'id': '1', 'name': 'Little Bobby Tables'}
         self.assertEqual(
             requests.put(endpoint, data=data).json()['code'],
             201)

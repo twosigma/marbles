@@ -205,12 +205,12 @@ class MainWithFailureTestCase(TestScriptRunningTestCase):
         '''Locals should be printed.'''
         if self.has_marbles:
             self.assertIn('data', self.stderr)
-            self.assertIn('Jane', self.stderr)
+            self.assertIn('Little Bobby Tables', self.stderr)
             self.assertIn('endpoint', self.stderr)
             self.assertIn('example.com', self.stderr)
         else:
             self.assertNotIn('data', self.stderr)
-            self.assertNotIn('Jane', self.stderr)
+            self.assertNotIn('Little Bobby Tables', self.stderr)
             self.assertNotIn('endpoint', self.stderr)
             self.assertNotIn('example.com', self.stderr)
 

@@ -72,5 +72,5 @@ setup(
         'jane@twosigma.com',
         'leif@twosigma.com'
     ],
-    url='https://gitlab.twosigma.com/jane/marbles'
+    url='https://github.com/twosigma/marbles'
 )
