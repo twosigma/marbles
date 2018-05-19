@@ -528,7 +528,7 @@ class TestCase(unittest.TestCase):
                     self, attr, self._REQUIRED_KEYS, msg, note,
                     list(args) + list(rem_args), kwargs) as annotation:
                 if rem_args:
-                    return attr(*args, annotation, *rem_args, **kwargs)
+                    return attr(*(args + [annotation] + rem_args), **kwargs)
                 return attr(*args, msg=annotation, **kwargs)
         return wrapper
 
