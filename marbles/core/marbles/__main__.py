@@ -52,6 +52,6 @@ if len(sys.argv) > 1 and sys.argv[1] == '--version':
 
 __unittest = True
 
-from marbles.core.main import main
+from marbles.core.main import main  # noqa: E402
 
 main(module=None)

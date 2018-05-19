@@ -55,7 +55,6 @@ from . import _stack
 from . import __version__
 
 
-
 # XXX(leif): I don't think it's worth the gymnastics it would take to
 #            test this function. We do test whether mixins are
 #            identified but catching all the cases here would be a
