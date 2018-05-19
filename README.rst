@@ -50,7 +50,7 @@ looks like
 
 .. code-block:: none
 
-   $ python -m marbles docs/examples/getting_started.py
+   python -m marbles docs/examples/getting_started.py
    F
    ======================================================================
    FAIL: test_create_resource (docs.examples.getting_started.ResponseTestCase)
