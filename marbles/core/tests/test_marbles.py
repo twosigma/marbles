@@ -62,6 +62,12 @@ class OddArgumentOrderTestCaseMixin(object):
 # member existence don't get confused, we enforce that the marbles
 # TestCase subclasses are earlier in the method resolution order than
 # unittest.TestCase.
+
+# This test case uses material from the Wikipedia article
+# https://en.wikipedia.org/wiki/Marble_(toy) which is
+# released under the Creative Commons Attribution-Share-Alike
+# License 3.0 https://creativecommons.org/licenses/by-sa/3.0
+
 @unittest.skip('This is the TestCase being tested')
 class ExampleTestCaseMixin(
         ReversingTestCaseMixin,
