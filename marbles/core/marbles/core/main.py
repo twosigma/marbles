@@ -31,7 +31,6 @@ including local variables and additional source code scope.
 '''
 
 import contextlib
-import os
 import unittest
 
 from marbles.core import TestCase

@@ -246,9 +246,9 @@ Locals:
         else:
             formatted_note = self._note.format(**self.locals)
             wrapper = _NoteWrapper(width=72,
-                                     break_long_words=False,
-                                     initial_indent='\t',
-                                     subsequent_indent='\t')
+                                   break_long_words=False,
+                                   initial_indent='\t',
+                                   subsequent_indent='\t')
             return wrapper.fill(formatted_note)
 
     @property

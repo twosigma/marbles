@@ -20,8 +20,8 @@
 #  IN THE SOFTWARE.
 #
 
-from ._version import __version__
-from .marbles import __doc__
+from ._version import __version__  # noqa: F401
+from .marbles import __doc__  # noqa: F401
 from .marbles import (
     AnnotatedTestCase,
     AnnotationError,
