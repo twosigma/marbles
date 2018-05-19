@@ -90,19 +90,22 @@ Ready to contribute? Here's how to set up marbles for local development.
 
     $ git clone git@github.com:your_name_here/marbles.git
 
-3. Install your local copy into a virtualenv. You can create a virtualenv with
-   ``virtualenv``, ``conda``, ``pipenv``, or any other python virtualenv
-   manager. Assuming you have ``virtualenv`` installed, this is how you set
-   up your fork for local development::
+3. Install your local copy into a virtualenv. If you have `pipenv
+   <https://docs.pipenv.org/>`_ installed, you can run::
 
     $ cd marbles/
-    $ virtualenv env
-    $ source env/bin/activate
-    $ pip install -r requirements.txt
+    $ pipenv install --dev
+    $ pipenv shell
 
-   The last line will install all of ``marbles``\'s development dependencies,
-   and then install ``marbles`` in development mode, so your changes to the
-   files in your clone will take effect immediately.
+   This will install all of the ``marbles`` development dependencies,
+   install ``marbles`` in development mode, so your changes to the
+   files in your clone will take effect immediately, and put you in a
+   shell where you can run the tests, build the docs, etc.
+
+   If you don't use `pipenv`_, you can get the same effect inside any
+   other virtualenv by running::
+
+    $ pip install -r requirements.txt
 
 4. Create a branch for local development::
 
