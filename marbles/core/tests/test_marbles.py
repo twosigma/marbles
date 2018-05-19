@@ -291,7 +291,7 @@ unearthed in the excavation of an old privy in New Orleans.'''
 
     def test_note_format_strings_custom_format(self):
         dt = datetime.date(2017, 8, 12)  # noqa: F841
-        note = 'the dt is {dt:%Y%m%d}'
+        note = 'the date is {dt:%Y%m%d}'
         self.assertTrue(False, note=note)
 
 
@@ -506,7 +506,7 @@ class TestContextualAssertionError(MarblesTestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 66)
+        self.assertEqual(e.linenumber, 83)
 
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_locals()
@@ -515,11 +515,11 @@ class TestContextualAssertionError(MarblesTestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 194)
+        self.assertEqual(e.linenumber, 211)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''
-        test_linenumber = 66
+        test_linenumber = 83
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_failure()
@@ -538,7 +538,7 @@ class TestContextualAssertionError(MarblesTestCase):
 
     def test_assert_stmt_surrounding_lines(self):
         '''Does _find_assert_stmt read surrounding lines from the file?'''
-        test_linenumber = 58
+        test_linenumber = 75
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_failure()
