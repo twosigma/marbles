@@ -9,8 +9,6 @@ marbles.mixins
    marbles.mixins.FileMixins
    marbles.mixins.CategoricalMixins
    marbles.mixins.DateTimeMixins
-   marbles.mixins.DataFrameMixins
-   marbles.mixins.PanelMixins
 
 .. automodule:: marbles.mixins
    :members:
