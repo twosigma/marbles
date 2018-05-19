@@ -25,11 +25,9 @@ from .mixins import __doc__
 from .mixins import (
     BetweenMixins,
     CategoricalMixins,
-    DataFrameMixins,
     DateTimeMixins,
     FileMixins,
     MonotonicMixins,
-    PanelMixins,
     UniqueMixins
 )
 
