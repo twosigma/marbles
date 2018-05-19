@@ -32,6 +32,5 @@ from .mixins import (
 )
 
 
-__all__ = ['BetweenMixins', 'CategoricalMixins', 'DataFrameMixins',
-           'DateTimeMixins', 'FileMixins', 'MonotonicMixins',
-           'PanelMixins', 'UniqueMixins']
+__all__ = ['BetweenMixins', 'CategoricalMixins', 'DateTimeMixins',
+           'FileMixins', 'MonotonicMixins', 'UniqueMixins']
