@@ -91,7 +91,7 @@ Ready to contribute? Here's how to set up marbles for local development.
     $ git clone git@github.com:your_name_here/marbles.git
 
 3. Install your local copy into a virtualenv. If you have `pipenv
-   <https://docs.pipenv.org/>`__ installed, you can run::
+   <https://docs.pipenv.org/>`_ installed, you can run::
 
     $ cd marbles/
     $ pipenv install --dev
@@ -102,7 +102,7 @@ Ready to contribute? Here's how to set up marbles for local development.
    files in your clone will take effect immediately, and put you in a
    shell where you can run the tests, build the docs, etc.
 
-   If you don't use pipenv, you can get the same effect inside any
+   If you don't use `pipenv`_, you can get the same effect inside any
    other virtualenv by running::
 
     $ pip install -r requirements.txt
