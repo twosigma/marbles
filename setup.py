@@ -31,6 +31,6 @@ setup(
         'jane@twosigma.com',
         'leif@twosigma.com'
     ],
-    description='Write better tests, read better test failures',
+    description='Read better test failures',
     url='https://gitlab.twosigma.com/jane/marbles'
 )
