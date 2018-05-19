@@ -13,12 +13,12 @@
 
 import os
 import os.path
-import site
 import subprocess
 import sys
 import tempfile
 import unittest
 import unittest.util
+from distutils import sysconfig
 
 
 class TestScriptRunningTestCase(unittest.TestCase):
@@ -111,19 +111,34 @@ class TestScriptRunningTestCase(unittest.TestCase):
         # in site-packages. This may not work on all environments, for
         # example, if site-packages is read-only, but it should work
         # in the places we're using to test.
-        with tempfile.NamedTemporaryFile(
-                mode='w', dir=site.getsitepackages()[0], suffix='.pth',
-                delete=False) as pth:
-            pth.write('import coverage; coverage.process_startup()\n')
-            pth.flush()
 
-        coverage_config = os.path.join(test_dir, '..', '.coveragerc')
+        # Also, due to https://github.com/pypa/virtualenv/issues/355,
+        # we can't use site.getsitepackages(), but
+        # distutils.sysconfig.get_python_lib() works.
+        if sys.gettrace():
+            # Only add this .pth file if we're running under the
+            # coverage tool, which is the most likely reason that
+            # sys.gettrace() would be set to anything.
+            site_packages = sysconfig.get_python_lib()
+            with tempfile.NamedTemporaryFile(
+                    mode='w', dir=site_packages, suffix='.pth',
+                    delete=False) as pth:
+                pth.write('import coverage; coverage.process_startup()\n')
+                pth.flush()
+
+            coverage_config = os.path.join(test_dir, '..', '.coveragerc')
+            env = {'COVERAGE_PROCESS_START': coverage_config}
+            to_remove = pth.name
+        else:
+            env = {}
+            to_remove = None
         try:
             proc = subprocess.run(
                 cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                env={'COVERAGE_PROCESS_START': coverage_config})
+                env=env)
         finally:
-            os.remove(pth.name)
+            if to_remove:
+                os.remove(to_remove)
         return proc.stdout.decode(), proc.stderr.decode()
 
     @property
