@@ -151,6 +151,9 @@ the version update, merge it (without squashing it into other
 commits), and then tag it once it's on the ``master`` branch:
 https://github.com/twosigma/marbles/releases/new.
 
+You can read a digression about why we bump all the versions at the
+same time below, in `Versioning philosophy`_.
+
 Uploading to PyPI
 -----------------
 
@@ -170,3 +173,48 @@ make sure your clone is up to date and clean, build both ``sdist`` and
 .. _tox: https://tox.readthedocs.io
 .. _bumpversion: https://github.com/peritus/bumpversion
 .. _twine: https://github.com/pypa/twine
+
+Versioning philosophy
+---------------------
+
+Marbles publishes two subpackages, :mod:`marbles.core` and
+:mod:`marbles.mixins`, and a metapackage depending on both,
+:mod:`marbles`. This allows users to install or depend on only one of
+the subpackages, and also suggests that anyone can publish their own
+mixins package.
+
+This raises the question of how to version each of these three
+packages.
+
+ 1. Release new versions of :mod:`marbles.core` and
+    :mod:`marbles.mixins` independently, and have the :mod:`marbles`
+    package basically only ever have one release, ``1.0.0``, since it
+    doesn't actually change over time.
+
+ 2. Give the :mod:`marbles` package a new version each time either
+    subpackage gets one, to make it feel like we're moving
+    forward.
+
+ 3. Release all three packages with the same version string each time
+    any of them gets a new release.
+
+`Jupyter <https://pypi.org/project/jupyter/>`_ takes the first
+approach, but keep in mind that Jupyter is a much larger project with
+distinct teams working on each component, so allowing subpackages to
+have independent release schedules makes more sense for that
+community.
+
+The second approach has the problem that if we release the subpackages
+independently, it's unclear what to name the metapackage when that
+happens. Taking the max of the subpackage version strings doesn't work
+if the subpackage with a lower one gets an update by itself. There are
+a couple other possiblities here, but none of them seemed right.
+
+The third approach, of updating everything in lock-step is what we've
+chosen. This will create multiple versions of one or the other package
+that are identical, in some cases, which is a little odd. However, it
+has the benefit of documenting which versions of :mod:`marbles.core`
+and :mod:`marbles.mixins` were reviewed and tested together and
+therefore can be expected to work together. It still allows users to
+install (and update) them independently, but encourages users of both
+to update them together.
