@@ -40,6 +40,8 @@ This will update the :file:`Pipfile` with :mod:`pylint` as a new
 development dependency, and will update :file:`Pipfile.lock` with the
 exact version you installed. If this dependency is needed for
 something you added to marbles, you should include the changes to both
+:file:`Pipfile` and :file:`Pipfile.lock` in your pull
+request. Otherwise, please don't include the changes to
 :file:`Pipfile` and :file:`Pipfile.lock` in your pull request.
 
 Linting
@@ -81,11 +83,10 @@ You can build the docs and view them locally::
 
 Then, load file:///path/to/marbles/build/sphinx/html/index.html in
 your browser. If you make changes to just docstrings, but not
-:file:`.rst` files, Sphinx may not rebuild those docs, so you should
-remove the built pages and rebuild::
+:file:`.rst` files, Sphinx may not rebuild those docs, you can
+embolden it to do so with these options::
 
-    $ rm -rf build/sphinx
-    $ python setup.py build_sphinx
+    $ python setup.py build_sphinx -Ea
 
 Automation with `tox`_
 ----------------------
