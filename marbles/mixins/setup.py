@@ -67,13 +67,7 @@ setup(
     license='MIT',
     description=('Semantically-rich assertions for use '
                  'in marbles and unittest test cases'),
-    author=[
-        'Jane Adams',
-        'Leif Walsh'
-    ],
-    author_email=[
-        'jane@twosigma.com',
-        'leif@twosigma.com'
-    ],
+    author='Jane Adams, Leif Walsh',
+    author_email='jane@twosigma.com, leif@twosigma.com',
     url='https://github.com/twosigma/marbles'
 )
