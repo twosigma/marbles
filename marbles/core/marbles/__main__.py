@@ -44,7 +44,9 @@ if len(sys.argv) > 1 and sys.argv[1] == '--version':
     print('marbles.core version: {}'.format(marbles.core.__version__))
     try:
         import marbles.mixins
-    except ImportError:
+    except ImportError:  # pragma: no cover
+        # Our tests run with both subpackages installed, it's probably
+        # not worth the effort it would take to cover this branch.
         print('marbles.mixins not installed')
     else:
         print('marbles.mixins version: {}'.format(marbles.mixins.__version__))
