@@ -63,6 +63,7 @@ setup(
     install_requires=[],
     tests_require=tests_require,
     extras_require=extras_require,
+    license='MIT',
     description=('A unittest extension that provides additional '
                  'information on test failure'),
     author=[

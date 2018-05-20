@@ -23,9 +23,13 @@
 from setuptools import setup
 
 
+version = '0.8.0'
+url = 'https://github.com/twosigma/marbles'
+
+
 setup(
     name='marbles',
-    version='0.8.0',
+    version=version,
     setup_requires=[
         'Sphinx',
         'sphinx_rtd_theme'
@@ -43,5 +47,8 @@ setup(
         'leif@twosigma.com'
     ],
     description='Read better test failures',
-    url='https://github.com/twosigma/marbles'
+    license='MIT',
+    url=url,
+    download_url='{url}/archive/{version}.tar.gz'.format(url=url,
+                                                         version=version)
 )
