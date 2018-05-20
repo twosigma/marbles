@@ -1,9 +1,9 @@
 Installation
 ============
 
-marbles can be installed from `PyPi`_.
+marbles can be installed from `PyPI`_.
 
-.. _PyPi: https://pypi.org/project/marbles
+.. _PyPI: https://pypi.org/project/marbles
 
 .. note::
 

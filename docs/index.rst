@@ -61,6 +61,7 @@ Developer Guide
    :maxdepth: 3
 
    contributing
+   maintaining
 
 Reference
 """""""""
