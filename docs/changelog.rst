@@ -18,9 +18,9 @@ Changelog
 * :support:`26` Added development automation and CI with tox
 * :support:`17` Changed to pipenv for development environment management
 * :support:`16` Added Contributor License Agreement forms
-* :bug:`15 major` Added Creative Commons attribution for test content from Wikipedia
-* :bug:`5 major` Changed copyright headers to refer to TSOS and the MIT license
-* :bug:`1 major` Fixed tests to run in virtualenvs
+* :bug:`15` Added Creative Commons attribution for test content from Wikipedia
+* :bug:`5` Changed copyright headers to refer to TSOS and the MIT license
+* :bug:`1` Fixed tests to run in virtualenvs
 * :support:`14` Removed DataFrame and Panel mixins
 * :support:`18` Removed TS internal details from README
 * :support:`21` Removed TS internal details from documentation and comments
@@ -34,16 +34,16 @@ Changelog
 * :feature:`0` Changed test case and test method to log separately,
   and added marbles version
 * :release:`0.6.9 <2017-10-18>`
-* :support:`0 backported`
+* :support:`0`
 
   .. admonition:: Nice
 
      Nice
 
-* :support:`0 backported` Added conda recipe (internal only)
-* :bug:`0 major` Fixed mixins that expect a specific type to raise
+* :support:`0` Added conda recipe (internal only)
+* :bug:`0` Fixed mixins that expect a specific type to raise
   ``TypeError`` instead of ``AssertionError``
-* :bug:`0 major` Fixed source code extraction to find it inside eggs
+* :bug:`0` Fixed source code extraction to find it inside eggs
 * :release:`0.6.0 <2017-08-10>`
 * :feature:`0` Added verbose logging option
 * :feature:`0` Changed annotation wrapping to wrap paragraphs in
@@ -56,7 +56,7 @@ Changelog
 * :release:`0.3.0 <2017-02-23>`
 * :feature:`0` Added assertion logging
 * :release:`0.2.0 <2016-12-14>`
-* :bug:`0 major` Fixed positional argument handling
+* :bug:`0` Fixed positional argument handling
 * :feature:`0` Removed display of "private" locals
 * :feature:`0` Removed extra ``message`` annotation
 * :release:`0.1.0 <2016-10-19>`

@@ -362,3 +362,4 @@ intersphinx_mapping = {
 # Changelog management
 
 releases_github_path = 'twosigma/marbles'
+releases_unstable_prehistory = True
