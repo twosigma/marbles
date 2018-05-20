@@ -117,6 +117,37 @@ You can also run a subset of these with ``-e``::
     $ tox -e py36
     $ tox -e flake8,coverage
 
+Maintaining the Changelog
+-------------------------
+
+The marbles :doc:`changelog` is maintained by the Sphinx plugin
+`releases`_, and its source is in :file:`docs/changelog.rst`.
+
+Most pull requests should add an item to the `changelog
+<https://github.com/twosigma/marbles/blob/master/docs/changelog.rst>`__,
+at the top, either a bug, feature, or support note.
+
+.. note::
+
+   `releases`_ is clear about the distinction between bugs and other
+   release notes. Bugs are included in the next patch version that
+   appears above them, while features aren't included until the next
+   major or minor version above them. The decision of whether to note
+   a change as a bug, feature, or support item will affect where it
+   appears in the log, though this can be controlled with the keywords
+   ``major`` (put bugs in the next major or minor release), and
+   ``backported`` (put features in the next bugfix release).
+
+   See `Release organization
+   <http://releases.readthedocs.io/en/latest/concepts.html#release-organization>`__
+   for details.
+
+Right before releasing a new version of marbles, add a release item to
+the top of the `changelog
+<https://github.com/twosigma/marbles/blob/master/docs/changelog.rst>`__
+noting the version string and release date, then follow the below
+instructions on `Releasing a new version`_.
+
 Releasing a new version
 -----------------------
 
@@ -133,6 +164,11 @@ a few different locations, due to the namespace package setup:
 
 In addition, when we bump the version, we do so in an isolated commit,
 and tag that commit with the version number as well.
+
+.. note::
+
+   Make sure you've groomed the :doc:`changelog` before tagging a new
+   release. See `Maintaining the Changelog`_ for details.
 
 We use `bumpversion`_ to automate this. To run `bumpversion`_, you
 need to be in a clean git tree (don't worry, it will complain to you
@@ -171,6 +207,7 @@ make sure your clone is up to date and clean, build both ``sdist`` and
 .. _pipenv: https://docs.pipenv.org
 .. _flake8: http://flake8.pycqa.org
 .. _tox: https://tox.readthedocs.io
+.. _releases: http://releases.readthedocs.io
 .. _bumpversion: https://github.com/peritus/bumpversion
 .. _twine: https://github.com/pypa/twine
 
