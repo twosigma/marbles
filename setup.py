@@ -30,14 +30,16 @@ url = 'https://github.com/twosigma/marbles'
 setup(
     name='marbles',
     version=version,
-    setup_requires=[
-        'Sphinx',
-        'sphinx_rtd_theme'
-    ],
     install_requires=[
         'marbles.core',
         'marbles.mixins'
     ],
+    extras_require={
+        'dev': [
+            'Sphinx',
+            'sphinx_rtd_theme'
+        ]
+    },
     author='Jane Adams, Leif Walsh',
     author_email='jane@twosigma.com, leif@twosigma.com',
     description='Read better test failures',
