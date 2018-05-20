@@ -64,6 +64,7 @@ setup(
     ],
     tests_require=tests_require,
     extras_require=extras_require,
+    license='MIT',
     description=('Semantically-rich assertions for use '
                  'in marbles and unittest test cases'),
     author=[
