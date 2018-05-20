@@ -258,7 +258,7 @@ Source ({filename}):
         return self._locals
 
     @property
-    def displayed_locals(self):
+    def public_test_locals(self):
         '''A dict containing the public (a.k.a., not internal or name-mangled)
         locals defined within the test.
 
@@ -319,14 +319,14 @@ Source ({filename}):
     @property
     def formattedMsg(self):  # mimic unittest's name for standardMsg
         fmt = self._META_FORMAT_STRING
-        if self.displayed_locals:
+        if self.public_test_locals:
             fmt += self._LOCALS_META_FORMAT_STRING
         if self.note:
             fmt += self._NOTE_META_FORMAT_STRING
+        local_string = self._format_locals(self.public_test_locals)
         return fmt.format(
             standardMsg=self.standardMsg, assert_stmt=self.assert_stmt,
-            note=self.note, locals=self._format_locals(self.displayed_locals),
-            filename=self.filename)
+            note=self.note, locals=local_string, filename=self.filename)
 
     @classmethod
     def _format_locals(cls, locals_):

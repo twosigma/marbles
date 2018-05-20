@@ -698,7 +698,7 @@ class TestContextualAssertionError(MarblesTestCase):
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_locals()
         e = ar.exception
-        locals_section = e._format_locals(e.displayed_locals).split('\n')
+        locals_section = e._format_locals(e.public_test_locals).split('\n')
         locals_ = [local.split('=')[0] for local in locals_section]
         for local in locals_:
             self.assertTrue(local.startswith('\t'))
@@ -710,7 +710,7 @@ class TestContextualAssertionError(MarblesTestCase):
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_internal_mangled_locals()
         e = ar.exception
-        locals_section = e._format_locals(e.displayed_locals).split('\n')
+        locals_section = e._format_locals(e.public_test_locals).split('\n')
         locals_ = [local.split('=')[0] for local in locals_section if local]
         for local in locals_:
             self.assertTrue(local.startswith('\t'))
