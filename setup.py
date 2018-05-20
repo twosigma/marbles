@@ -38,14 +38,8 @@ setup(
         'marbles.core',
         'marbles.mixins'
     ],
-    author=[
-        'Jane Adams',
-        'Leif Walsh'
-    ],
-    author_email=[
-        'jane@twosigma.com',
-        'leif@twosigma.com'
-    ],
+    author='Jane Adams, Leif Walsh',
+    author_email='jane@twosigma.com, leif@twosigma.com',
     description='Read better test failures',
     license='MIT',
     url=url,

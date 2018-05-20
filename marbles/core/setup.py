@@ -66,13 +66,7 @@ setup(
     license='MIT',
     description=('A unittest extension that provides additional '
                  'information on test failure'),
-    author=[
-        'Jane Adams',
-        'Leif Walsh'
-    ],
-    author_email=[
-        'jane@twosigma.com',
-        'leif@twosigma.com'
-    ],
+    author='Jane Adams, Leif Walsh',
+    author_email='jane@twosigma.com, leif@twosigma.com',
     url='https://github.com/twosigma/marbles'
 )
