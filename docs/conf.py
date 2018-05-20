@@ -38,6 +38,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.todo',
+    'releases',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -357,3 +358,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3.5', 'python-inv.txt'),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable', 'pandas-inv.txt')
 }
+
+# Changelog management
+
+releases_github_path = 'twosigma/marbles'
