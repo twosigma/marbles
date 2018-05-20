@@ -24,9 +24,18 @@ import os.path
 from setuptools import setup
 
 
-with open(os.path.join(os.path.dirname(__file__),
-                       'marbles/core/VERSION')) as vfile:
+url = 'https://github.com/twosigma/marbles'
+setup_dir = os.path.dirname(__file__)
+root_dir = os.path.join(setup_dir, '..', '..')
+
+with open(os.path.join(setup_dir, 'marbles/core/VERSION')) as vfile:
     __version__ = vfile.read().strip()
+
+with open(os.path.join(root_dir, 'classifiers.txt'), 'r') as f:
+    classifiers = [line.strip() for line in f.readlines()]
+
+with open(os.path.join(root_dir, 'README.rst'), 'r') as f:
+    long_description = f.read()
 
 
 setup(
@@ -54,10 +63,19 @@ setup(
             'flake8-per-file-ignores'
         ]
     },
+    python_requires='>=3.4,<3.7',
     license='MIT',
     description=('A unittest extension that provides additional '
                  'information on test failure'),
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
     author='Jane Adams, Leif Walsh',
     author_email='jane@twosigma.com, leif@twosigma.com',
-    url='https://github.com/twosigma/marbles'
+    url=url,
+    project_urls={
+        'Documentation': 'https://marbles.readthedocs.io',
+        'Source': url,
+        'Tracker': '{url}/issues'.format(url=url)
+    },
+    classifiers=classifiers
 )

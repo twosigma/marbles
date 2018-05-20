@@ -20,12 +20,19 @@
 #  IN THE SOFTWARE.
 #
 
+import os.path
 from setuptools import setup
 
 
 version = '0.9.2'
 url = 'https://github.com/twosigma/marbles'
+setup_dir = os.path.dirname(__file__)
 
+with open(os.path.join(setup_dir, 'classifiers.txt'), 'r') as f:
+    classifiers = [line.strip() for line in f.readlines()]
+
+with open(os.path.join(setup_dir, 'README.rst'), 'r') as f:
+    long_description = f.read()
 
 setup(
     name='marbles',
@@ -43,8 +50,16 @@ setup(
     author='Jane Adams, Leif Walsh',
     author_email='jane@twosigma.com, leif@twosigma.com',
     description='Read better test failures',
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
     license='MIT',
     url=url,
     download_url='{url}/archive/{version}.tar.gz'.format(url=url,
-                                                         version=version)
+                                                         version=version),
+    project_urls={
+        'Documentation': 'https://marbles.readthedocs.io',
+        'Source': url,
+        'Tracker': '{url}/issues'.format(url=url)
+    },
+    classifiers=classifiers
 )
