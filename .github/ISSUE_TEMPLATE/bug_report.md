@@ -1,3 +1,9 @@
+---
+name: Bug report
+about: Create a report to help us improve
+
+---
+
 * marbles.core version: `python -m marbles --version`
 * marbles.mixins version: `python -m marbles --version`
 * Python version: `python --version`
@@ -14,3 +20,9 @@ Tell us what happened, what went wrong, and what you expected to happen.
 Paste the command(s) you ran and the output.
 If there was a crash, please include the traceback here.
 ```
+
+### Expected behavior
+A clear and concise description of what you expected to happen.
+
+### Additional context
+Add any other context about the problem here.

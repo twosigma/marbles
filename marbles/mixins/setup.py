@@ -28,19 +28,6 @@ with open(os.path.join(os.path.dirname(__file__),
                        'marbles/mixins/VERSION')) as vfile:
     __version__ = vfile.read().strip()
 
-setup_requires = [
-    'coverage',
-    'flake8',
-    'flake8-per-file-ignores'
-]
-
-tests_require = [
-    'coverage'
-]
-
-extras_require = {
-    'dev': list(set(setup_requires + tests_require))
-}
 
 setup(
     name='marbles.mixins',
@@ -58,12 +45,16 @@ setup(
         'marbles.mixins': ['VERSION'],
     },
     test_suite='tests',
-    setup_requires=setup_requires,
     install_requires=[
         'pandas<0.21,>=0.19.1'
     ],
-    tests_require=tests_require,
-    extras_require=extras_require,
+    extras_require={
+        'dev': [
+            'coverage',
+            'flake8',
+            'flake8-per-file-ignores'
+        ]
+    },
     license='MIT',
     description=('Semantically-rich assertions for use '
                  'in marbles and unittest test cases'),

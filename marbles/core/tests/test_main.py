@@ -31,83 +31,22 @@ import unittest
 import unittest.util
 from distutils import sysconfig
 
+import marbles.core
 
-class TestScriptRunningTestCase(unittest.TestCase):
-    '''A TestCase which runs another test suite in a few ways.
 
-    Can use ``python -m marbles``, ``python -m unittest``, and just
-    ``python path/to/test_file.py``.
+class CommandRunningTestCase(unittest.TestCase):
 
-    Parameters
-    ----------
-    methodName : str
-        Test method (within the subclass of this TestCase) to run,
-        passed through to unittest.
-    runner : str
-        Either the name of a main module (marbles or unittest) to use
-        with ``python -m``, or the word ``script``, to run the test
-        file as a script.
-    verbose : bool
-        Whether to use verbose mode (``-v``).
-    test_file : str
-        Path to the test file to run.
-    '''
-
-    def __init__(self, methodName='runTest', *, runner=None, verbose=None,
-                 test_file=None):  # noqa: D102
+    def __init__(self, methodName='runTest', *, cmd=None):  # noqa: D102
         super().__init__(methodName=methodName)
-        self.runner = runner
-        self.verbose = verbose
-        self.test_file = test_file
-
-    def __str__(self):  # noqa: D102
-        params = ', '.join('{}={!r}'.format(name, getattr(self, name))
-                           for name in ('runner', 'verbose', 'test_file'))
-        return '{} ({}) ({})'.format(
-            self._testMethodName,
-            unittest.util.strclass(self.__class__),
-            params)
+        self.cmd = cmd
 
     def setUp(self):  # noqa: D102
-        stdout, stderr = self.__run_test()
+        stdout, stderr = self.__run_cmd()
         setattr(self, 'stdout', stdout)
         setattr(self, 'stderr', stderr)
 
-    def __run_test(self):
-        '''Run the test under either unittest or marbles.
-
-        Since we're already running a unittest test (i.e. this class),
-        and :mod:`marbles.core.main` rebinds
-        :class:`unittest.TestCase`, it's risky to run those tests
-        inside this process, they could modify (or have their behavior
-        affected by) this process's modules and interpreter state.
-
-        We use subprocess to make sure the tests we're running have a
-        fresh Python interpreter and go through all the normal Python
-        startup procedures, so we're testing as closely as possible to
-        what users will see.
-
-        It is possible to run these in-process using
-        :func:`runpy.run_module` and :func:`runpy.run_path`, and that
-        would be faster (and would not require the coverage hack
-        below), but at the risk of exposing the problems described
-        above.
-
-        Returns
-        -------
-        (str, str)
-            Standard output and error produced by the test.
-        '''
-        test_dir = os.path.dirname(__file__)
-        core_dir = os.path.dirname(test_dir)
-        test_path = os.path.join(test_dir, 'examples', self.test_file)
-        if self.runner == 'script':
-            cmd = [sys.executable, test_path]
-        else:
-            cmd = [sys.executable, '-m', self.runner, test_path]
-        if self.verbose:
-            cmd.append('-v')
-
+    def __run_cmd(self):
+        '''Run the command provided and return stdout and stderr.'''
         # In order to get coverage working for tests run through
         # subprocess, we need to set COVERAGE_PROCESS_START to point
         # to a .coveragerc, and trick the python interpreter into
@@ -127,6 +66,7 @@ class TestScriptRunningTestCase(unittest.TestCase):
         # Also, due to https://github.com/pypa/virtualenv/issues/355,
         # we can't use site.getsitepackages(), but
         # distutils.sysconfig.get_python_lib() works.
+        core_dir = os.path.dirname(os.path.dirname(__file__))
         if sys.gettrace():
             # Only add this .pth file if we're running under the
             # coverage tool, which is the most likely reason that
@@ -138,7 +78,7 @@ class TestScriptRunningTestCase(unittest.TestCase):
                 pth.write('import coverage; coverage.process_startup()\n')
                 pth.flush()
 
-            coverage_config = os.path.join(test_dir, '..', '.coveragerc')
+            coverage_config = os.path.join(core_dir, '.coveragerc')
             env = {'COVERAGE_PROCESS_START': coverage_config}
             to_remove = pth.name
         else:
@@ -146,12 +86,85 @@ class TestScriptRunningTestCase(unittest.TestCase):
             to_remove = None
         try:
             proc = subprocess.run(
-                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 env=env, cwd=core_dir)
         finally:
             if to_remove:
                 os.remove(to_remove)
         return proc.stdout.decode(), proc.stderr.decode()
+
+
+class TestScriptRunningTestCase(CommandRunningTestCase):
+    '''A TestCase which runs another test suite in a few ways.
+
+    Can use ``python -m marbles``, ``python -m unittest``, and just
+    ``python path/to/test_file.py``.
+
+    Since we're already running a unittest test (i.e. this class),
+    and :mod:`marbles.core.main` rebinds
+    :class:`unittest.TestCase`, it's risky to run those tests
+    inside this process, they could modify (or have their behavior
+    affected by) this process's modules and interpreter state.
+
+    We use subprocess to make sure the tests we're running have a
+    fresh Python interpreter and go through all the normal Python
+    startup procedures, so we're testing as closely as possible to
+    what users will see.
+
+    It is possible to run these in-process using
+    :func:`runpy.run_module` and :func:`runpy.run_path`, and that
+    would be faster (and would not require the coverage hack
+    below), but at the risk of exposing the problems described
+    above.
+
+    Parameters
+    ----------
+    methodName : str
+        Test method (within the subclass of this TestCase) to run,
+        passed through to unittest.
+    runner : str
+        Either the name of a main module (marbles or unittest) to use
+        with ``python -m``, or the word ``script``, to run the test
+        file as a script.
+    verbose : bool
+        Whether to use verbose mode (``-v``).
+    test_file : str
+        Path to the test file to run.
+    '''
+
+    def __init__(self, methodName='runTest', *, runner=None, verbose=None,
+                 test_file=None):  # noqa: D102
+        if not (runner and test_file):
+            # unittest's loader tries to instantiate this class
+            # without calling our load_tests, so all our variables
+            # will be None. Though it won't run that object, it needs
+            # to create it without raising an exception, and
+            # os.path.join raises if test_file is None. So, in that
+            # case, just return something, it will be discarded and
+            # our load_tests will construct real versions of this
+            # TestCase later.
+            super().__init__(methodName=methodName)
+        else:
+            self.runner = runner
+            self.verbose = verbose
+            self.test_file = test_file
+            test_dir = os.path.dirname(__file__)
+            test_path = os.path.join(test_dir, 'examples', self.test_file)
+            if self.runner == 'script':
+                cmd = [sys.executable, test_path]
+            else:
+                cmd = [sys.executable, '-m', self.runner, test_path]
+            if self.verbose:
+                cmd.append('-v')
+            super().__init__(methodName=methodName, cmd=cmd)
+
+    def __str__(self):  # noqa: D102
+        params = ', '.join('{}={!r}'.format(name, getattr(self, name))
+                           for name in ('runner', 'verbose', 'test_file'))
+        return '{} ({}) ({})'.format(
+            self._testMethodName,
+            unittest.util.strclass(self.__class__),
+            params)
 
     @property
     def run_with_marbles(self):
@@ -224,6 +237,23 @@ class MainWithErrorTestCase(TestScriptRunningTestCase):
         self.assertIn('Traceback', self.stderr)
 
 
+class VersionTestCase(CommandRunningTestCase):
+    '''Test that marbles --version works.'''
+
+    def __init__(self, methodName='runTest'):  # noqa: D102
+        super().__init__(methodName=methodName,
+                         cmd=[sys.executable, '-m', 'marbles', '--version'])
+
+    def test_stdout(self):
+        '''The version output should contain marbles.core's version.'''
+        expected = 'marbles.core version: {}'.format(marbles.core.__version__)
+        self.assertIn(expected, self.stdout)
+
+    def test_stderr(self):
+        '''The error output should be empty.'''
+        self.assertEqual('', self.stderr)
+
+
 def load_tests_from_testcase(loader, class_, test_files):
     '''Load and parametrize tests for ``class_``.'''
     runners = [
@@ -252,6 +282,9 @@ def load_tests(loader, tests, pattern):  # noqa: D103
     error_tests = ['example_error.py']
     suite.addTests(load_tests_from_testcase(
         loader, MainWithErrorTestCase, error_tests))
+
+    suite.addTests(VersionTestCase(methodName=test_name)
+                   for test_name in loader.getTestCaseNames(VersionTestCase))
 
     return suite
 
