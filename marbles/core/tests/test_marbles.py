@@ -427,6 +427,27 @@ class InterfaceTestCase(MarblesTestCase):
             with self.assertRaises(AssertionError):
                 self.case.test_missing_annotation_fail()
 
+    def test_locals_hidden_when_missing(self):
+        '''Does marbles hide the Locals section if there are none?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_failure()
+        e = ar.exception
+        self.assertNotIn('Locals:', str(e))
+
+    def test_locals_hidden_when_all_private(self):
+        '''Does marbles hide the Locals section if all are private?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_internal_mangled_locals()
+        e = ar.exception
+        self.assertNotIn('Locals:', str(e))
+
+    def test_locals_shown_when_present(self):
+        '''Does marbles show the Locals section if there are some?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_locals()
+        e = ar.exception
+        self.assertIn('Locals:', str(e))
+
 
 class TestAssertionLoggingFailure(MarblesTestCase):
 
@@ -677,7 +698,7 @@ class TestContextualAssertionError(MarblesTestCase):
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_locals()
         e = ar.exception
-        locals_section = e._format_locals(e.locals).split('\n')
+        locals_section = e._format_locals(e.displayed_locals).split('\n')
         locals_ = [local.split('=')[0] for local in locals_section]
         for local in locals_:
             self.assertTrue(local.startswith('\t'))
@@ -689,7 +710,7 @@ class TestContextualAssertionError(MarblesTestCase):
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_internal_mangled_locals()
         e = ar.exception
-        locals_section = e._format_locals(e.locals).split('\n')
+        locals_section = e._format_locals(e.displayed_locals).split('\n')
         locals_ = [local.split('=')[0] for local in locals_section if local]
         for local in locals_:
             self.assertTrue(local.startswith('\t'))
