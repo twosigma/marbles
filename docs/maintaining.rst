@@ -205,12 +205,12 @@ have independent release schedules makes more sense for that
 community.
 
 The second approach has the problem that if we release the subpackages
-independently, it's unclear what to name the metapackage when that
+independently, it's unclear how to version the metapackage when that
 happens. Taking the max of the subpackage version strings doesn't work
 if the subpackage with a lower one gets an update by itself. There are
 a couple other possiblities here, but none of them seemed right.
 
-The third approach, of updating everything in lock-step is what we've
+The third approach, of updating everything in lock-step, is what we've
 chosen. This will create multiple versions of one or the other package
 that are identical, in some cases, which is a little odd. However, it
 has the benefit of documenting which versions of :mod:`marbles.core`
