@@ -8,9 +8,10 @@ name = "pypi"
 "55bbcad" = {path = "./marbles/mixins", extras = ["dev"], editable = true}
 
 [dev-packages]
-Sphinx = "*"
-sphinx_rtd_theme = "*"
+bumpversion = "*"
 coverage = "*"
 "flake8" = "*"
-tox = "*"
 "flake8-per-file-ignores" = "*"
+Sphinx = "*"
+sphinx_rtd_theme = "*"
+tox = "*"

@@ -132,13 +132,8 @@ Ready to contribute? Here's how to set up marbles for local development.
    .. note:: Don't worry about bumping version numbers yourself. We'll
              handle this in the release that includes your changes.
 
-   If you want to run the full set of linting, testing, and coverage
-   measurement that will be done in CI, you can use `tox
-   <https://tox.readthedocs.io>`_. With no arguments, it runs
-   everything, with ``-e`` you can select a subset::
-
-    $ tox
-    $ tox -e coverage,flake8,docs
+   For more developer workflows (linting, testing, test coverage,
+   docs), see :doc:`maintaining`.
 
 6. Commit your changes and push your branch to GitHub::
 
