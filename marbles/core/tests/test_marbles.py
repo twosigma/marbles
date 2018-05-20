@@ -427,27 +427,6 @@ class InterfaceTestCase(MarblesTestCase):
             with self.assertRaises(AssertionError):
                 self.case.test_missing_annotation_fail()
 
-    def test_locals_hidden_when_missing(self):
-        '''Does marbles hide the Locals section if there are none?'''
-        with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_failure()
-        e = ar.exception
-        self.assertNotIn('Locals:', str(e))
-
-    def test_locals_hidden_when_all_private(self):
-        '''Does marbles hide the Locals section if all are private?'''
-        with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_internal_mangled_locals()
-        e = ar.exception
-        self.assertNotIn('Locals:', str(e))
-
-    def test_locals_shown_when_present(self):
-        '''Does marbles show the Locals section if there are some?'''
-        with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_locals()
-        e = ar.exception
-        self.assertIn('Locals:', str(e))
-
 
 class TestAssertionLoggingFailure(MarblesTestCase):
 
@@ -739,6 +718,27 @@ class TestContextualAssertionError(MarblesTestCase):
             self.case.test_note_format_strings_custom_format()
         e = ar.exception
         self.assertEqual('the date is 20170812', e.note.strip())
+
+    def test_locals_hidden_when_missing(self):
+        '''Does marbles hide the Locals section if there are none?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_failure()
+        e = ar.exception
+        self.assertNotIn('Locals:', str(e))
+
+    def test_locals_hidden_when_all_private(self):
+        '''Does marbles hide the Locals section if all are private?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_internal_mangled_locals()
+        e = ar.exception
+        self.assertNotIn('Locals:', str(e))
+
+    def test_locals_shown_when_present(self):
+        '''Does marbles show the Locals section if there are some?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_locals()
+        e = ar.exception
+        self.assertIn('Locals:', str(e))
 
 
 def load_tests(loader, tests, pattern):
