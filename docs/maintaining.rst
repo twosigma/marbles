@@ -121,7 +121,7 @@ Releasing a new version
 -----------------------
 
 The marbles meta-package and subpackage version strings are stored in
-a few different locations, due to our namespace package setup:
+a few different locations, due to the namespace package setup:
 
 1. :file:`setup.py`
 
