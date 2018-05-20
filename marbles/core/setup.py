@@ -30,7 +30,8 @@ with open(os.path.join(os.path.dirname(__file__),
 
 setup_requires = [
     'coverage',
-    'flake8'
+    'flake8',
+    'flake8-per-file-ignores'
 ]
 
 tests_require = [

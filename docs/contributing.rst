@@ -120,9 +120,10 @@ Ready to contribute? Here's how to set up marbles for local development.
    2. The mixins live in :mod:`marbles.mixins`, which you'll find inside the
       repo under :file:`marbles/mixins`.
 
-5. When you're done making changes, check that your changes pass flake8 and the
-   tests. These should be run inside the package you've made changes to, so if
-   you've made changes to :mod:`marbles.core`, you should run this::
+5. As you make changes, you can run the tests and lint with
+   flake8. These should be run inside the package you've made changes
+   to, so if you've made changes to :mod:`marbles.core`, you should
+   run this::
 
     $ cd marbles/core
     $ python setup.py flake8
@@ -130,6 +131,14 @@ Ready to contribute? Here's how to set up marbles for local development.
 
    .. note:: Don't worry about bumping version numbers yourself. We'll
              handle this in the release that includes your changes.
+
+   If you want to run the full set of linting, testing, and coverage
+   measurement that will be done in CI, you can use `tox
+   <https://tox.readthedocs.io>`_. With no arguments, it runs
+   everything, with ``-e`` you can select a subset::
+
+    $ tox
+    $ tox -e coverage,flake8,docs
 
 6. Commit your changes and push your branch to GitHub::
 
