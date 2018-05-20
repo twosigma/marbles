@@ -1,10 +1,9 @@
 Installation
 ============
 
-marbles can be installed from `PyPi`_ or from `conda-forge`_.
+marbles can be installed from `PyPi`_ with
 
 .. _PyPi: https://pypi.org/project/marbles
-.. _conda-forge: https://conda-forge.org/marbles-feedstock
 
 .. note::
 
@@ -25,18 +24,6 @@ To install marbles with pip
    # -or-
    pip install marbles.core
    pip install marbles.mixins
-
-conda
------
-
-To install marbles with conda
-
-.. code-block:: bash
-
-   conda install marbles
-   # -or-
-   conda install marbles-core
-   conda install marbles-mixins
 
 .. _install-source:
 
