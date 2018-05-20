@@ -23,7 +23,7 @@
 from setuptools import setup
 
 
-version = '0.9.1'
+version = '0.9.2'
 url = 'https://github.com/twosigma/marbles'
 
 
