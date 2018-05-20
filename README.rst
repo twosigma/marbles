@@ -20,7 +20,7 @@ marbles
 Read better test failures.
 
 * Free software: MIT license
-* Documentation: https://marbles.readthedocs.io.
+* Documentation: https://marbles.readthedocs.io
 
 Overview
 --------

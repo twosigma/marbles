@@ -20,7 +20,7 @@ class Response(object):
         return self._reason
 
 
-class requests(object):
+class requests(object):  # noqa: F811
 
     @classmethod
     def put(cls, endpoint, data=None):

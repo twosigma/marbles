@@ -183,10 +183,11 @@ class ContextualAssertionError(AssertionError):
 
 Source ({filename}):
 {assert_stmt}
-Locals:
+'''
+    _LOCALS_META_FORMAT_STRING = '''Locals:
 {locals}
 '''
-    _NOTE_META_FORMAT_STRING = _META_FORMAT_STRING + '''Note:
+    _NOTE_META_FORMAT_STRING = '''Note:
 {note}
 '''
     # If msg and/or note are declared in the test's scope and passed
@@ -253,15 +254,21 @@ Locals:
 
     @property
     def locals(self):
-        '''Returns a string displaying the public (a.k.a., not internal
-        or name-mangled) locals defined within the test.
+        '''A dict containing the locals defined within the test.'''
+        return self._locals
+
+    @property
+    def public_test_locals(self):
+        '''A dict containing the public (a.k.a., not internal or name-mangled)
+        locals defined within the test.
 
         .. note:
 
            The public local variables ``self``, ``note``, and
            ``msg``, if present, are excluded.
         '''
-        return self._locals
+        return {k: v for k, v in self.locals.items()
+                if k not in self._IGNORE_LOCALS and not k.startswith('_')}
 
     @property
     def module(self):
@@ -311,19 +318,18 @@ Locals:
 
     @property
     def formattedMsg(self):  # mimic unittest's name for standardMsg
-        if self.note is not None:
-            fmt = self._NOTE_META_FORMAT_STRING
-        else:
-            fmt = self._META_FORMAT_STRING
+        fmt = self._META_FORMAT_STRING
+        if self.public_test_locals:
+            fmt += self._LOCALS_META_FORMAT_STRING
+        if self.note:
+            fmt += self._NOTE_META_FORMAT_STRING
+        local_string = self._format_locals(self.public_test_locals)
         return fmt.format(
             standardMsg=self.standardMsg, assert_stmt=self.assert_stmt,
-            note=self.note, locals=self._format_locals(self.locals),
-            filename=self.filename)
+            note=self.note, locals=local_string, filename=self.filename)
 
     @classmethod
     def _format_locals(cls, locals_):
-        locals_ = {k: v for k, v in locals_.items()
-                   if k not in cls._IGNORE_LOCALS and not k.startswith('_')}
         return '\n'.join('\t{0}={1}'.format(k, v) for k, v in locals_.items())
 
     @staticmethod
