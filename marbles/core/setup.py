@@ -28,19 +28,6 @@ with open(os.path.join(os.path.dirname(__file__),
                        'marbles/core/VERSION')) as vfile:
     __version__ = vfile.read().strip()
 
-setup_requires = [
-    'coverage',
-    'flake8',
-    'flake8-per-file-ignores'
-]
-
-tests_require = [
-    'coverage'
-]
-
-extras_require = {
-    'dev': list(set(setup_requires + tests_require))
-}
 
 setup(
     name='marbles.core',
@@ -59,10 +46,14 @@ setup(
         'marbles.core': ['VERSION']
     },
     test_suite='tests',
-    setup_requires=setup_requires,
     install_requires=[],
-    tests_require=tests_require,
-    extras_require=extras_require,
+    extras_require={
+        'dev': [
+            'coverage',
+            'flake8',
+            'flake8-per-file-ignores'
+        ]
+    },
     license='MIT',
     description=('A unittest extension that provides additional '
                  'information on test failure'),
