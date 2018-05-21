@@ -43,6 +43,7 @@ setup(
     ],
     extras_require={
         'dev': [
+            'releases',
             'Sphinx',
             'sphinx_rtd_theme'
         ]
