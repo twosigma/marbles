@@ -86,20 +86,7 @@ Depending on the complexity of what you're testing, you may want to require that
 
 If you don't provide notes to an assertion on an :class:`~marbles.core.AnnotatedTestCase` you'll see an error
 
-.. code-block:: bash
-   :emphasize-lines: 6
-
-   $ python -m marbles docs/examples/required_note.py
-   E
-   ======================================================================
-   ERROR: test_for_edge_case (docs.examples.required_note.ComplexTestCase)
-   ----------------------------------------------------------------------
-   marbles.core.marbles.AnnotationError: Annotation missing required fields: {'note'}
-
-   ----------------------------------------------------------------------
-   Ran 1 test in 0.000s
-
-   FAILED (errors=1)
+.. literalinclude:: examples/required_note.txt
 
 Custom assertions
 -----------------
