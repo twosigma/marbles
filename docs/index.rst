@@ -62,6 +62,7 @@ Developer Guide
 
    contributing
    maintaining
+   changelog
 
 Reference
 """""""""
