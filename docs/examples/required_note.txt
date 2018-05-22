@@ -1,0 +1,19 @@
+E
+======================================================================
+ERROR: test_for_edge_case (docs.examples.required_note.ComplexTestCase)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/docs/examples/required_note.py", line 7, in test_for_edge_case
+    self.assertTrue(False)
+  File "/path/to/marbles/core/marbles/core/marbles.py", line 535, in wrapper
+    list(args) + list(rem_args), kwargs) as annotation:
+  File "/path/to/marbles/core/marbles/core/marbles.py", line 407, in __enter__
+    self._validate_annotation(annotation)
+  File "/path/to/marbles/core/marbles/core/marbles.py", line 397, in _validate_annotation
+    raise AnnotationError(error)
+marbles.core.marbles.AnnotationError: Annotation missing required fields: {'note'}
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (errors=1)
