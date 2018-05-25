@@ -23,7 +23,9 @@ Marbles provides some functionality similar to `pytest`_:
 Marbles goes beyond pytest with:
 
 * Note annotations
-* Custom assertion mixins
+* Explicit assertion names
+* Finer grained local variable control
+* Assertion logging
 
 Finally, marbles tests have the same structure as unittest tests,
 which are more explicit than pytest tests, and therefore are easier to
@@ -57,14 +59,47 @@ While pytest presents just the variables involved in the assertion
 (and shows each sub-expression involved in the assertion), marbles
 presents all public local variables in scope in the test method.
 
-Marbles is a little more flexible here. While pytest has the ability
-to expand complex expressions and present all of their constituent
-names in the failure message, it doesn't present any other variables
-leading up to the assertion, which may provide valuable context.
+Advantages of marbles
+~~~~~~~~~~~~~~~~~~~~~
 
-With marbles, you can get the same effect as pytest by simply
-decomposing a complex assertion statement into its constituent parts,
-and giving each of these parts a distinct local variable binding.
+Note annotations
+""""""""""""""""
+
+Marbles allows test authors to :ref:`annotate assertion statements
+<notes>` with additional information about the test that will help the
+test consumer put the failed assertion in context.
+
+Explicit assertion names
+""""""""""""""""""""""""
+
+Pytest relies on the bare ``assert`` keyword, and encourages use of it
+directly. This puts the burden on the test consumer to understand the
+author's intent. As a consumer, you need to parse the logic of the
+assertion condition and read the rest of the test to understand what's
+going on.
+
+Marbles tests use the standard unittest assertions, whose names convey
+the author's intent to the test consumer. On top of this,
+:mod:`marbles.mixins` provides a suite of even more specific assertion
+methods. With marbles, the assertion name tells you explicitly what is
+being checked.
+
+Local variable control
+""""""""""""""""""""""
+
+Regarding the display of test data, marbles is a little more
+flexible. While pytest has the ability to expand complex expressions,
+it doesn't present any other variables leading up to the assertion,
+which may provide valuable context. Marbles shows all of them, and
+allows the author to control explicitly which locals will be
+presented, with the natural mechanism of choosing public or private
+variable names.
+
+With marbles, you can get the same effect as pytest's sub-expression
+display by simply decomposing a complex assertion statement into its
+constituent parts, and giving each of these parts a distinct local
+variable binding. Refactoring complex expressions and giving their
+constituent parts useful names is a good habit to get into anyway.
 
 Consider the following pytest code::
 
@@ -74,54 +109,33 @@ If this assertion fails, pytest will show you the values of the
 expressions ``a * b`` and ``c * d``, as well as the individual values
 of each variable ``a``, ``b``, ``c``, and ``d``.
 
-In marbles, one could instead write this test as::
+In marbles, one could instead write the test this way, and get the
+same information, if the author believes ``lhs`` and ``rhs`` are
+useful to see::
 
     lhs = a * b
     rhs = c * d
     self.assertLess(lhs, rhs)
 
-Advantages of marbles
-~~~~~~~~~~~~~~~~~~~~~
-
-Note annotations
-""""""""""""""""
-
-Marbles gives the test author a place to :ref:`annotate assertion
-statements <notes>` with information about not just a description of
-what assertion failed, but also information about why that assertion
-is important, or maybe what the test consumer should do to handle that
-failure.
-
-Custom assertion mixins
-"""""""""""""""""""""""
-
-Pytest relies on the bare ``assert`` keyword, and encourages use of it
-directly. This puts the burden on the test consumer to understand the
-author's intent. As a consumer, you need to parse the logic of the
-assertion condition and read the rest of the test to understand what's
-going on.
-
-Marbles provides, through :mod:`marbles.mixins` classes, richly-named
-assertion methods which convey the author's intent to the test
-consumer. With marbles, the assertion name tells you explicitly what
-is being checked.
-
 Pure extension of unittest
 """"""""""""""""""""""""""
 
 While pytest gives you lots of power to be clever with fixtures when
-writing tests, pytest failures are much more difficult to respond to.
+writing tests, this is often at the expense of being able to easily
+understand what any given test is doing when you're trying to debug a
+failure.
 
 It can be hard to piece together where fixtures come from, they might
 not even be in the same file, or any that are imported. Even if you
-can find the fixtures, it's unclear exactly what the control flow is.
+can find the fixtures, it's unclear exactly what the control flow
+is. This gets particularly complicated if the author used
+:file:`conftest.py` anywhere in the project.
 
 Marbles works with unmodified :mod:`unittest` tests. We find unittest
 tests have a clearer structure than pytest tests, especially those
-with complicated fixtures.
-
-With unittest, control flow is explicit, as long as you understand
-basic Python semantics. There's no magic, it's just inheritance.
+with complicated fixtures. With unittest, control flow is explicit, as
+long as you understand basic Python semantics. There's no magic, it's
+just inheritance.
 
 We have found that, at scale, unittest's boilerplate is a benefit
 rather than a burden. It makes for tests that are more explicit about
