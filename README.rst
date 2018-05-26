@@ -46,6 +46,7 @@ Features
   * Ability to toggle traceback
 
 * Semantically-rich assertion methods
+* Assertion logging
 
 Demo
 ----
@@ -78,7 +79,7 @@ looks like
 
    FAILED (failures=1)
 
-You can also run your existing `unittest` tests with `marbles` in two steps
+You can also run your existing `unittest` tests with `marbles`
 
 .. code-block:: bash
 
