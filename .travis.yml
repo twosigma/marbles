@@ -5,4 +5,5 @@ python:
   - "3.6"
 install: pip install tox-travis codecov
 script: tox
+cache: pip
 after_success: codecov
