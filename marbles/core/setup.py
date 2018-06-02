@@ -26,15 +26,14 @@ from setuptools import setup
 
 url = 'https://github.com/twosigma/marbles'
 setup_dir = os.path.dirname(__file__)
-root_dir = os.path.join(setup_dir, '..', '..')
 
 with open(os.path.join(setup_dir, 'marbles/core/VERSION')) as vfile:
     __version__ = vfile.read().strip()
 
-with open(os.path.join(root_dir, 'classifiers.txt'), 'r') as f:
+with open(os.path.join(setup_dir, 'classifiers.txt'), 'r') as f:
     classifiers = [line.strip() for line in f.readlines()]
 
-with open(os.path.join(root_dir, 'README.rst'), 'r') as f:
+with open(os.path.join(setup_dir, 'README.rst'), 'r') as f:
     long_description = f.read()
 
 
