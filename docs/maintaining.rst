@@ -196,13 +196,9 @@ Uploading to PyPI
 Once you've tagged the latest version of marbles, pull from GitHub to
 make sure your clone is up to date and clean, build both ``sdist`` and
 ``wheel`` packages for all three packages, and upload them with
-`twine`_::
+`twine`_. We have a `tox`_ rule to automate building and uploading::
 
-    $ rm -rf dist marbles/{core,mixins}/dist
-    $ (cd marbles/core; python setup.py sdist bdist_wheel)
-    $ (cd marbles/mixins; python setup.py sdist bdist_wheel)
-    $ python setup.py sdist bdist_wheel
-    $ twine upload dist/* marbles/{core,mixins}/dist/*
+    $ tox -e pypi
 
 .. _pipenv: https://docs.pipenv.org
 .. _flake8: http://flake8.pycqa.org
