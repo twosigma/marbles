@@ -17,6 +17,9 @@ marbles
         :target: https://marbles.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
+.. image:: https://codecov.io/gh/twosigma/marbles/branch/master/graph/badge.svg
+        :target: https://codecov.io/gh/twosigma/marbles
+
 Read better test failures.
 
 * Free software: MIT license
