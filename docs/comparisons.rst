@@ -25,7 +25,7 @@ pytest
 ------
 
 As far as failure messages go, marbles has the most in common with
-`pytest`_. However, because marbles is bulit on top of unittest,
+`pytest`_. However, because marbles is built on top of unittest,
 writing marbles tests is pretty different than writing pytest tests.
 
 Marbles is all about the test consumer, while pytest is all about the
@@ -69,7 +69,7 @@ the time an assertion in your test failed.
 Pytest exposes only the variables that are involved in the assertion
 (and shows each sub-expression involved in the assertion). Marbles
 exposes any public variables that are in scope at the time the
-assertion failed, whether or not they are direcly involved in the
+assertion failed, whether or not they are directly involved in the
 assertion.
 
 Advantages of marbles
