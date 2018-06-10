@@ -75,5 +75,10 @@ setup(
         'Source': url,
         'Tracker': '{url}/issues'.format(url=url)
     },
+    entry_points={
+        "distutils.commands": [
+            "marbles = marbles.setuptools:MarblesCommand",
+        ],
+    },
     classifiers=classifiers
 )
