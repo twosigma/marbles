@@ -1,5 +1,6 @@
 Development Status :: 5 - Production/Stable
 Environment :: Console
+Framework :: Setuptools Plugin
 Intended Audience :: Developers
 Intended Audience :: Financial and Insurance Industry
 Intended Audience :: Healthcare Industry
