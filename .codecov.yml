@@ -5,3 +5,4 @@ coverage:
         target: auto
         threshold: null
         base: auto 
+  comment: off
