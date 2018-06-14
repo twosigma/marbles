@@ -17,6 +17,9 @@ marbles
         :target: https://marbles.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
+.. image:: https://codecov.io/gh/twosigma/marbles/branch/master/graph/badge.svg
+        :target: https://codecov.io/gh/twosigma/marbles
+
 Read better test failures.
 
 * Free software: MIT license
@@ -46,6 +49,7 @@ Features
   * Ability to toggle traceback
 
 * Semantically-rich assertion methods
+* Assertion logging
 
 Demo
 ----
@@ -78,7 +82,7 @@ looks like
 
    FAILED (failures=1)
 
-You can also run your existing `unittest` tests with `marbles` in two steps
+You can also run your existing `unittest` tests with `marbles`
 
 .. code-block:: bash
 

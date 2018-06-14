@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :release:`0.9.4 <2018-06-03>`
+* :bug:`65` Fixed sdist installation
+* :release:`0.9.3 <2018-06-02>`
 * :support:`43` Added version bumping automation and maintenance documentation
 * :support:`39` Added issue templates
 * :bug:`40` Fixed "Locals" section in failure output to be hidden when
