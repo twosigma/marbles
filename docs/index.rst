@@ -50,19 +50,12 @@ User Guide
 """"""""""
 .. toctree::
    :maxdepth: 3
+   :caption: User Guide
 
    install
    quickstart
    winning
-
-Developer Guide
-"""""""""""""""
-.. toctree::
-   :maxdepth: 3
-
-   contributing
-   maintaining
-   changelog
+   comparisons
 
 Reference
 """""""""
@@ -70,6 +63,16 @@ Reference
    :maxdepth: 3
 
    reference
+
+Developer Guide
+"""""""""""""""
+.. toctree::
+   :maxdepth: 3
+   :caption: Developer Guide
+
+   contributing
+   maintaining
+   changelog
 
 Indices and tables
 ------------------
