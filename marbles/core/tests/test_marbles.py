@@ -345,46 +345,46 @@ class InterfaceTestCase(MarblesTestCase):
         with self.assertRaises(ContextualAssertionError):
             self.case.test_failure()
 
-    def test_fail_handles_note_properly(self):
-        '''Does TestCase.fail() deal with note the right way?'''
-        if self._use_annotated_test_case:
-            with self.assertRaises(AnnotationError):
-                self.case.test_fail_without_msg_without_note()
-        else:
-            with self.assertRaises(ContextualAssertionError):
-                self.case.test_fail_without_msg_without_note()
-        with self.assertRaises(ContextualAssertionError):
-            self.case.test_fail_without_msg_kwargs_note()
-        with self.assertRaises(ContextualAssertionError):
-            self.case.test_fail_positional_msg_kwargs_note()
-        with self.assertRaises(ContextualAssertionError):
-            self.case.test_fail_kwargs_msg_kwargs_note()
+    #  def test_fail_handles_note_properly(self):
+    #      '''Does TestCase.fail() deal with note the right way?'''
+    #      if self._use_annotated_test_case:
+    #          with self.assertRaises(AnnotationError):
+    #              self.case.test_fail_without_msg_without_note()
+    #      else:
+    #          with self.assertRaises(ContextualAssertionError):
+    #              self.case.test_fail_without_msg_without_note()
+    #      with self.assertRaises(ContextualAssertionError):
+    #          self.case.test_fail_without_msg_kwargs_note()
+    #      with self.assertRaises(ContextualAssertionError):
+    #          self.case.test_fail_positional_msg_kwargs_note()
+    #      with self.assertRaises(ContextualAssertionError):
+    #          self.case.test_fail_kwargs_msg_kwargs_note()
 
-    def test_fail_rejects_extra_args(self):
-        '''Does TestCase.fail() reject extra arguments?'''
-        with self.assertRaises(TypeError):
-            self.case.test_fail_extra_arg_positional_msg_kwargs_note()
+    #  def test_fail_rejects_extra_args(self):
+    #      '''Does TestCase.fail() reject extra arguments?'''
+    #      with self.assertRaises(TypeError):
+    #          self.case.test_fail_extra_arg_positional_msg_kwargs_note()
 
-    def test_fail_works_when_invoked_by_builtin_assertions(self):
-        with self.assertRaises(ContextualAssertionError):
-            self.case.test_fail_after_calling_formatMessage()
+    #  def test_fail_works_when_invoked_by_builtin_assertions(self):
+    #      with self.assertRaises(ContextualAssertionError):
+    #          self.case.test_fail_after_calling_formatMessage()
 
-    def test_assert_raises_success(self):
-        '''Does assertRaises work correctly when the test passes?'''
-        self.case.test_assert_raises_success()
+    #  def test_assert_raises_success(self):
+    #      '''Does assertRaises work correctly when the test passes?'''
+    #      self.case.test_assert_raises_success()
 
-    def test_assert_raises_failure(self):
-        '''Does assertRaises work correctly when the test fails?'''
-        with self.assertRaises(ContextualAssertionError):
-            self.case.test_assert_raises_failure()
+    #  def test_assert_raises_failure(self):
+    #      '''Does assertRaises work correctly when the test fails?'''
+    #      with self.assertRaises(ContextualAssertionError):
+    #          self.case.test_assert_raises_failure()
 
-    def test_assert_raises_missing_note(self):
-        '''Do we notice missing note for assertRaises?'''
-        if self._use_annotated_test_case:
-            with self.assertRaises(AnnotationError):
-                self.case.test_assert_raises_missing_note()
-        else:
-            self.case.test_assert_raises_missing_note()
+    #  def test_assert_raises_missing_note(self):
+    #      '''Do we notice missing note for assertRaises?'''
+    #      if self._use_annotated_test_case:
+    #          with self.assertRaises(AnnotationError):
+    #              self.case.test_assert_raises_missing_note()
+    #      else:
+    #          self.case.test_assert_raises_missing_note()
 
     def test_string_equality(self):
         '''Can we use assertEqual on strings?
