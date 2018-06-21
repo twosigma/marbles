@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 "2faa170" = {path = "./marbles/core", extras = ["dev"], editable = true}
 "55bbcad" = {path = "./marbles/mixins", extras = ["dev"], editable = true}
-pandas = "==0.23.1"
 
 [dev-packages]
 bumpversion = "*"
