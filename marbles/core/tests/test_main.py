@@ -79,10 +79,10 @@ class CommandRunningTestCase(unittest.TestCase):
                 pth.flush()
 
             coverage_config = os.path.join(core_dir, '.coveragerc')
-            env = {'COVERAGE_PROCESS_START': coverage_config}
+            env = {**os.environ, **{'COVERAGE_PROCESS_START': coverage_config}}
             to_remove = pth.name
         else:
-            env = {}
+            env = None
             to_remove = None
         try:
             proc = subprocess.run(
