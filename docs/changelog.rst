@@ -2,6 +2,9 @@
 Changelog
 =========
 
+* :release:`0.9.5 <2018-06-24>`
+* :support:`80` Added support for ``pandas<0.24``
+* :bug:`58` Fixed test failure on OSX
 * :release:`0.9.4 <2018-06-03>`
 * :bug:`65` Fixed sdist installation
 * :release:`0.9.3 <2018-06-02>`
