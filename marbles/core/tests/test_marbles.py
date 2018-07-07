@@ -82,6 +82,26 @@ class ExampleTestCaseMixin(
     def test_failure(self):
         self.assertTrue(False, note='some note')
 
+    def test_deprecated_assertEquals_success(self):
+        x = 1
+        y = 1
+        self.assertEquals(x, y)
+
+    def test_deprecated_assertEquals_failure(self):
+        x = 1
+        y = 2
+        self.assertEquals(x, y)
+
+    def test_deprecated_assertEquals_success_with_note(self):
+        x = 1
+        y = 1
+        self.assertEquals(x, y, note='x should equal y')
+
+    def test_deprecated_assertEquals_failure_with_note(self):
+        x = 1
+        y = 2
+        self.assertEquals(x, y, note='x should equal y')
+
     def test_fail_without_msg_without_note(self):
         self.fail()
 
@@ -345,6 +365,29 @@ class InterfaceTestCase(MarblesTestCase):
         with self.assertRaises(ContextualAssertionError):
             self.case.test_failure()
 
+    def test_deprecated_assertEquals_success(self):
+        '''Does the deprecated assertEquals method still work?'''
+        if self._use_annotated_test_case:
+            with self.assertRaises(AnnotationError):
+                self.case.test_deprecated_assertEquals_success()
+            self.case.test_deprecated_assertEquals_success_with_note()
+        else:
+            self.case.test_deprecated_assertEquals_success()
+            self.case.test_deprecated_assertEquals_success_with_note()
+
+    def test_deprecated_assertEquals_failure(self):
+        '''Does the deprecated assertEquals method work on failure?'''
+        if self._use_annotated_test_case:
+            with self.assertRaises(AnnotationError):
+                self.case.test_deprecated_assertEquals_failure()
+            with self.assertRaises(ContextualAssertionError):
+                self.case.test_deprecated_assertEquals_failure_with_note()
+        else:
+            with self.assertRaises(ContextualAssertionError):
+                self.case.test_deprecated_assertEquals_failure()
+            with self.assertRaises(ContextualAssertionError):
+                self.case.test_deprecated_assertEquals_failure_with_note()
+
     def test_fail_handles_note_properly(self):
         '''Does TestCase.fail() deal with note the right way?'''
         if self._use_annotated_test_case:
@@ -515,7 +558,7 @@ class TestContextualAssertionError(MarblesTestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 211)
+        self.assertEqual(e.linenumber, 231)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''

@@ -432,9 +432,19 @@ def _find_msg_argument(signature):
         The index of the ``msg`` param, the default value for it,
         and the number of non-``msg`` positional parameters we expect.
     '''
-    names = signature.parameters.keys()
+    names = list(signature.parameters.keys())
+    if len(names) == 2:
+        param_kinds = [signature.parameters[name].kind for name in names]
+        if (param_kinds[0] == inspect.Parameter.VAR_POSITIONAL
+                and param_kinds[1] == inspect.Parameter.VAR_KEYWORD):
+            # This is likely an assertion wrapper like
+            # assertEquals(*args, **kwargs), in which case we should
+            # just forward the arguments along and catch them in the
+            # wrapped assertion method (see
+            # https://github.com/twosigma/marbles/issue/85).
+            return sys.maxsize, None, len(names)
     try:
-        msg_idx = list(names).index('msg')
+        msg_idx = names.index('msg')
         default_msg = signature.parameters['msg'].default
     except ValueError:  # 'msg' is not in list
         # It's likely that this is a custom assertion that's just

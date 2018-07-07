@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :bug:`85` Fixed marbles handling of deprecated assertEquals and similar methods
 * :release:`0.9.5 <2018-06-24>`
 * :support:`80` Added support for ``pandas<0.24``
 * :bug:`58` Fixed test failure on OSX
