@@ -132,6 +132,22 @@ As we saw :ref:`above <Quickstart>`, you can also run vanilla unit tests with ma
 
    python -m marbles /path/to/unittest_tests.py
 
+Marbles also creates a setuptools command so if you are used to running
+``python setup.py test``, you can now run:
+
+.. code-block:: bash
+
+    python setup.py marbles
+
+You can go one step further and alias the command test to run marbles
+by adding the following to :file:`setup.cfg`:
+
+.. code-block:: bash
+
+    [aliases]
+    test = marbles
+
+
 Declaring marbles as a dependency
 ---------------------------------
 

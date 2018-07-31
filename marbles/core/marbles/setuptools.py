@@ -10,7 +10,7 @@ from marbles.core.main import main  # noqa: E402
 # and overrides functions that reference unittest to instead
 # use marbles.
 # Hopefully you can find a better way to achieve the same goal.
-class MarblesCommand(setuptools.command.test.test):
+class MarblesTestCommand(setuptools.command.test.test):
     description = 'Run tests using Marbles'
 
     def run_tests(self):
@@ -22,6 +22,7 @@ class MarblesCommand(setuptools.command.test.test):
             testRunner=self._resolve_as_ep(self.test_runner),
             exit=False,
         )
+
         if not test.result.wasSuccessful():
             msg = 'Test failed: %s' % test.result
             self.announce(msg, log.ERROR)

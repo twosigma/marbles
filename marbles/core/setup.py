@@ -77,7 +77,7 @@ setup(
     },
     entry_points={
         "distutils.commands": [
-            "marbles = marbles.setuptools:MarblesCommand",
+            "marbles = marbles.setuptools:MarblesTestCommand",
         ],
     },
     classifiers=classifiers
