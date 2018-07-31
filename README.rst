@@ -66,14 +66,14 @@ You can also run your existing `unittest` tests with `marbles`
    python -m marbles test_module.py
 
 Marbles also creates a setuptools command so if you are used to running
-`python setup.py test`, you can now run:
+``python setup.py test``, you can now run:
 
 .. code-block:: bash
 
     python setup.py marbles
 
 You can go one step further and alias the command test to run marbles
-by adding the following to setup.cfg:
+by adding the following to :file:`setup.cfg`:
 
 .. code-block:: bash
 
