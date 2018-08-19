@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :support:`88` Document how to install with conda
 * :release:`0.9.5 <2018-06-24>`
 * :support:`80` Added support for ``pandas<0.24``
 * :bug:`58` Fixed test failure on OSX

@@ -27,10 +27,21 @@ To install marbles with pip
 
 .. _install-source:
 
+conda
+-----
+
+To install marbles with conda
+
+.. code-block:: bash
+
+   conda install -c conda-forge marbles
+
 Source
 ------
 
 If you need a copy of the source, you can clone the `GitHub`_ repository or download the `tarball`_.
+
+.. _GitHub: https://github.com/twosigma/marbles
 
 GitHub
 ^^^^^^
