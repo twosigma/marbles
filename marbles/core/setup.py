@@ -62,7 +62,7 @@ setup(
             'flake8-per-file-ignores'
         ]
     },
-    python_requires='>=3.4,<3.7',
+    python_requires='>=3.4,<3.8',
     license='MIT',
     description=('A unittest extension that provides additional '
                  'information on test failure'),
