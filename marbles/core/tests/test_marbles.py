@@ -102,6 +102,27 @@ class ExampleTestCaseMixin(
         y = 2
         self.assertEquals(x, y, note='x should equal y')
 
+    # When assertRaises (and assertWarns, assertRaisesRegex, and
+    # assertWarnsRegex) aren't used as contex managers, they don't
+    # accept a msg argument
+    def test_assertion_without_msg_success(self):
+        self.assertRaises(self.failureException,
+                          self.assertAlmostEqual, 1.0000001, 1.0)
+
+    def test_assertion_without_msg_failure(self):
+        self.assertRaises(self.failureException,
+                          self.assertAlmostEqual, 1.0000000, 1.0)
+
+    def test_assertion_without_msg_success_with_note(self):
+        self.assertRaises(self.failureException,
+                          self.assertAlmostEqual, 1.0000001, 1.0,
+                          note='some note')
+
+    def test_assertion_without_msg_failure_with_note(self):
+        self.assertRaises(self.failureException,
+                          self.assertAlmostEqual, 1.0000000, 1.0,
+                          note='some note')
+
     def test_fail_without_msg_without_note(self):
         self.fail()
 
@@ -388,6 +409,27 @@ class InterfaceTestCase(MarblesTestCase):
             with self.assertRaises(ContextualAssertionError):
                 self.case.test_deprecated_assertEquals_failure_with_note()
 
+    def test_assertion_without_msg_success(self):
+        if self._use_annotated_test_case:
+            with self.assertRaises(AnnotationError):
+                self.case.test_assertion_without_msg_success()
+            self.case.test_assertion_without_msg_success_with_note()
+        else:
+            self.case.test_assertion_without_msg_success()
+            self.case.test_assertion_without_msg_success_with_note()
+
+    def test_assertion_without_msg_failure(self):
+        if self._use_annotated_test_case:
+            with self.assertRaises(AnnotationError):
+                self.case.test_assertion_without_msg_failure()
+            with self.assertRaises(ContextualAssertionError):
+                self.case.test_assertion_without_msg_failure_with_note()
+        else:
+            with self.assertRaises(ContextualAssertionError):
+                self.case.test_assertion_without_msg_failure()
+            with self.assertRaises(ContextualAssertionError):
+                self.case.test_assertion_without_msg_failure_with_note()
+
     def test_fail_handles_note_properly(self):
         '''Does TestCase.fail() deal with note the right way?'''
         if self._use_annotated_test_case:
@@ -558,7 +600,7 @@ class TestContextualAssertionError(MarblesTestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 231)
+        self.assertEqual(e.linenumber, 252)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''
