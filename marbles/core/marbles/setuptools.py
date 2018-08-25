@@ -14,6 +14,8 @@ class MarblesTestCommand(setuptools.command.test.test):
     description = 'Run tests using Marbles'
 
     def run_tests(self):
+        print("I'm HERE!!!!")
+        print(self._argv)
         test = main(
             module=None,
             defaultTest=None,
