@@ -36,9 +36,10 @@ import marbles.core
 
 class CommandRunningTestCase(unittest.TestCase):
 
-    def __init__(self, methodName='runTest', *, cmd=None):  # noqa: D102
+    def __init__(self, methodName='runTest', *, cmd=None, cwd=None):  # noqa: D102
         super().__init__(methodName=methodName)
         self.cmd = cmd
+        self.cwd = cwd
 
     def setUp(self):  # noqa: D102
         stdout, stderr = self.__run_cmd()
@@ -85,9 +86,10 @@ class CommandRunningTestCase(unittest.TestCase):
             env = None
             to_remove = None
         try:
+            cwd = core_dir if self.cwd is None else self.cwd
             proc = subprocess.run(
                 self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                env=env, cwd=core_dir)
+                env=env, cwd=cwd)
         finally:
             if to_remove:
                 os.remove(to_remove)
