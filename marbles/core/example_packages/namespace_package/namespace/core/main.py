@@ -4,4 +4,3 @@ def double(x):
         return x*2
     else:
         return x*3
-

@@ -20,33 +20,18 @@
 #  IN THE SOFTWARE.
 #
 
-import contextlib
-import distutils.errors
-import io
-import json
 import os
-import setuptools.dist
 import sys
-import unittest
 
-import marbles.setuptools
 import tests.test_main
 
-@contextlib.contextmanager
-def working_directory(dir):
-    try:
-        cwd = os.getcwd()
-        os.chdir(dir)
-        yield
-    finally:
-        os.chdir(cwd)
 
 class MarblesCommandTestCase(tests.test_main.CommandRunningTestCase):
     "Abstract test case to be run on a sample package directory"
 
     def __init__(self, methodName='runTest', package_dir=None):
         core_dir = os.path.dirname(os.path.dirname(__file__))
-        abs_package_dir = os.path.join(core_dir,package_dir)
+        abs_package_dir = os.path.join(core_dir, package_dir)
         cmd = [sys.executable, 'setup.py', 'marbles']
         super().__init__(methodName=methodName, cmd=cmd, cwd=abs_package_dir)
         self.package_dir = package_dir
@@ -75,11 +60,11 @@ class TopLevelTestsTestCase(MarblesCommandTestCase):
             self.assertIn(e, self.stderr)
 
     def test_source(self):
-        expected_lines = ['Source', 'e = 2', 'self.assertEqual(a,e)']
+        expected_lines = ['Source', 'e = 2', 'self.assertEqual(a, e)']
         for e in expected_lines:
             self.assertIn(e, self.stderr)
 
-    
+
 class NamespaceTestCase(MarblesCommandTestCase):
     "Test with namespace package"
 
@@ -87,17 +72,15 @@ class NamespaceTestCase(MarblesCommandTestCase):
         super().__init__(methodName=methodName,
                          package_dir='example_packages/namespace_package/')
 
-
     def test_locals(self):
         expected_lines = ['Locals:', 'i=6']
         for e in expected_lines:
             self.assertIn(e, self.stderr)
 
-    
     def test_tests_run(self):
         expected_lines = [
-                'test_neg_numbers (tests.namespace.core.test.TestCase) ... ok',
-                'test_pos_numbers (tests.namespace.core.test.TestCase) ... FAIL',
+                'test_neg_nums (tests.namespace.core.test.TestCase) ... ok',
+                'test_pos_nums (tests.namespace.core.test.TestCase) ... FAIL',
                 'Ran 2 tests in',
                 ]
         for e in expected_lines:
@@ -105,12 +88,13 @@ class NamespaceTestCase(MarblesCommandTestCase):
 
     def test_source(self):
         expected_lines = [
-                'Source', 
-                'for i in range(10)', 
+                'Source',
+                'for i in range(10)',
                 'self.assertEqual(i*2, m.double(i))'
                 ]
         for e in expected_lines:
             self.assertIn(e, self.stderr)
+
 
 class NoTestTestCase(MarblesCommandTestCase):
     "Test a package with no tests"

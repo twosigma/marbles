@@ -36,7 +36,13 @@ import marbles.core
 
 class CommandRunningTestCase(unittest.TestCase):
 
-    def __init__(self, methodName='runTest', *, cmd=None, cwd=None):  # noqa: D102
+    def __init__(
+            self,
+            methodName='runTest',
+            *,
+            cmd=None,
+            cwd=None
+            ):  # noqa: D102
         super().__init__(methodName=methodName)
         self.cmd = cmd
         self.cwd = cwd
