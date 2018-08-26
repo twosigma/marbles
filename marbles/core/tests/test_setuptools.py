@@ -45,8 +45,9 @@ class MarblesCommandTestCase(tests.test_main.CommandRunningTestCase):
     "Abstract test case to be run on a sample package directory"
 
     def __init__(self, methodName='runTest', package_dir=None):
+        core_dir = os.path.dirname(os.path.dirname(__file__))
         cmd = [sys.executable, 'setup.py', 'marbles']
-        super().__init__(methodName=methodName, cmd=cmd, cwd=package_dir)
+        super().__init__(methodName=methodName, cmd=cmd, cwd=os.path.join(package_dir))
         self.package_dir = package_dir
         self.maxDiff = None
 
