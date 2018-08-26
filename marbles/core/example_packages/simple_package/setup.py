@@ -1,6 +1,6 @@
 from setuptools import setup
 
 setup(
-    name='foo',
+    name='flat_package',
     test_suite='tests',
     )
