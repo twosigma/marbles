@@ -329,7 +329,7 @@ Source ({filename}):
             note=self.note, locals=local_string, filename=self.filename)
 
     @classmethod
-    def _format_one_local(cls, name, value):
+    def _format_local(cls, name, value):
         value_str = repr(value)
         if '\n' in value_str:
             value_str = textwrap.indent(value_str, '\t\t')
@@ -339,7 +339,7 @@ Source ({filename}):
 
     @classmethod
     def _format_locals(cls, locals_):
-        return '\n'.join(cls._format_one_local(k, v)
+        return '\n'.join(cls._format_local(k, v)
                          for k, v in locals_.items())
 
     @staticmethod
