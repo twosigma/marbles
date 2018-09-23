@@ -329,8 +329,17 @@ Source ({filename}):
             note=self.note, locals=local_string, filename=self.filename)
 
     @classmethod
+    def _format_local(cls, name, value):
+        value_str = repr(value)
+        if '\n' in value_str:
+            value_str = textwrap.indent(value_str, '\t\t')
+            return '\t{0} =\n{1}'.format(name, value_str)
+        else:
+            return '\t{0} = {1}'.format(name, value_str)
+
+    @classmethod
     def _format_locals(cls, locals_):
-        return '\n'.join('\t{0}={1}'.format(k, v) for k, v in locals_.items())
+        return '\n'.join(cls._format_local(k, v) for k, v in locals_.items())
 
     @staticmethod
     def _find_assert_stmt(filename, linenumber, leading=1, following=2,

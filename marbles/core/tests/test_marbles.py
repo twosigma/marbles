@@ -210,6 +210,19 @@ unearthed in the excavation of an old privy in New Orleans.'''
         foo = 'bar'  # noqa: F841
         self.assertTrue(False, note='some note about {foo!r}')
 
+    def test_multiline_locals(self):
+        class Record(object):
+            def __init__(self, **kwargs):
+                self.kwargs = kwargs
+
+            def __repr__(self):
+                return 'Record(\n{}\n)'.format('\n'.join(
+                    '  {key} = {value!r},'.format(key=key, value=value)
+                    for key, value in self.kwargs.items()
+                ))
+        foo = Record(a=1, b=2)  # noqa: F841
+        self.assertTrue(False, note='some note')
+
     def test_string_equality(self):
         s = ''
         self.assertEqual(s, s, note='some note')
@@ -480,6 +493,14 @@ class TestContextualAssertionError(MarblesTestCase):
         e = ar.exception
         self.assertEqual(e.note.strip(), "some note about 'bar'")
 
+    def test_multiline_locals_indentation(self):
+        '''Are locals with multiline reprs indented correctly?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_multiline_locals()
+        e = ar.exception
+        self.assertIn("\n\t\t  a = 1,\n",
+                      e._format_locals(e.public_test_locals))
+
     def test_assert_raises_without_msg(self):
         '''Do we capture annotations properly for assertRaises?'''
         with self.assertRaises(ContextualAssertionError) as ar:
@@ -538,16 +559,16 @@ class TestContextualAssertionError(MarblesTestCase):
 
     def test_assert_stmt_surrounding_lines(self):
         '''Does _find_assert_stmt read surrounding lines from the file?'''
-        test_linenumber = 75
+        test_linenumber = 83
         test_filename = os.path.abspath(__file__)
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_failure()
         e = ar.exception
         lines = e._find_assert_stmt(test_filename, test_linenumber)[0]
-        self.assertEqual(len(lines), 7)
+        self.assertEqual(len(lines), 3)
         more_lines = e._find_assert_stmt(
             test_filename, test_linenumber, 2, 5)[0]
-        self.assertEqual(len(more_lines), 11)
+        self.assertEqual(len(more_lines), 7)
 
     def test_note_wrapping(self):
         '''Do we wrap the note properly?'''
