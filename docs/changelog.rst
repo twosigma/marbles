@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :feature:`92` Format multiline locals better
 * :support:`90` Added support for python 3.7
 * :support:`88` Document how to install with conda
 * :release:`0.9.5 <2018-06-24>`
