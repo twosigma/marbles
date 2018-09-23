@@ -155,9 +155,9 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Make sure
    your new functionality is documented with docstrings and appropriate
    additions to the Sphinx docs, and add the feature to the list in README.md.
-3. The pull request should work for Python 2.7, 3.4, 3.5, and 3.6, and for
-   PyPy. Check https://travis-ci.org/twosigma/marbles/pull_requests and make
-   sure that the tests pass for all supported Python versions.
+3. The pull request should work for Python 3.5, 3.6, and 3.7. Check
+   https://travis-ci.org/twosigma/marbles/pull_requests and make sure
+   that the tests pass for all supported Python versions.
 4. In order to accept your code contributions, please fill out the appropriate
    Contributor License Agreement in the `cla folder
    <https://github.com/twosigma/marbles/tree/master/cla>`__ and submit it to
