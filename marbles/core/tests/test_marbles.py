@@ -493,8 +493,8 @@ class TestContextualAssertionError(MarblesTestCase):
         e = ar.exception
         self.assertEqual(e.note.strip(), "some note about 'bar'")
 
-    def test_verify_multiline_locals(self):
-        '''Are locals with multiline reprs formatted correctly?'''
+    def test_multiline_locals_indentation(self):
+        '''Are locals with multiline reprs indented correctly?'''
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_multiline_locals()
         e = ar.exception

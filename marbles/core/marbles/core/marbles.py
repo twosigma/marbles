@@ -339,8 +339,7 @@ Source ({filename}):
 
     @classmethod
     def _format_locals(cls, locals_):
-        return '\n'.join(cls._format_local(k, v)
-                         for k, v in locals_.items())
+        return '\n'.join(cls._format_local(k, v) for k, v in locals_.items())
 
     @staticmethod
     def _find_assert_stmt(filename, linenumber, leading=1, following=2,
