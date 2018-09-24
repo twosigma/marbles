@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.10.0 <2018-09-23>`
 * :feature:`92` Improve indentation of multiline locals
 * :support:`90` Added support for python 3.7
 * :support:`88` Document how to install with conda
