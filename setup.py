@@ -24,7 +24,7 @@ import os.path
 from setuptools import setup
 
 
-version = '0.9.5'
+version = '0.10.0'
 url = 'https://github.com/twosigma/marbles'
 setup_dir = os.path.dirname(__file__)
 
