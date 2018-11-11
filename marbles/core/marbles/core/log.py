@@ -96,6 +96,14 @@ class AssertionLogger(object):
            log.logger.configure(logfile='/path/to/marbles.log',
                                 attrs=['filename', 'date'])
            marbles.core.main()
+
+    .. note::
+       If you configure logging within an ``if __name__ == '__main__'``,
+       block (as opposed to via environment variables), you must run
+       your tests with ``python /path/to/tests.py``. If you run your
+       tests with ``python -m marbles``, the
+       ``if __name__ == '__main__'`` block won't get executed and the
+       logger won't get configured.
     '''
 
     def __init__(self):

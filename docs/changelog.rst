@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :support: `101` Added note about how to execute logging configured tests
+* :support: `99` Fixed ``assertCategoricalLevel(Not)In`` docstring parameters
 * :release:`0.10.0 <2018-09-23>`
 * :feature:`92` Improve indentation of multiline locals
 * :support:`90` Added support for python 3.7

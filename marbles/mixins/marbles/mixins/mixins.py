@@ -1196,8 +1196,8 @@ class CategoricalMixins(abc.ABC):
 
         Parameters
         ----------
-        levels1
-        levels2 : iterable
+        level
+        levels : iterable
         msg : str
             If not provided, the :mod:`marbles.mixins` or
             :mod:`unittest` standard message will be used.
@@ -1205,7 +1205,7 @@ class CategoricalMixins(abc.ABC):
         Raises
         ------
         TypeError
-            If ``levels2`` is not iterable.
+            If ``levels`` is not iterable.
         '''
         if not isinstance(levels, collections.Iterable):
             raise TypeError('Second argument is not iterable')
@@ -1219,8 +1219,8 @@ class CategoricalMixins(abc.ABC):
 
         Parameters
         ----------
-        levels1
-        levels2 : iterable
+        level
+        levels : iterable
         msg : str
             If not provided, the :mod:`marbles.mixins` or
             :mod:`unittest` standard message will be used.
@@ -1228,7 +1228,7 @@ class CategoricalMixins(abc.ABC):
         Raises
         ------
         TypeError
-            If ``levels2`` is not iterable.
+            If ``levels`` is not iterable.
         '''
         if not isinstance(levels, collections.Iterable):
             raise TypeError('Second argument is not iterable')
