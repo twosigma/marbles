@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :support:`105` Fixed ``UniqueMixins`` literalinclude line numbers in docs
 * :support:`101` Added note about how to execute logging configured tests
 * :support:`99` Fixed ``assertCategoricalLevel(Not)In`` docstring parameters
 * :release:`0.10.0 <2018-09-23>`
