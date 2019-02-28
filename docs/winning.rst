@@ -117,7 +117,7 @@ Writing your own mixins
 You can write your own assertions and mix them in to your test cases, too. We recommend reading the :mod:`marbles.mixins` source code to see how to do this. Here is the :class:`~marbles.mixins.UniqueMixins` source as an example:
 
 .. literalinclude:: ../marbles/mixins/marbles/mixins/mixins.py
-   :lines: 348-425
+   :pyobject: UniqueMixins
 
 If you write assertions that you think would be useful for others, we would love to see a `pull request`_ from you!
 
