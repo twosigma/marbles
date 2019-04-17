@@ -539,6 +539,9 @@ class TestCase(unittest.TestCase):
 
             note = kwargs.pop('note', None)
 
+            if note:
+                note = textwrap.dedent(note)
+
             with AnnotationContext(
                     self, attr, self._REQUIRED_KEYS, msg, note,
                     list(args) + list(rem_args), kwargs) as annotation:
