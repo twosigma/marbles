@@ -335,14 +335,12 @@ Source ({filename}):
             value_str = textwrap.indent(value_str, '\t\t')
             return '\t{0} =\n{1}'.format(name, value_str)
         else:
-            return '\t{0} = {1}'.format(name, value_str)
+            short_value_str = unittest.util.safe_repr(value_str, short=True)
+            return '\t{0} = {1}'.format(name, short_value_str)
 
     @classmethod
     def _format_locals(cls, locals_):
-        local_variable_names, local_variable_values = zip(*locals_.items())
-        shortened_local_variable_values = unittest.util._common_shorten_repr(*local_variable_values)
-        new_locals_items_representation = zip(local_variable_names, shortened_local_variable_values)
-        return '\n'.join(cls._format_local(k, v) for k, v in new_locals_items_representation)
+        return '\n'.join(cls._format_local(k, v) for k, v in locals_.items())
 
     @staticmethod
     def _find_assert_stmt(filename, linenumber, leading=1, following=2,
