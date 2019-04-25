@@ -61,6 +61,7 @@ import re
 import sys
 import textwrap
 import unittest
+from unittest import util
 
 from . import log
 from . import _stack
@@ -330,18 +331,17 @@ Source ({filename}):
 
     @classmethod
     def _format_local(cls, name, value):
-        def truncate(s):
-            return unittest.util.safe_repr(s, short=True)
         value_str = repr(value)
         if '\n' in value_str:
             value_str_lines = value_str.split('\n')
-            value_str_lines = [truncate(line) for line in value_str_lines]
-            truncated_value_str = '\n'.join(value_str_lines)
-            value_str = textwrap.indent(truncated_value_str, '\t\t')
+            short_lines = [util.safe_repr(line, short=True)
+                           for line in value_str_lines]
+            short_value_str = '\n'.join(short_lines)
+            value_str = textwrap.indent(short_value_str, '\t\t')
             return '\t{0} =\n{1}'.format(name, value_str)
         else:
-            value_str = truncate(value_str)
-            return '\t{0} = {1}'.format(name, value_str)
+            short_value_str = util.safe_repr(value_str, short=True)
+            return '\t{0} = {1}'.format(name, short_value_str)
 
     @classmethod
     def _format_locals(cls, locals_):
