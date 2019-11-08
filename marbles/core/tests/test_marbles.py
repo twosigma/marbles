@@ -138,6 +138,24 @@ cane-cut marble industry. An early example, dated between 1850 and
 Orleans.'''
         self.assertTrue(False, note=note)
 
+    def test_indented_note(self):
+        note = '''Onionskins - Although this cane-cut swirl usually has at its center a
+        clear glass core, it appears solidly colored because the clear core is
+        covered by a thin layer of opaque color and then covered again by a
+        thin layer of clear glass. Extremely popular and highly prized,
+        onionskins take their name from the layering of glass, like layers of
+        an onion. In contrast to end of day marbles, onion skins have two
+        pontils. The base color, usually white or yellow, was applied by
+        rolling clear glass marble in powdered glass. Accent colors were added
+        by rolling the heated piece over fragments of crashed glass, creating
+        the speckled effect. There are various types of onionskins: single
+        color, speckled, and segmented. Sometimes mica was added to the glass,
+        thus increasing its value. Onionskins were known to exist from the
+        beginning of the cane-cut marble industry. An early example, dated
+        between 1850 and 1860 was unearthed in the excavation of an old privy
+        in New Orleans.'''
+        self.assertTrue(False, note=note)
+
     def test_multi_paragraphs_in_note(self):
         note = '''
 Onionskins - Although this cane-cut swirl usually has at its center a
@@ -536,7 +554,7 @@ class TestContextualAssertionError(MarblesTestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 211)
+        self.assertEqual(e.linenumber, 229)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''
@@ -585,6 +603,12 @@ class TestContextualAssertionError(MarblesTestCase):
         e = ar.exception
         lines = e.note.split('\n')
         self.assertTrue(any(len(line) > 75 for line in lines))
+
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_indented_note()
+        e = ar.exception
+        lines = e.note.split('\n')
+        self.assertTrue(all(line.lstrip() == line[1:] for line in lines))
 
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_multi_paragraphs_in_note()
