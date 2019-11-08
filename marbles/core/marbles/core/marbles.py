@@ -245,7 +245,8 @@ Source ({filename}):
         if self._note is None:
             return None
         else:
-            formatted_note = self._note.format(**self.locals)
+            dedented_note = textwrap.dedent(self._note)
+            formatted_note = dedented_note.format(**self.locals)
             wrapper = _NoteWrapper(width=72,
                                    break_long_words=False,
                                    initial_indent='\t',
