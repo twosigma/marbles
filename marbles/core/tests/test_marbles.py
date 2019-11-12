@@ -102,44 +102,7 @@ class ExampleTestCaseMixin(
 
     def test_long_note(self):
         note = '''
-Onionskins - Although this cane-cut swirl usually has at its center a
-clear glass core, it appears solidly colored because the clear core is
-covered by a thin layer of opaque color and then covered again by a
-thin layer of clear glass. Extremely popular and highly prized,
-onionskins take their name from the layering of glass, like layers of
-an onion. In contrast to end of day marbles, onion skins have two
-pontils. The base color, usually white or yellow, was applied by
-rolling clear glass marble in powdered glass. Accent colors were added
-by rolling the heated piece over fragments of crashed glass, creating
-the speckled effect. There are various types of onionskins: single
-color, speckled, and segmented. Sometimes mica was added to the glass,
-thus increasing its value. Onionskins were known to exist from the
-beginning of the cane-cut marble industry. An early example, dated
-between 1850 and 1860 was unearthed in the excavation of an old privy
-in New Orleans.'''
-        self.assertTrue(False, note=note)
-
-    def test_long_line_in_note(self):
-        note = '''
-OnionskinsAlthoughthiscanecutswirlusuallyhasatitscenteraclearglasscoreitappears
-solidly colored because the clear core is covered by a thin layer of
-opaque color and then covered again by a thin layer of clear
-glass. Extremely popular and highly prized, onionskins take their name
-from the layering of glass, like layers of an onion. In contrast to
-end of day marbles, onion skins have two pontils. The base color,
-usually white or yellow, was applied by rolling clear glass marble in
-powdered glass. Accent colors were added by rolling the heated piece
-over fragments of crashed glass, creating the speckled effect. There
-are various types of onionskins: single color, speckled, and
-segmented. Sometimes mica was added to the glass, thus increasing its
-value. Onionskins were known to exist from the beginning of the
-cane-cut marble industry. An early example, dated between 1850 and
-1860 was unearthed in the excavation of an old privy in New
-Orleans.'''
-        self.assertTrue(False, note=note)
-
-    def test_indented_note(self):
-        note = '''Onionskins - Although this cane-cut swirl usually has at its center a
+        Onionskins - Although this cane-cut swirl usually has at its center a
         clear glass core, it appears solidly colored because the clear core is
         covered by a thin layer of opaque color and then covered again by a
         thin layer of clear glass. Extremely popular and highly prized,
@@ -156,55 +119,74 @@ Orleans.'''
         in New Orleans.'''
         self.assertTrue(False, note=note)
 
+    def test_long_line_in_note(self):
+        note = '''
+        OnionskinsAlthoughthiscanecutswirlusuallyhasatitscenteraclearglasscoreitappears
+        solidly colored because the clear core is covered by a thin layer of
+        opaque color and then covered again by a thin layer of clear
+        glass. Extremely popular and highly prized, onionskins take their name
+        from the layering of glass, like layers of an onion. In contrast to
+        end of day marbles, onion skins have two pontils. The base color,
+        usually white or yellow, was applied by rolling clear glass marble in
+        powdered glass. Accent colors were added by rolling the heated piece
+        over fragments of crashed glass, creating the speckled effect. There
+        are various types of onionskins: single color, speckled, and
+        segmented. Sometimes mica was added to the glass, thus increasing its
+        value. Onionskins were known to exist from the beginning of the
+        cane-cut marble industry. An early example, dated between 1850 and
+        1860 was unearthed in the excavation of an old privy in New
+        Orleans.'''
+        self.assertTrue(False, note=note)
+
     def test_multi_paragraphs_in_note(self):
         note = '''
-Onionskins - Although this cane-cut swirl usually has at its center a
-clear glass core, it appears solidly colored because the clear core is
-covered by a thin layer of opaque color and then covered again by a
-thin layer of clear glass. Extremely popular and highly prized,
-onionskins take their name from the layering of glass, like layers of
-an onion.
+        Onionskins - Although this cane-cut swirl usually has at its center a
+        clear glass core, it appears solidly colored because the clear core is
+        covered by a thin layer of opaque color and then covered again by a
+        thin layer of clear glass. Extremely popular and highly prized,
+        onionskins take their name from the layering of glass, like layers of
+        an onion.
 
-In contrast to end of day marbles, onion skins have two pontils. The
-base color, usually white or yellow, was applied by rolling clear glass
-marble in powdered glass. Accent colors were added by rolling the
-heated piece over fragments of crashed glass, creating the speckled
-effect.
+        In contrast to end of day marbles, onion skins have two pontils. The
+        base color, usually white or yellow, was applied by rolling clear glass
+        marble in powdered glass. Accent colors were added by rolling the
+        heated piece over fragments of crashed glass, creating the speckled
+        effect.
 
-There are various types of onionskins: single color, speckled, and
-segmented. Sometimes mica was added to the glass, thus increasing its
-value. Onionskins were known to exist from the beginning of the
-cane-cut marble industry. An early example, dated between 1850 and 1860
-was unearthed in the excavation of an old privy in New Orleans.'''
+        There are various types of onionskins: single color, speckled, and
+        segmented. Sometimes mica was added to the glass, thus increasing its
+        value. Onionskins were known to exist from the beginning of the
+        cane-cut marble industry. An early example, dated between 1850 and 1860
+        was unearthed in the excavation of an old privy in New Orleans.'''
         self.assertTrue(False, note=note)
 
     def test_list_in_note(self):
         note = '''
-There are various types of onionskins:
+        There are various types of onionskins:
 
-    1. single color,
+            1. single color,
 
-    2. speckled,
+            2. speckled,
 
-    3. and segmented.
+            3. and segmented.
 
-    42. Sometimes mica was added to the glass, thus increasing its
-value. Onionskins were known to exist from the beginning of the cane-
-cut marble industry. An early example, dated between 1850 and 1860 was
-unearthed in the excavation of an old privy in New Orleans.
+            42. Sometimes mica was added to the glass, thus increasing its
+        value. Onionskins were known to exist from the beginning of the cane-
+        cut marble industry. An early example, dated between 1850 and 1860 was
+        unearthed in the excavation of an old privy in New Orleans.
 
-There are various types of onionskins:
+        There are various types of onionskins:
 
-    a) single color,
+            a) single color,
 
-    b) speckled,
+            b) speckled,
 
-    c) and segmented.
+            c) and segmented.
 
-    d) Sometimes mica was added to the glass, thus increasing its
-value. Onionskins were known to exist from the beginning of the cane-
-cut marble industry. An early example, dated between 1850 and 1860 was
-unearthed in the excavation of an old privy in New Orleans.'''
+            d) Sometimes mica was added to the glass, thus increasing its
+        value. Onionskins were known to exist from the beginning of the cane-
+        cut marble industry. An early example, dated between 1850 and 1860 was
+        unearthed in the excavation of an old privy in New Orleans.'''
         self.assertTrue(False, note=note)
 
     def test_assert_raises_success(self):
@@ -603,12 +585,6 @@ class TestContextualAssertionError(MarblesTestCase):
         e = ar.exception
         lines = e.note.split('\n')
         self.assertTrue(any(len(line) > 75 for line in lines))
-
-        with self.assertRaises(ContextualAssertionError) as ar:
-            self.case.test_indented_note()
-        e = ar.exception
-        lines = e.note.split('\n')
-        self.assertTrue(all(line.lstrip() == line[1:] for line in lines))
 
         with self.assertRaises(ContextualAssertionError) as ar:
             self.case.test_multi_paragraphs_in_note()
