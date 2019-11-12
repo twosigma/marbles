@@ -536,7 +536,7 @@ class TestContextualAssertionError(MarblesTestCase):
         self.assertEqual(e.filename, os.path.abspath(__file__))
         # This isn't great because I have to change it every time I
         # add/remove imports but oh well
-        self.assertEqual(e.linenumber, 229)
+        self.assertEqual(e.linenumber, 211)
 
     def test_assert_stmt_indicates_line(self):
         '''Does e.assert_stmt indicate the line from the source code?'''
