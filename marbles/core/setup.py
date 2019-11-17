@@ -59,7 +59,6 @@ setup(
         'dev': [
             'coverage',
             'flake8',
-            'flake8-per-file-ignores'
         ]
     },
     python_requires='>=3.5,<3.8',
