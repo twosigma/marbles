@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :release:`0.11.0 <2019-11-17>`
+* :feature:`107` Allow triple-quoted annotations to be indented in source
 * :support:`105` Fixed ``UniqueMixins`` literalinclude line numbers in docs
 * :support:`101` Added note about how to execute logging configured tests
 * :support:`99` Fixed ``assertCategoricalLevel(Not)In`` docstring parameters
