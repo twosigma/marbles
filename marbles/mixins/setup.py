@@ -60,7 +60,6 @@ setup(
         'dev': [
             'coverage',
             'flake8',
-            'flake8-per-file-ignores'
         ]
     },
     license='MIT',

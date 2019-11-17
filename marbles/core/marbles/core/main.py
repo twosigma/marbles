@@ -26,7 +26,7 @@ With :mod:`unittest`, you can run ``python -m unittest`` to discover
 and run your tests.
 
 With :mod:`marbles`, you can run ``python -m marbles`` to discover and
-run them, but with :mod:`marbles`\-style assertion failure messages,
+run them, but with :mod:`marbles`\\-style assertion failure messages,
 including local variables and additional source code scope.
 '''
 
