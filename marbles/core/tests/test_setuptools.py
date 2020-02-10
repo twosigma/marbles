@@ -46,7 +46,7 @@ class TopLevelTestsTestCase(MarblesCommandTestCase):
                          package_dir='example_packages/simple_package/')
 
     def test_locals(self):
-        expected_lines = ['Locals:', 'e=2', 'a=1']
+        expected_lines = ['Locals:', 'e = 2', 'a = 1']
         for e in expected_lines:
             self.assertIn(e, self.stderr)
 
@@ -73,7 +73,7 @@ class NamespaceTestCase(MarblesCommandTestCase):
                          package_dir='example_packages/namespace_package/')
 
     def test_locals(self):
-        expected_lines = ['Locals:', 'i=6']
+        expected_lines = ['Locals:', 'i = 6']
         for e in expected_lines:
             self.assertIn(e, self.stderr)
 
