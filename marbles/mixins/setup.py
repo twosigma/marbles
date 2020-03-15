@@ -54,7 +54,7 @@ setup(
     },
     test_suite='tests',
     install_requires=[
-        'pandas<0.24,>=0.19.1'
+        'pandas<2,>=0.19.1'
     ],
     extras_require={
         'dev': [
