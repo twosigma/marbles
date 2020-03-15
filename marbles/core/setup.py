@@ -61,7 +61,7 @@ setup(
             'flake8',
         ]
     },
-    python_requires='>=3.5,<3.8',
+    python_requires='>=3.5,<3.9',
     license='MIT',
     description=('A unittest extension that provides additional '
                  'information on test failure'),

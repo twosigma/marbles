@@ -215,9 +215,9 @@ class MainWithFailureTestCase(TestScriptRunningTestCase):
         '''The source code should appear.'''
         if self.has_marbles:
             self.assertIn('Source', self.stderr)
-            self.assertIn('self.assertEqual(', self.stderr)
+            self.assertIn('requests.put(', self.stderr)
         else:
-            self.assertNotIn('self.assertEqual(', self.stderr)
+            self.assertNotIn('requests.put(', self.stderr)
 
     def test_show_msg(self):
         '''The failure message should always appear.'''
