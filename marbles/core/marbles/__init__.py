@@ -20,10 +20,10 @@
 #  IN THE SOFTWARE.
 #
 
-import pkgutil
+import pkgutil  # pragma: no cover
 
 
-__path__ = pkgutil.extend_path(__path__, __name__)
+__path__ = pkgutil.extend_path(__path__, __name__)  # pragma: no cover
 
 # Even though pkgutil.extend_path is a valid (and more modern) way of
 # declaring a namespace package, setuptools still checks for the
