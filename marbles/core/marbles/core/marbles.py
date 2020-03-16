@@ -135,7 +135,8 @@ class _StatementFinder(ast.NodeVisitor):
         self.found = None
 
     @property
-    def current_stmt(self):
+    def current_stmt(self):  # pragma: no cover
+        # Not covered for the reason explained below in visit().
         return self.stack[-1]
 
     def visit(self, node):
@@ -143,7 +144,13 @@ class _StatementFinder(ast.NodeVisitor):
         if lineno == self.target and self.found is None:
             if isinstance(node, ast.stmt):
                 self.found = node.lineno
-            else:
+            else:  # pragma: no cover
+                # This branch is not counted for coverage because it is no
+                # longer taken on Python 3.8 and above (since Python 3.8, the
+                # line reported by unittest will always be the start of a
+                # statement).
+
+                # pragma: no cover
                 self.found = self.current_stmt.lineno
 
         if isinstance(node, ast.stmt):
