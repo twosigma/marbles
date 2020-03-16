@@ -26,7 +26,7 @@ Here, we are checking that all the configuration entry-points (env
 vars and marbles.log.logger.configure) work properly.
 '''
 
-import collections
+import collections.abc
 import io
 import json
 import os
@@ -84,7 +84,7 @@ class LoggingConfigureTestCase(unittest.TestCase):
         for k, v in self.new_env.items():
             if isinstance(v, str):
                 os.environ[k] = v
-            elif isinstance(v, collections.Sequence):
+            elif isinstance(v, collections.abc.Sequence):
                 os.environ[k] = ','.join(str(x) for x in v)
             else:
                 os.environ[k] = str(v)
