@@ -67,7 +67,7 @@ Example:
 '''
 
 import abc
-import collections
+import collections.abc
 import operator
 import os
 from datetime import date, datetime, timedelta, timezone
@@ -210,7 +210,7 @@ class MonotonicMixins(abc.ABC):
         TypeError
             If ``sequence`` is not iterable.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
         if strict:
@@ -252,7 +252,7 @@ class MonotonicMixins(abc.ABC):
         TypeError
             If ``sequence`` is not iterable.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
         if strict:
@@ -294,7 +294,7 @@ class MonotonicMixins(abc.ABC):
         TypeError
             If ``sequence`` is not iterable.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
         if strict:
@@ -336,7 +336,7 @@ class MonotonicMixins(abc.ABC):
         TypeError
             If ``sequence`` is not iterable.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
         if strict:
@@ -386,7 +386,7 @@ class UniqueMixins(abc.ABC):
         TypeError
             If ``container`` is not iterable.
         '''
-        if not isinstance(container, collections.Iterable):
+        if not isinstance(container, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
         standardMsg = 'Elements in %s are not unique' % (container,)
@@ -415,7 +415,7 @@ class UniqueMixins(abc.ABC):
         TypeError
             If ``container`` is not iterable.
         '''
-        if not isinstance(container, collections.Iterable):
+        if not isinstance(container, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
         standardMsg = 'Elements in %s are unique' % (container,)
@@ -1143,9 +1143,9 @@ class CategoricalMixins(abc.ABC):
         TypeError
             If either ``levels1`` or ``levels2`` is not iterable.
         '''
-        if not isinstance(levels1, collections.Iterable):
+        if not isinstance(levels1, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
-        if not isinstance(levels2, collections.Iterable):
+        if not isinstance(levels2, collections.abc.Iterable):
             raise TypeError('Second argument is not iterable')
 
         standardMsg = '%s levels != %s levels' % (levels1, levels2)
@@ -1172,9 +1172,9 @@ class CategoricalMixins(abc.ABC):
         TypeError
             If either ``levels1`` or ``levels2`` is not iterable.
         '''
-        if not isinstance(levels1, collections.Iterable):
+        if not isinstance(levels1, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
-        if not isinstance(levels2, collections.Iterable):
+        if not isinstance(levels2, collections.abc.Iterable):
             raise TypeError('Second argument is not iterable')
 
         standardMsg = '%s levels == %s levels' % (levels1, levels2)
@@ -1207,7 +1207,7 @@ class CategoricalMixins(abc.ABC):
         TypeError
             If ``levels`` is not iterable.
         '''
-        if not isinstance(levels, collections.Iterable):
+        if not isinstance(levels, collections.abc.Iterable):
             raise TypeError('Second argument is not iterable')
 
         self.assertIn(level, levels, msg=msg)
@@ -1230,7 +1230,7 @@ class CategoricalMixins(abc.ABC):
         TypeError
             If ``levels`` is not iterable.
         '''
-        if not isinstance(levels, collections.Iterable):
+        if not isinstance(levels, collections.abc.Iterable):
             raise TypeError('Second argument is not iterable')
 
         self.assertNotIn(level, levels, msg=msg)
@@ -1289,7 +1289,7 @@ class DateTimeMixins(abc.ABC):
             If ``target`` is not a datetime or date object and is not
             iterable.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
         if strict:
@@ -1302,7 +1302,7 @@ class DateTimeMixins(abc.ABC):
 
         # Null date(time)s will always compare False, but
         # we want to know about null date(time)s
-        if isinstance(target, collections.Iterable):
+        if isinstance(target, collections.abc.Iterable):
             if len(target) != len(sequence):
                 raise ValueError(('Length mismatch: '
                                   'first argument contains %s elements, '
@@ -1349,7 +1349,7 @@ class DateTimeMixins(abc.ABC):
             If ``target`` is not a datetime or date object and is not
             iterable.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
         if strict:
@@ -1363,7 +1363,7 @@ class DateTimeMixins(abc.ABC):
 
         # Null date(time)s will always compare False, but
         # we want to know about null date(time)s
-        if isinstance(target, collections.Iterable):
+        if isinstance(target, collections.abc.Iterable):
             if len(target) != len(sequence):
                 raise ValueError(('Length mismatch: '
                                   'first argument contains %s elements, '
@@ -1407,7 +1407,7 @@ class DateTimeMixins(abc.ABC):
             If max element in ``sequence`` is not a datetime or date
             object.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
         # Cannot compare datetime to date, so if dates are provided use
@@ -1450,7 +1450,7 @@ class DateTimeMixins(abc.ABC):
             If min element in ``sequence`` is not a datetime or date
             object.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
         # Cannot compare datetime to date, so if dates are provided use
@@ -1486,7 +1486,7 @@ class DateTimeMixins(abc.ABC):
         # TODO (jsa): check that elements in sequence are dates or
         # datetimes, keeping in mind that sequence may contain null
         # values
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
         if not isinstance(frequency, timedelta):
             raise TypeError('Second argument is not a timedelta object')
@@ -1530,7 +1530,7 @@ class DateTimeMixins(abc.ABC):
             If max element in ``sequence`` is not a datetime or date
             object.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
         if not isinstance(lag, timedelta):
             raise TypeError('Second argument is not a timedelta object')
@@ -1576,7 +1576,7 @@ class DateTimeMixins(abc.ABC):
             If max element in ``sequence`` is not a datetime or date
             object.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
         if not isinstance(lag, timedelta):
             raise TypeError('Second argument is not a timedelta object')
@@ -1622,7 +1622,7 @@ class DateTimeMixins(abc.ABC):
             If max element in ``sequence`` is not a datetime or date
             object.
         '''
-        if not isinstance(sequence, collections.Iterable):
+        if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
         if not isinstance(lag, timedelta):
             raise TypeError('Second argument is not a timedelta object')
