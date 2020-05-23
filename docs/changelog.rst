@@ -2,6 +2,10 @@
 Changelog
 =========
 
+* :release:`0.12.0 <2020-05-23>`
+* :support:`120` Upgrade to python 3.8
+* :support:`119` Upgrade to pandas 1.0
+* :feature:`50` Add a distutils command for marbles
 * :release:`0.11.0 <2019-11-17>`
 * :feature:`107` Allow triple-quoted annotations to be indented in source
 * :support:`105` Fixed ``UniqueMixins`` literalinclude line numbers in docs
