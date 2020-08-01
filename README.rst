@@ -73,7 +73,7 @@ Marbles also creates a setuptools command so if you are used to running
     python setup.py marbles
 
 You can go one step further and alias the command test to run marbles
-by adding the following to :file:`setup.cfg`:
+by adding the following to ``setup.cfg``:
 
 .. code-block:: bash
 
