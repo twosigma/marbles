@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :support:`125` Fix long_description for PyPI
 * :release:`0.12.0 <2020-05-23>`
 * :support:`120` Upgrade to python 3.8
 * :support:`119` Upgrade to pandas 1.0
