@@ -3,7 +3,7 @@
 build
 bumpversion
 coverage
-flake8
+pipx
 releases
 semantic-version
 Sphinx
