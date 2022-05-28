@@ -1,0 +1,13 @@
+-c marbles/core/requirements.txt
+-c marbles/mixins/requirements.txt
+build
+bumpversion
+coverage
+flake8
+releases
+semantic-version
+Sphinx
+sphinx_rtd_theme
+tox
+twine
+wheel

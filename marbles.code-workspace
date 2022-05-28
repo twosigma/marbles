@@ -1,0 +1,28 @@
+{
+    "folders": [
+        {
+            "name": "marbles",
+            "path": "."
+        },
+        {
+            "name": "marbles.core",
+            "path": "marbles/core"
+        },
+        {
+            "name": "marbles.mixins",
+            "path": "marbles/mixins"
+        }
+    ],
+    "settings": {
+        "python.testing.unittestArgs": [
+            "discover",
+            "-v",
+            "-s",
+            ".",
+            "-p",
+            "*test*.py"
+        ],
+        "python.testing.pytestEnabled": false,
+        "python.testing.unittestEnabled": true
+    }
+}
