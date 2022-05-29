@@ -6,4 +6,4 @@ import sys
 
 for f in pathlib.Path(sys.argv[1]).glob("**/*.coverage*"):
     print("Collecting", f)
-    shutil.move(f, sys.argv[2])
+    shutil.move(str(f), sys.argv[2])
