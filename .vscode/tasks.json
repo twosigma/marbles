@@ -11,7 +11,7 @@
                 "--parallel",
                 "auto",
                 "-e",
-                "flake8,docs,py39,py310"
+                "flake8-linux,docs-linux,py310"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -42,7 +42,7 @@
             "command": "tox",
             "args": [
                 "-e",
-                "coverage"
+                "py310-coverage-linux"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -94,7 +94,7 @@
             "command": "tox",
             "args": [
                 "-e",
-                "docs"
+                "docs-linux"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
