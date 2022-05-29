@@ -11,13 +11,17 @@ on:
 
 jobs:
   build:
-
-    runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest, macos-latest]
         python-version: ["3.7", "3.8", "3.9", "3.10"]
+
+    runs-on: ${{ matrix.platform }}
+
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      PYTHON: ${{ matrix.python-version }}
 
     steps:
     - uses: actions/checkout@v3
@@ -35,5 +39,5 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
-        env_vars: OS,PYTHON
+        env_vars: PLATFORM,PYTHON
         files: ./coverage.xml
