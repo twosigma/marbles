@@ -117,6 +117,7 @@ class LoggingConfigureTestCase(unittest.TestCase):
         self.__config = self.log_config.copy()
         if self._use_file:
             _, self._tmpfilename = tempfile.mkstemp()
+            os.close(_)  # On Windows, we need to close this file handle.
             self.__config['logfile'] = self._tmpfilename
         else:
             self.__file_handle = io.StringIO()
@@ -375,6 +376,7 @@ class TestAssertionLoggingRespectsEnvOverrides(LoggingConfigureTestCase):
         super().setUp()
         self.old_logfile = os.environ.get('MARBLES_LOGFILE')
         _, self._tmpfilename = tempfile.mkstemp()
+        os.close(_)  # On Windows, we need to close this file handle.
         os.environ['MARBLES_LOGFILE'] = self._tmpfilename
 
     def tearDown(self):
