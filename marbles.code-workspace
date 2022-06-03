@@ -41,14 +41,16 @@
             ".tox": true,
             "**/dist": true,
             "**/__pycache__": true
-        }
+        },
+        "esbonio.sphinx.confDir": ""
     },
     "extensions": {
         "recommendations": [
             "ms-python.python",
             "ms-python.vscode-pylance",
             "bungcip.better-toml",
-            "lextudio.restructuredtext-pack"
+            "lextudio.restructuredtext-pack",
+            "spmeesseman.vscode-taskexplorer"
         ]
     }
 }

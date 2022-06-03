@@ -49,7 +49,8 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "bungcip.better-toml",
-        "lextudio.restructuredtext-pack"
+        "lextudio.restructuredtext-pack",
+        "spmeesseman.vscode-taskexplorer"
     ],
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
