@@ -1,5 +1,4 @@
--c marbles/core/requirements.txt
--c marbles/mixins/requirements.txt
+-c base.in
 build
 bumpversion
 coverage

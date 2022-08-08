@@ -11,5 +11,5 @@ set -u
     cd marbles/mixins
     pip-compile --upgrade --generate-hashes
 )
-pip-compile --upgrade --generate-hashes requirements.in
-pip-compile --upgrade --generate-hashes dev-requirements.in
+pip-compile --upgrade --generate-hashes requirements/base.in
+pip-compile --upgrade --generate-hashes requirements/dev.in
