@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* :support:`139` Support Python 3.10
+* :support:`138` Test on Windows
 * :release:`0.12.1 <2020-08-02>`
 * :support:`125` Fix long_description for PyPI
 * :release:`0.12.0 <2020-05-23>`
