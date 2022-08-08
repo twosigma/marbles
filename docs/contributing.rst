@@ -88,23 +88,23 @@ Using Devcontainers
 ~~~~~~~~~~~~~~~~~~~
 
 We provide a
-[devcontainers](https://code.visualstudio.com/docs/remote/containers) config
+`devcontainers <https://code.visualstudio.com/docs/remote/containers>`__ config
 that should get you a working development environment with one gesture. If
-you're new to devcontainers, make sure you have [VS
-Code](https://code.visualstudio.com/) installed with the [Remote
-Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+you're new to devcontainers, make sure you have `VS
+Code <https://code.visualstudio.com/>`__ installed with the `Remote
+Containers <https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers>`__
 extension.
 
-Use the `Remote-Containers: Clone Repository in Container Volume...` action in
-VS Code to clone the `twosigma/marbles` repo. It will set up your development
-environment so you can run `tox` and start coding straight away.
+Use the ``Remote-Containers: Clone Repository in Container Volume...`` action in
+VS Code to clone the ``twosigma/marbles`` repo. It will set up your development
+environment so you can run ``tox`` and start coding straight away.
 
 Using Codespaces
 ~~~~~~~~~~~~~~~~
 
 You can also try this environment in
-[Codespaces](https://github.com/features/codespaces) by creating a codespace
-from the [marbles repo homepage](https://github.com/twosigma/marbles).
+`Codespaces <https://github.com/features/codespaces>`__ by creating a codespace
+from the `marbles repo homepage <https://github.com/twosigma/marbles>`__\ .
 
 Developing on Your Own Machine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
