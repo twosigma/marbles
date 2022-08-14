@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     env:
-      PLATFORM: ${{ matrix.platform }}
+      PLATFORM: ${{ fromJSON('{"ubuntu-latest": "linux", "macos-latest": "darwin": "windows-latest": "win32"}')[matrix.platform] }}
       PYTHON: ${{ matrix.python-version }}
 
     steps:
@@ -34,7 +34,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install nox
     - name: Test
-      run: nox -p ${PYTHON} -s coverage
+      run: nox -p ${PYTHON} -s coverage -k ${PLATFORM}
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
@@ -50,7 +50,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     env:
-      PLATFORM: ${{ matrix.platform }}
+      PLATFORM: ${{ fromJSON('{"ubuntu-latest": "linux", "macos-latest": "darwin": "windows-latest": "win32"}')[matrix.platform] }}
       PYTHON: ${{ matrix.python-version }}
 
     steps:
@@ -64,11 +64,11 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install nox
     - name: Lint
-      run: nox -p ${PYTHON} -s flake8
+      run: nox -p ${PYTHON} -s flake8 -k ${PLATFORM}
     - name: Build docs
-      run: nox -p ${PYTHON} -s docs
+      run: nox -p ${PYTHON} -s docs -k ${PLATFORM}
     - name: Package
-      run: nox -p ${PYTHON} -s package
+      run: nox -p ${PYTHON} -s package -k ${PLATFORM}
     - uses: actions/upload-artifact@v3
       with:
         name: docs-${{ matrix.platform }}
