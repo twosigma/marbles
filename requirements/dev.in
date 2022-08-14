@@ -1,12 +1,6 @@
 -c base.in
-build
-bumpversion
-coverage
-flake8
-releases
-semantic-version
-Sphinx
-sphinx_rtd_theme
-tox
-twine
-wheel
+-c coverage.in
+-c docs.in
+-c lint.in
+-c package.in
+nox

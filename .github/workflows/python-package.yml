@@ -10,7 +10,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  test:
     strategy:
       fail-fast: false
       matrix:
@@ -32,12 +32,51 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install tox tox-gh-actions
-    - name: Run tox
-      run: |
-        tox
+        python -m pip install nox
+    - name: Test
+      run: nox -p ${PYTHON} -s coverage
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
         env_vars: PLATFORM,PYTHON
         files: ./coverage.xml
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.8"]
+
+    runs-on: ${{ matrix.platform }}
+
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      PYTHON: ${{ matrix.python-version }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install nox
+    - name: Lint
+      run: nox -p ${PYTHON} -s flake8
+    - name: Build docs
+      run: nox -p ${PYTHON} -s docs
+    - name: Package
+      run: nox -p ${PYTHON} -s package
+    - uses: actions/upload-artifact@v3
+      with:
+        name: docs
+        path: build/sphinx/html
+    - uses: actions/upload-artifact@v3
+      with:
+        name: packages
+        path: |
+          dist
+          marbles/core/dist
+          marbles/mixins/dist
