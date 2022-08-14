@@ -71,11 +71,11 @@ jobs:
       run: nox -p ${PYTHON} -s package
     - uses: actions/upload-artifact@v3
       with:
-        name: docs
+        name: docs-${{ matrix.platform }}
         path: build/sphinx/html
     - uses: actions/upload-artifact@v3
       with:
-        name: packages
+        name: packages-${{ matrix.platform }}
         path: |
           dist
           marbles/core/dist
