@@ -69,6 +69,13 @@ def coverage(session: nox.Session):
     session.run('coverage', 'xml')
 
 
+@nox.session
+def serve_coverage(session: nox.Session):
+    '''Serve coverage data.'''
+    with session.chdir('build/coverage/html'):
+        session.run('python', '-m', 'http.server', *session.posargs)
+
+
 @sync_session('lint', tags=['actions-check'])
 def flake8(session: nox.Session):
     '''Lint with flake8.'''
@@ -81,6 +88,13 @@ def docs(session: nox.Session):
     session.run('sphinx-build', '-b', 'html', '-Ea',
                 '-d', 'build/sphinx/doctrees',
                 'docs', 'build/sphinx/html')
+
+
+@nox.session
+def serve_docs(session: nox.Session):
+    '''Serve built docs.'''
+    with session.chdir('build/sphinx/html'):
+        session.run('python', '-m', 'http.server', *session.posargs)
 
 
 @sync_session('package', tags=['actions-check'])
