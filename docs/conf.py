@@ -30,6 +30,7 @@
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+from marbles.core import __version__ as marbles_version
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
@@ -66,7 +67,6 @@ author = 'Jane Adams and Leif Walsh'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 
-from marbles.core import __version__ as marbles_version
 
 # The short X.Y version.
 version = '.'.join(marbles_version.split('.')[:2])
@@ -254,21 +254,21 @@ htmlhelp_basename = 'marblesdoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-     # The paper size ('letterpaper' or 'a4paper').
-     #
-     # 'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    # 'papersize': 'letterpaper',
 
-     # The font size ('10pt', '11pt' or '12pt').
-     #
-     # 'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #
+    # 'pointsize': '10pt',
 
-     # Additional stuff for the LaTeX preamble.
-     #
-     # 'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #
+    # 'preamble': '',
 
-     # Latex figure (float) alignment
-     #
-     # 'figure_align': 'htbp',
+    # Latex figure (float) alignment
+    #
+    # 'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -355,7 +355,7 @@ texinfo_documents = [
 
 autodoc_member_order = 'bysource'
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.5', 'python-inv.txt'),
+    'python': ('https://docs.python.org/3', 'python-inv.txt'),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable', 'pandas-inv.txt')
 }
 

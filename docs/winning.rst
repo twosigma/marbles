@@ -109,7 +109,7 @@ These custom assertions are provided via mixin classes so that they can use othe
 
     :mod:`marbles.mixins` can be mixed into a :class:`unittest.TestCase`, a :class:`marbles.core.TestCase`, a :class:`marbles.core.AnnotatedTestCase`, or any other class that implements a :class:`unittest.TestCase` interface. To enforce this, mixins define `abstract methods <abc>`_. This means that, when mixing them into your test case, they must come `after` the class(es) that implement those methods instead of appearing first in the inheritance list like normal mixins.
 
-    .. _abc: https://docs.python.org/3.5/library/abc.html#abc.abstractmethod
+    .. _abc: https://docs.python.org/3/library/abc.html#abc.abstractmethod
 
 Writing your own mixins
 ^^^^^^^^^^^^^^^^^^^^^^^
