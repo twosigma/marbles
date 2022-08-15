@@ -56,7 +56,7 @@ def coverage(session: nox.Session):
     with session.chdir('marbles/core'):
         session.run('coverage', 'run', '-m', 'unittest', 'discover', 'tests')
     examples_dir = Path('marbles/core/example_packages')
-    for f in examples_dir.glob("**/*.coverage*"):
+    for f in examples_dir.glob('**/*.coverage*'):
         shutil.move(str(f), 'marbles/core')
 
     with session.chdir('marbles/mixins'):
@@ -132,7 +132,7 @@ def pip_compile(session: nox.Session):
     # Remove after https://github.com/jazzband/pip-tools/pull/1650
     for f in reqs_dir.glob('*.txt'):
         content = f.read_text()
-        content = content.replace(f"{Path.cwd()}/", "")
+        content = content.replace(f'{Path.cwd()}/', '')
         f.write_text(content)
 
 
