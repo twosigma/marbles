@@ -41,7 +41,8 @@ def sync_session(*envs, install_marbles=False, **kwargs):
             session.run_always('pip-sync', *concrete_reqs)
 
             if install_marbles:
-                session.install('-e', 'marbles/core', '-e', 'marbles/mixins')
+                session.install('-e', 'marbles/core', '-e', 'marbles/mixins',
+                                '--no-deps')
             return f(session, *args, **kwargs)
 
         return wrapper
