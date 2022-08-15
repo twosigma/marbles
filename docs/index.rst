@@ -46,28 +46,18 @@ The main idea behind marbles is that test failures are documentation. We wanted 
 Contents
 --------
 
-User Guide
-""""""""""
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: User Guide
 
    install
    quickstart
    winning
    comparisons
-
-Reference
-"""""""""
-.. toctree::
-   :maxdepth: 3
-
    reference
 
-Developer Guide
-"""""""""""""""
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Developer Guide
 
    contributing
@@ -79,4 +69,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`search`
-
