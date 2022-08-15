@@ -1,13 +1,20 @@
 from concurrent.futures import ThreadPoolExecutor
 from functools import wraps
+import os
 from pathlib import Path
 import shutil
 import sys
 
 import nox
 
-nox.options.sessions = ['test', 'flake8']
-nox.options.reuse_existing_virtualenvs = True
+if os.environ.get('GITHUB_ACTIONS', False):
+    nox.options.pythons = [os.environ['PYTHON']]
+    nox.options.error_on_missing_interpreters = True
+    nox.options.error_on_external_run = True
+else:
+    # local development defaults
+    nox.options.sessions = ['test', 'flake8']
+    nox.options.reuse_existing_virtualenvs = True
 
 SUPPORTED_PYTHONS = ('3.8', '3.9', '3.10')
 MIN_SUPPORTED_PYTHON = '3.8'
