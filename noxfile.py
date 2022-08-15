@@ -60,7 +60,7 @@ def sync_session(
 @nox.session(python=MIN_SUPPORTED_PYTHON)
 def pip_compile(session: nox.Session):
     session.install('pip-tools')
-    args = ['--no-emit-index-url', '--generate-hashes']
+    args = ['--generate-hashes']
 
     for subpackage in ('marbles/core', 'marbles/mixins'):
         with session.chdir(subpackage):
