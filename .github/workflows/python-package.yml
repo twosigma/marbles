@@ -69,11 +69,13 @@ jobs:
         python -m pip install nox
     - name: Lint, build docs, and package
       run: nox -t actions-check
-    - uses: actions/upload-artifact@v3
+    - name: Upload docs
+      uses: actions/upload-artifact@v3
       with:
         name: docs-${{ matrix.platform }}
         path: build/sphinx/html
-    - uses: actions/upload-artifact@v3
+    - name: Upload packages
+      uses: actions/upload-artifact@v3
       with:
         name: packages-${{ matrix.platform }}
         path: |
