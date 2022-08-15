@@ -9,8 +9,8 @@ import nox
 
 if os.environ.get('GITHUB_ACTIONS', False):
     nox.options.pythons = [os.environ['PYTHON']]
+
     platform = os.environ['PLATFORM']
-    print(platform)
     if platform.startswith('windows'):
         nox.options.keywords = 'win32'
     elif platform.startswith('macos'):
@@ -19,6 +19,7 @@ if os.environ.get('GITHUB_ACTIONS', False):
         nox.options.keywords = 'linux'
     else:
         raise RuntimeError(f'Unknown platform: {platform}')
+
     nox.options.error_on_missing_interpreters = True
     nox.options.error_on_external_run = True
 else:
