@@ -76,7 +76,7 @@ def test(session: nox.Session):
             session.run('python', '-m', 'unittest', 'discover', 'tests')
 
 
-@sync_session('coverage')
+@sync_session('coverage', tags=['actions-test'])
 def coverage(session: nox.Session):
     session.install('-e', 'marbles/core', '-e', 'marbles/mixins')
     session.run('coverage', 'erase')
@@ -97,12 +97,12 @@ def coverage(session: nox.Session):
     session.run('coverage', 'xml')
 
 
-@sync_session('lint', python=MIN_SUPPORTED_PYTHON, tags=['lint'])
+@sync_session('lint', python=MIN_SUPPORTED_PYTHON, tags=['actions-check'])
 def flake8(session: nox.Session):
     session.run('flake8')
 
 
-@sync_session('docs', python=MIN_SUPPORTED_PYTHON)
+@sync_session('docs', python=MIN_SUPPORTED_PYTHON, tags=['actions-check'])
 def docs(session: nox.Session):
     session.install('-e', 'marbles/core', '-e', 'marbles/mixins')
     session.run('sphinx-build', '-b', 'html', '-Ea',
@@ -110,7 +110,7 @@ def docs(session: nox.Session):
                 'docs', 'build/sphinx/html')
 
 
-@sync_session('package', python=MIN_SUPPORTED_PYTHON)
+@sync_session('package', python=MIN_SUPPORTED_PYTHON, tags=['actions-check'])
 def package(session: nox.Session):
     for d in ('dist', 'marbles/core/dist', 'marbles/mixins/dist'):
         shutil.rmtree(d, ignore_errors=True)
