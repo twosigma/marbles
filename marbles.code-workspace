@@ -38,7 +38,7 @@
             "**/.coverage.*": true,
             "**/*.egg-info": true,
             ".eggs": true,
-            ".tox": true,
+            ".nox": true,
             "**/dist": true,
             "**/__pycache__": true
         },

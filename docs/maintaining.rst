@@ -111,9 +111,9 @@ each in its own virtualenv::
 
 You can also run a subset of these with ``-s``::
 
-    $ tox -s docs
-    $ tox -s test-3.8
-    $ tox -s flake8 coverage-3.8
+    $ nox -s docs
+    $ nox -s test-3.8
+    $ nox -s flake8 coverage-3.8
 
 VS Code Tasks
 ~~~~~~~~~~~~~
