@@ -85,7 +85,7 @@ def flake8(session: nox.Session):
 @sync_session('docs', install_marbles=True, tags=['actions-check'])
 def docs(session: nox.Session):
     '''Build docs with Sphinx.'''
-    session.run('sphinx-build', '-b', 'html', '-Ea',
+    session.run('sphinx-build', '-b', 'html', '-WEa',
                 '-d', 'build/sphinx/doctrees',
                 'docs', 'build/sphinx/html')
 
