@@ -8,7 +8,6 @@ import sys
 import nox
 
 if os.environ.get('GITHUB_ACTIONS', False):
-    nox.options.pythons = [os.environ['PYTHON']]
     nox.options.error_on_missing_interpreters = True
     nox.options.error_on_external_run = True
 else:
