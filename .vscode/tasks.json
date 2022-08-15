@@ -4,32 +4,16 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run tox",
+            "label": "Run nox",
             "type": "shell",
-            "command": "tox",
+            "command": "nox",
             "args": [
-                "--parallel",
-                "auto",
-                "-e",
-                "flake8-linux,docs-linux,py310"
+                "--python",
+                "3.8"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "problemMatcher": [
-                {
-                    "owner": "rst",
-                    "applyTo": "allDocuments",
-                    "fileLocation": "autoDetect",
-                    "pattern": {
-                        "regexp": "^(.*):(\\d+):\\s*([A-Za-z]*):(.*)$",
-                        "file": 1,
-                        "location": 2,
-                        "severity": 3,
-                        "message": 4
-                    }
-                }
-            ],
             "isBackground": false,
             "group": {
                 "kind": "test",
@@ -39,10 +23,12 @@
         {
             "label": "Run coverage",
             "type": "shell",
-            "command": "tox",
+            "command": "nox",
             "args": [
-                "-e",
-                "py310-coverage-linux"
+                "--python",
+                "3.8",
+                "--session",
+                "coverage"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -65,13 +51,13 @@
         {
             "label": "Serve coverage",
             "type": "shell",
-            "command": "python",
+            "command": "nox",
             "args": [
-                "-m",
-                "http.server"
+                "--session",
+                "serve_coverage"
             ],
             "options": {
-                "cwd": "${workspaceFolder}/build/coverage/html"
+                "cwd": "${workspaceFolder}"
             },
             "group": "none",
             "presentation": {
@@ -91,10 +77,10 @@
         {
             "label": "Build docs",
             "type": "shell",
-            "command": "tox",
+            "command": "nox",
             "args": [
-                "-e",
-                "docs-linux"
+                "--session",
+                "docs"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -128,13 +114,13 @@
         {
             "label": "Serve docs",
             "type": "shell",
-            "command": "python",
+            "command": "nox",
             "args": [
-                "-m",
-                "http.server"
+                "--session",
+                "serve_docs"
             ],
             "options": {
-                "cwd": "${workspaceFolder}/build/sphinx/html"
+                "cwd": "${workspaceFolder}"
             },
             "group": "none",
             "presentation": {
