@@ -7,6 +7,9 @@ import sys
 
 import nox
 
+# Environment defaults: we want strict behavior in CI, and good local defaults
+# so `nox` works reasonably and fast.
+
 if os.environ.get('GITHUB_ACTIONS', False):
     nox.options.error_on_missing_interpreters = True
     nox.options.error_on_external_run = True
@@ -15,9 +18,15 @@ else:
     nox.options.sessions = ['test', 'flake8']
     nox.options.reuse_existing_virtualenvs = True
 
+# The versions we test against, and the lowest version of Python we support.
+# We should always update with pip-compile using the lowest version of Python
+# so that we get all backport packages we'll need for that.
+
 SUPPORTED_PYTHONS = ('3.8', '3.9', '3.10')
 MIN_SUPPORTED_PYTHON = '3.8'
 
+
+# Helper session for integrating well with pip-sync.
 
 def sync_session(*envs, install_marbles=False, **kwargs):
     '''Nox session decorator that uses pip-sync to manage dependencies.'''
@@ -38,6 +47,8 @@ def sync_session(*envs, install_marbles=False, **kwargs):
         return wrapper
     return decorator
 
+
+# Most useful testing code below: tests, coverage, linting, docs.
 
 @sync_session('base', python=SUPPORTED_PYTHONS, install_marbles=True)
 def test(session: nox.Session):
@@ -106,9 +117,12 @@ def package(session: nox.Session):
         session.run('python', '-m', 'build', d)
 
 
+# Administrative sessions: uploading to PyPI, updating dependencies, increasing
+# the version strings.
+
 @nox.session
 def upload(session: nox.Session):
-    '''Upload distributions to PyPI'''
+    '''Upload distributions to PyPI.'''
     session.install('twine')
     session.run(
         'twine', 'upload',
