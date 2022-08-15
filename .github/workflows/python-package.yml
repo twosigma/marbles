@@ -35,6 +35,10 @@ jobs:
         python -m pip install nox
     - name: Test
       run: nox -s coverage-${PYTHON}
+      if: ${{ matrix.platform != windows-latest }}
+    - name: Test
+      run: nox -s coverage-${env:PYTHON}
+      if: ${{ matrix.platform == windows-latest }}
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
