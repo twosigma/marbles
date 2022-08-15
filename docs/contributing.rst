@@ -97,7 +97,7 @@ extension.
 
 Use the ``Remote-Containers: Clone Repository in Container Volume...`` action in
 VS Code to clone the ``twosigma/marbles`` repo. It will set up your development
-environment so you can run ``tox`` and start coding straight away.
+environment so you can run ``nox`` and start coding straight away.
 
 Using Codespaces
 ~~~~~~~~~~~~~~~~
@@ -141,8 +141,12 @@ Developing on Your Own Machine
 5. As you make changes, you can run the tests and lint with
    flake8::
 
-    $ tox -e flake8-linux
-    $ tox -e py310  # or your local version of Python
+    $ nox
+
+   To separately lint or run tests, specify a session::
+
+    $ nox -s flake8
+    $ nox -s test
 
    .. note:: Don't worry about bumping version numbers yourself. We'll
              handle this in the release that includes your changes.
@@ -170,9 +174,8 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Make sure
    your new functionality is documented with docstrings and appropriate
    additions to the Sphinx docs, and add the feature to the list in README.md.
-3. The pull request should work for Python 3.5, 3.6, and 3.7. Check
-   https://travis-ci.org/twosigma/marbles/pull_requests and make sure
-   that the tests pass for all supported Python versions.
+3. The pull request should work for Python 3.8, 3.9, and 3.10, and on Linux,
+   Windows, and OS X. You'll see those checks run in your pull request.
 4. In order to accept your code contributions, please fill out the appropriate
    Contributor License Agreement in the `cla folder
    <https://github.com/twosigma/marbles/tree/master/cla>`__ and submit it to
