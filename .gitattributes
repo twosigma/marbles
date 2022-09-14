@@ -1,1 +1,2 @@
 marbles/_version.py export-subst
+file:* binary -delta
