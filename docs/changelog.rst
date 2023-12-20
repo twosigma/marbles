@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :support:`144` Support Python 3.11
 * :support:`139` Support Python 3.10
 * :support:`138` Test on Windows
 * :release:`0.12.1 <2020-08-02>`
