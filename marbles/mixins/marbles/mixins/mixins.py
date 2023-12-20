@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2018 Two Sigma Open Source, LLC
+#  Copyright (c) 2018-2023 Two Sigma Open Source, LLC
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -42,7 +42,7 @@ a test case with all the assertions that they need.
     class(es) that implement those methods instead of appearing first
     in the inheritance list like normal mixins.
 
-    .. _abc: https://docs.python.org/3.5/library/abc.html#abc.abstractmethod
+    .. _abc: https://docs.python.org/3/library/abc.html#abc.abstractmethod
 
 Example:
 
@@ -442,7 +442,7 @@ class FileMixins(abc.ABC):
     Accepting a file-like object is useful for testing files that are
     not present locally, e.g., files in HDFS.
 
-    .. _file-like object: http://docs.python.org/3.5/glossary.html#term-file-like-object
+    .. _file-like object: http://docs.python.org/3/glossary.html#term-file-like-object
 
     .. code-block:: python
 

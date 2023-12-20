@@ -10,95 +10,93 @@ marbles. Most of these are also useful when developing marbles.
 Environment
 -----------
 
-Marbles comes with a :file:`Pipfile` that `pipenv`_ can use to manage
-your virtualenv for developing. To get started, install `pipenv`_ once
-for your machine with your package manager of choice::
+Marbles comes with a :file:`requirements/dev.txt` file you can use to create
+a virtualenv for developing. To get started, just install from this
+requirements file in a virtualenv::
 
-    $ pip install --user pipenv
+    $ pip install -r requirements/dev.txt
 
-Creating your environment
-~~~~~~~~~~~~~~~~~~~~~~~~~
+.. note::
 
-In the marbles codebase, create a development virtualenv, and enter
-it::
-
-    $ pipenv install --dev
-    $ pipenv shell
-
-Inside this environment, you should have everything you need to work
-on marbles. See the other sections in this doc for common activities.
+    If you're using our VS Code devcontainer, you can skip this step: all the
+    tools you need will be installed by default in your environment.
 
 Adding new packages
 ~~~~~~~~~~~~~~~~~~~
 
-If you want to add a new package for development, install it with
-`pipenv`_::
+You can tentatively add packages to your environment as normal, with ``pip
+install``. These will only affect your own environment, but you can try them
+out by running ``python -m unittests discover ...`` to see if they work.
 
-    $ pipenv install --dev pylint
+When you're ready to commit to using them, add them to the appropriate ``*.in``
+file in :file:`requirements/`, or if they're going to be new runtime
+dependencies, either :file:`marbles/core/setup.cfg` or
+:file:`marbles/mixins/setup.cfg`. Then resolve them to concrete dependencies
+with::
 
-This will update the :file:`Pipfile` with :mod:`pylint` as a new
-development dependency, and will update :file:`Pipfile.lock` with the
-exact version you installed. If this dependency is needed for
-something you added to marbles, you should include the changes to both
-:file:`Pipfile` and :file:`Pipfile.lock` in your pull
-request. Otherwise, please don't include the changes to
-:file:`Pipfile` and :file:`Pipfile.lock` in your pull request.
+    $ nox -s pip_compile
+
+This will make those new dependencies available to the `nox`_ environments.
+More on `nox`_ below.
+
+After this, add and commit all :file:`requirements/*.txt` and
+:file:`*/requirements.txt` files and include them in your pull request.
 
 Linting
 -------
 
 You can lint the code with `flake8`_::
 
-    $ python -m flake8
+    $ nox -s flake8
 
 Tests
 -----
 
 You can run the tests for either :mod:`marbles.core` or
-:mod:`marbles.mixins` separately::
+:mod:`marbles.mixins` separately, in either subpackage's directory::
 
-    $ python marbles/core/setup.py test
-    $ python marbles/mixins/setup.py test
+    $ python -m unittest discover tests
+
+You can run all the tests with `nox`_::
+
+    $ nox -s test
 
 Coverage
 --------
 
 Since the marbles tests are split across the subpackages, checking
-coverage isn't very straightforward, but we've configured `tox`_ to do
-it for you (more on `tox`_ below)::
+coverage isn't very straightforward, but we've configured `nox`_ to do
+it for you::
 
-    $ tox -e coverage
+    $ nox -s coverage
 
 If you want to look at the source code annotated with coverage
-metrics, this produces an HTML report you can view, by loading
-file:///path/to/marbles/build/coverage/html/index.html in your
-browser.
+metrics, this produces an HTML report you can view. You can serve it locally::
+
+    $ nox -s serve_coverage
 
 Documentation
 -------------
 
 You can build the docs and view them locally::
 
-    $ python setup.py build_sphinx
+    $ nox -s docs
 
-Then, load file:///path/to/marbles/build/sphinx/html/index.html in
-your browser. If you make changes to just docstrings, but not
-:file:`.rst` files, Sphinx may not rebuild those docs, you can
-embolden it to do so with these options::
+Similarly, you can serve them for local viewing::
 
-    $ python setup.py build_sphinx -Ea
+    $ nox -s serve_docs
 
-Automation with `tox`_
+Automation with `nox`_
 ----------------------
 
-We use `tox`_ to run continuous integration builds for multiple
-versions of Python, and to run each piece of our continuous
-integration in a separate virtualenv. You can do this locally too, to
-make sure your change will build cleanly on Travis CI.
+We use `nox`_ to run continuous integration builds for multiple versions of
+Python and on multiple platforms in GitHub Actions, and to run each piece of
+our continuous integration in a separate virtualenv. You can do this locally
+too, to make sure your change will build cleanly.
 
-We've configured `tox`_ to be able to:
+We've configured `nox`_ to be able to:
 
-1. Run all the tests with Python 3.5 and 3.6
+1. Run all the tests with Python 3.8, 3.9, 3.10, and 3.11
 
 2. Measure and report on code coverage
 
@@ -106,16 +104,22 @@ We've configured `tox`_ to be able to:
 
 4. Build the documentation
 
-If you just run :program:`tox` by itself, it will do all of the above,
+If you just run :program:`nox` by itself, it will run tests and linting,
 each in its own virtualenv::
 
-    $ tox
+    $ nox
 
-You can also run a subset of these with ``-e``::
+You can also run a subset of these with ``-s``::
 
-    $ tox -e docs
-    $ tox -e py36
-    $ tox -e flake8,coverage
+    $ nox -s docs
+    $ nox -s test-3.8
+    $ nox -s flake8 coverage-3.8
+
+VS Code Tasks
+~~~~~~~~~~~~~
+
+We provide several VS Code tasks that can run common things you'll want to run
+while developing.
 
 Maintaining the Changelog
 -------------------------
@@ -154,13 +158,11 @@ Releasing a new version
 The marbles meta-package and subpackage version strings are stored in
 a few different locations, due to the namespace package setup:
 
-1. :file:`setup.py`
+1. :file:`setup.cfg`
 
-2. :file:`setup.cfg`
+2. :file:`marbles/core/marbles/core/VERSION`
 
-3. :file:`marbles/core/marbles/core/VERSION`
-
-4. :file:`marbles/mixins/marbles/mixins/VERSION`
+3. :file:`marbles/mixins/marbles/mixins/VERSION`
 
 In addition, when we bump the version, we do so in an isolated commit,
 and tag that commit with the version number as well.
@@ -170,21 +172,21 @@ and tag that commit with the version number as well.
    Make sure you've groomed the :doc:`changelog` before tagging a new
    release. See `Maintaining the Changelog`_ for details.
 
-We use `bumpversion`_ to automate this. To run `bumpversion`_, you
+We use `bump2version`_ to automate this. To run `bump2version`_, you
 need to be in a clean git tree (don't worry, it will complain to you
 if that's not the case).
 
 You can increase either the ``major``, ``minor``, or ``patch``
 version::
 
-    $ bumpversion major
-    $ bumpversion minor
-    $ bumpversion patch
+    $ nox -s bumpversion -- major
+    $ nox -s bumpversion -- minor
+    $ nox -s bumpversion -- patch
 
 This will update the version strings in all the above files and commit
 that change, but won't tag it. You should create a pull request for
 the version update, merge it (without squashing it into other
-commits), and then tag it once it's on the ``master`` branch:
+commits), and then tag it once it's on the ``main`` branch:
 https://github.com/twosigma/marbles/releases/new.
 
 You can read a digression about why we bump all the versions at the
@@ -196,15 +198,15 @@ Uploading to PyPI
 Once you've tagged the latest version of marbles, pull from GitHub to
 make sure your clone is up to date and clean, build both ``sdist`` and
 ``wheel`` packages for all three packages, and upload them with
-`twine`_. We have a `tox`_ rule to automate building and uploading::
+`twine`_. We have `nox`_ sessions to automate building and uploading::
 
-    $ tox -e pypi
+    $ nox -s package
+    $ nox -s upload
 
-.. _pipenv: https://docs.pipenv.org
 .. _flake8: http://flake8.pycqa.org
-.. _tox: https://tox.readthedocs.io
+.. _nox: https://nox.thea.codes/en/stable
 .. _releases: http://releases.readthedocs.io
-.. _bumpversion: https://github.com/peritus/bumpversion
+.. _bump2version: https://github.com/c4urself/bump2version
 .. _twine: https://github.com/pypa/twine
 
 Versioning philosophy

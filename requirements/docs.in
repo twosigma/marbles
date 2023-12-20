@@ -1,0 +1,5 @@
+-c base.in
+releases
+semantic-version
+Sphinx
+sphinx_rtd_theme

@@ -1,0 +1,141 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run nox",
+            "type": "shell",
+            "command": "nox",
+            "args": [
+                "--python",
+                "3.8"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": false,
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run coverage",
+            "type": "shell",
+            "command": "nox",
+            "args": [
+                "--python",
+                "3.8",
+                "--session",
+                "coverage"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": false,
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Serve coverage",
+            "type": "shell",
+            "command": "nox",
+            "args": [
+                "--session",
+                "serve_coverage"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "none",
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [],
+            "isBackground": true,
+            "dependsOn": [
+                "Run coverage"
+            ]
+        },
+        {
+            "label": "Build docs",
+            "type": "shell",
+            "command": "nox",
+            "args": [
+                "--session",
+                "docs"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": false,
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": {
+                "owner": "rst",
+                "applyTo": "allDocuments",
+                "fileLocation": "autoDetect",
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):\\s*([A-Za-z]*):(.*)$",
+                    "file": 1,
+                    "location": 2,
+                    "severity": 3,
+                    "message": 4
+                }
+            }
+        },
+        {
+            "label": "Serve docs",
+            "type": "shell",
+            "command": "nox",
+            "args": [
+                "--session",
+                "serve_docs"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "none",
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [],
+            "isBackground": true,
+            "dependsOn": [
+                "Build docs"
+            ]
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2018 Two Sigma Open Source, LLC
+#  Copyright (c) 2018-2023 Two Sigma Open Source, LLC
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -52,12 +52,12 @@ class TopLevelTestsTestCase(MarblesCommandTestCase):
 
     def test_tests_run(self):
         expected_lines = [
-                'test_test (tests.test_two.TestTest) ... ok',
-                'test_test (tests.test.TestTest) ... FAIL',
-                'Ran 2 tests in',
-                ]
+            r'test_test \(tests\.test_two\.TestTest(\.test_test)?\) \.\.\. ok',
+            r'test_test \(tests\.test\.TestTest(\.test_test)?\) \.\.\. FAIL',
+            r'Ran 2 tests in',
+        ]
         for e in expected_lines:
-            self.assertIn(e, self.stderr)
+            self.assertRegexpMatches(self.stderr, e)
 
     def test_source(self):
         expected_lines = ['Source', 'e = 2', 'self.assertEqual(a, e)']
@@ -79,19 +79,19 @@ class NamespaceTestCase(MarblesCommandTestCase):
 
     def test_tests_run(self):
         expected_lines = [
-                'test_neg_nums (tests.namespace.core.test.TestCase) ... ok',
-                'test_pos_nums (tests.namespace.core.test.TestCase) ... FAIL',
-                'Ran 2 tests in',
-                ]
+            r'test_neg_nums \(tests\.namespace\.core\.test\.TestCase(\.test_neg_nums)?\) \.\.\. ok',  # noqa: E501
+            r'test_pos_nums \(tests\.namespace\.core\.test\.TestCase(\.test_pos_nums)?\) \.\.\. FAIL',  # noqa: E501
+            r'Ran 2 tests in',
+        ]
         for e in expected_lines:
-            self.assertIn(e, self.stderr)
+            self.assertRegexpMatches(self.stderr, e)
 
     def test_source(self):
         expected_lines = [
-                'Source',
-                'for i in range(10)',
-                'self.assertEqual(i*2, m.double(i))'
-                ]
+            'Source',
+            'for i in range(10)',
+            'self.assertEqual(i*2, m.double(i))'
+        ]
         for e in expected_lines:
             self.assertIn(e, self.stderr)
 

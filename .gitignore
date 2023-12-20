@@ -6,4 +6,4 @@ dist/
 coverage.xml
 *.pyc
 .eggs
-.tox/
+.venv/

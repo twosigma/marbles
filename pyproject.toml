@@ -1,0 +1,7 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.pyright]
+include = ["marbles/core", "marbles/mixins"]
+exclude = ["marbles/core/build", "marbles/core/example_packages", "marbles/mixins/build"]
