@@ -171,7 +171,7 @@ class AnnotationError(Exception):
 
 
 class ContextualAssertionError(AssertionError):
-    '''Extends :class:`AssertionError` to accept and display additiona
+    '''Extends :class:`AssertionError` to accept and display additional
     information beyond the static ``msg`` parameter provided by
     :mod:`unittest` assertions.
 
