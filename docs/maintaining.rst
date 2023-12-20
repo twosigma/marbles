@@ -96,7 +96,7 @@ too, to make sure your change will build cleanly.
 
 We've configured `nox`_ to be able to:
 
-1. Run all the tests with Python 3.8, 3.9, and 3.10
+1. Run all the tests with Python 3.8, 3.9, 3.10, and 3.11
 
 2. Measure and report on code coverage
 
@@ -119,11 +119,7 @@ VS Code Tasks
 ~~~~~~~~~~~~~
 
 We provide several VS Code tasks that can run common things you'll want to run
-while developing. The extension ``SanaAjani.taskrunnercode`` will show them in
-a convenient place in the file explorer where you can run them with one click.
-
-If you're using the devcontainer setup, this extension will be installed for
-you automatically.
+while developing.
 
 Maintaining the Changelog
 -------------------------

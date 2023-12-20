@@ -24,9 +24,6 @@
         ],
         "python.testing.pytestEnabled": false,
         "python.testing.unittestEnabled": true,
-        "python.linting.enabled": true,
-        "python.linting.pylintEnabled": false,
-        "python.linting.flake8Enabled": true,
         "files.exclude": {
             "**/.git": true,
             "**/.svn": true,
@@ -48,9 +45,12 @@
         "recommendations": [
             "ms-python.python",
             "ms-python.vscode-pylance",
-            "bungcip.better-toml",
-            "lextudio.restructuredtext-pack",
-            "spmeesseman.vscode-taskexplorer"
+            "ms-python.flake8",
+            "ms-python.black-formatter",
+            "ms-python.mypy-type-checker",
+            "tamasfe.even-better-toml",
+            "lextudio.restructuredtext",
+            "trond-snekvik.simple-rst"
         ]
     }
 }
