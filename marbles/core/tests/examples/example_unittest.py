@@ -56,5 +56,27 @@ class ResponseTestCase(unittest.TestCase):
             201)
 
 
+class SetupFailureTestCase(unittest.TestCase):
+    '''Test when setUp() contains failing assertions.'''
+
+    def setUp(self):
+        local_var = 1
+        self.assertEqual(local_var, 2, 'oh no')
+
+    def test_foo(self):
+        self.assertTrue(True, 'yay')
+
+
+class TeardownFailureTestCase(unittest.TestCase):
+    '''Test when tearDown() contains failing assertions.'''
+
+    def tearDown(self):
+        local_var = 1
+        self.assertEqual(local_var, 2, 'oh no')
+
+    def test_foo(self):
+        self.assertTrue(True, 'yay')
+
+
 if __name__ == '__main__':
     unittest.main()
