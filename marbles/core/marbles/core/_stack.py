@@ -40,6 +40,7 @@ def get_stack_info():
     # because we always find a test.
     for frame, _ in stack:  # pragma: no branch
         code = frame.f_code
-        if code.co_name.startswith('test_'):
+        func_name = code.co_name
+        if func_name.startswith('test_') or func_name in {'setUp', 'tearDown'}:
             return (frame.f_locals.copy(), frame.f_globals['__name__'],
                     code.co_filename, frame.f_lineno)
