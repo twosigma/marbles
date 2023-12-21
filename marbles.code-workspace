@@ -39,7 +39,8 @@
             "**/dist": true,
             "**/__pycache__": true
         },
-        "esbonio.sphinx.confDir": ""
+        "esbonio.sphinx.confDir": "",
+        "git.branchProtection": ["main"]
     },
     "extensions": {
         "recommendations": [
