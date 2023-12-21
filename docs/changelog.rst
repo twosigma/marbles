@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :support:`145` Support Python 3.12 (and drop 3.8)
 * :release:`0.12.2 <2023-12-20>`
 * :support:`144` Support Python 3.11
 * :support:`139` Support Python 3.10
