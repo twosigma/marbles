@@ -237,7 +237,7 @@ class MainWithFailureTestCase(TestScriptRunningTestCase):
             self.assertNotIn('example.com', self.stderr)
 
     def test_stack_info_handles_setup_failure(self):
-        '''Our stack_info() handles setup failures and shows locals.'''
+        '''Our stack_info() handles setup failures without crashing.'''
         self.assertNotIn('_stack.get_stack_info', self.stderr)
 
     def test_setup_failure_shows_locals(self):
