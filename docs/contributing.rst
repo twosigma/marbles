@@ -23,8 +23,8 @@ If you are reporting a bug, please include:
 * Any details about your local setup that might be helpful in troubleshooting.
 * Detailed steps to reproduce the bug.
 
-The `issue template <https://github.com/twosigma/marbles/issues/new>`__ will
-tell you how to collect version information.
+The `issue templates <https://github.com/twosigma/marbles/issues/new/choose>`__
+will tell you how to collect version information.
 
 Fix Bugs
 ~~~~~~~~
@@ -51,7 +51,7 @@ Submit Feedback
 ~~~~~~~~~~~~~~~
 
 The best way to send feedback is to file an issue at
-https://github.com/twosigma/marbles/issues.
+https://github.com/twosigma/marbles/issues/new/choose.
 
 If you are proposing a feature:
 
