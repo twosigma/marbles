@@ -9,3 +9,5 @@ build:
   python:
     install:
       - requirements: requirements/docs.txt
+      - package: marbles/core
+      - package: marbles/mixins
