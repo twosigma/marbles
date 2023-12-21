@@ -23,8 +23,8 @@ If you are reporting a bug, please include:
 * Any details about your local setup that might be helpful in troubleshooting.
 * Detailed steps to reproduce the bug.
 
-The `issue template <https://github.com/twosigma/marbles/issues/new>`__ will
-tell you how to collect version information.
+The `issue templates <https://github.com/twosigma/marbles/issues/new/choose>`__
+will tell you how to collect version information.
 
 Fix Bugs
 ~~~~~~~~
@@ -51,7 +51,7 @@ Submit Feedback
 ~~~~~~~~~~~~~~~
 
 The best way to send feedback is to file an issue at
-https://github.com/twosigma/marbles/issues.
+https://github.com/twosigma/marbles/issues/new/choose.
 
 If you are proposing a feature:
 
@@ -174,7 +174,7 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Make
    sure your new functionality is documented with docstrings and appropriate
    additions to the Sphinx docs, and add the feature to the list in README.md.
-3. The pull request should work for Python 3.8, 3.9, 3.10, and 3.11, and on
+3. The pull request should work for Python 3.9, 3.10, 3.11, and 3.12, and on
    Linux, Windows, and OS X. You'll see those checks run in your pull request.
 4. In order to accept your code contributions, please fill out the appropriate
    Contributor License Agreement in the `cla folder

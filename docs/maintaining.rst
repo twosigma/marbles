@@ -96,7 +96,7 @@ too, to make sure your change will build cleanly.
 
 We've configured `nox`_ to be able to:
 
-1. Run all the tests with Python 3.8, 3.9, 3.10, and 3.11
+1. Run all the tests with Python 3.9, 3.10, 3.11, and 3.12
 
 2. Measure and report on code coverage
 
@@ -112,8 +112,8 @@ each in its own virtualenv::
 You can also run a subset of these with ``-s``::
 
     $ nox -s docs
-    $ nox -s test-3.8
-    $ nox -s flake8 coverage-3.8
+    $ nox -s test-3.9
+    $ nox -s flake8 coverage-3.9
 
 VS Code Tasks
 ~~~~~~~~~~~~~

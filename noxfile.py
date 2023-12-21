@@ -22,8 +22,8 @@ else:
 # We should always update with pip-compile using the lowest version of Python
 # so that we get all backport packages we'll need for that.
 
-SUPPORTED_PYTHONS = ('3.8', '3.9', '3.10', '3.11')
-MIN_SUPPORTED_PYTHON = '3.8'
+SUPPORTED_PYTHONS = ('3.9', '3.10', '3.11', '3.12')
+MIN_SUPPORTED_PYTHON = '3.9'
 
 
 # Helper session for integrating well with pip-sync.
