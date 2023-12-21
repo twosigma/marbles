@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.12.2 <2023-12-20>`
 * :support:`144` Support Python 3.11
 * :support:`139` Support Python 3.10
 * :support:`138` Test on Windows
