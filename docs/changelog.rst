@@ -2,6 +2,7 @@
 Changelog
 =========
 
+* :release:`0.12.3 <2023-12-20>`
 * :bug:`128` Properly handle assertion failures during setUp/tearDown
 * :support:`145` Support Python 3.12 (and drop 3.8)
 * :release:`0.12.2 <2023-12-20>`
