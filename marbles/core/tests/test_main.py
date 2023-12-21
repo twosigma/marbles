@@ -243,7 +243,7 @@ class MainWithFailureTestCase(TestScriptRunningTestCase):
     def test_setup_failure_shows_locals(self):
         '''Setup failures should show locals when running with marbles.'''
         if self.run_with_marbles:
-            self.assertRegex(self.stderr, r'Locals:\n.*local_var = 1')
+            self.assertRegex(self.stderr, r'Locals:\r?\n.*local_var = 1')
 
 
 class MainWithErrorTestCase(TestScriptRunningTestCase):
