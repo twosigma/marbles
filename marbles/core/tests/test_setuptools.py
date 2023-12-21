@@ -57,7 +57,7 @@ class TopLevelTestsTestCase(MarblesCommandTestCase):
             r'Ran 2 tests in',
         ]
         for e in expected_lines:
-            self.assertRegexpMatches(self.stderr, e)
+            self.assertRegex(self.stderr, e)
 
     def test_source(self):
         expected_lines = ['Source', 'e = 2', 'self.assertEqual(a, e)']
@@ -84,7 +84,7 @@ class NamespaceTestCase(MarblesCommandTestCase):
             r'Ran 2 tests in',
         ]
         for e in expected_lines:
-            self.assertRegexpMatches(self.stderr, e)
+            self.assertRegex(self.stderr, e)
 
     def test_source(self):
         expected_lines = [
