@@ -23,8 +23,8 @@ If you are reporting a bug, please include:
 * Any details about your local setup that might be helpful in troubleshooting.
 * Detailed steps to reproduce the bug.
 
-The `issue template <https://github.com/twosigma/marbles/issues/new>`__ will
-tell you how to collect version information.
+The `issue templates <https://github.com/twosigma/marbles/issues/new/choose>`__
+will tell you how to collect version information.
 
 Fix Bugs
 ~~~~~~~~
@@ -51,7 +51,7 @@ Submit Feedback
 ~~~~~~~~~~~~~~~
 
 The best way to send feedback is to file an issue at
-https://github.com/twosigma/marbles/issues.
+https://github.com/twosigma/marbles/issues/new/choose.
 
 If you are proposing a feature:
 
@@ -84,28 +84,46 @@ Get Started!
 
 Ready to contribute? Here's how to set up marbles for local development.
 
+Using Devcontainers
+~~~~~~~~~~~~~~~~~~~
+
+We provide a
+`devcontainers <https://code.visualstudio.com/docs/remote/containers>`__ config
+that should get you a working development environment with one gesture. If
+you're new to devcontainers, make sure you have `VS
+Code <https://code.visualstudio.com/>`__ installed with the `Remote
+Containers <https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers>`__
+extension.
+
+Use the ``Remote-Containers: Clone Repository in Container Volume...`` action in
+VS Code to clone the ``twosigma/marbles`` repo. It will set up your development
+environment so you can run ``nox`` and start coding straight away.
+
+Using Codespaces
+~~~~~~~~~~~~~~~~
+
+You can also try this environment in
+`Codespaces <https://github.com/features/codespaces>`__ by creating a codespace
+from the `marbles repo homepage <https://github.com/twosigma/marbles>`__\ .
+
+Developing on Your Own Machine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 1. Fork the marbles repo on GitHub `here
    <https://github.com/twosigma/marbles/fork>`__.
 2. Clone your fork locally::
 
     $ git clone git@github.com:your_name_here/marbles.git
 
-3. Install your local copy into a virtualenv. If you have `pipenv
-   <https://docs.pipenv.org/>`_ installed, you can run::
+3. Install your local copy into a virtualenv. You can run::
 
-    $ cd marbles/
-    $ pipenv install --dev
-    $ pipenv shell
+    $ pip install -r requirements/dev.txt
+    $ pip install -e marbles/core -e marbles/mixins
 
    This will install all of the ``marbles`` development dependencies,
-   install ``marbles`` in development mode, so your changes to the
+   and install ``marbles`` in development mode, so your changes to the
    files in your clone will take effect immediately, and put you in a
    shell where you can run the tests, build the docs, etc.
-
-   If you don't use `pipenv`_, you can get the same effect inside any
-   other virtualenv by running::
-
-    $ pip install -r requirements.txt
 
 4. Create a branch for local development::
 
@@ -121,13 +139,14 @@ Ready to contribute? Here's how to set up marbles for local development.
       repo under :file:`marbles/mixins`.
 
 5. As you make changes, you can run the tests and lint with
-   flake8. These should be run inside the package you've made changes
-   to, so if you've made changes to :mod:`marbles.core`, you should
-   run this::
+   flake8::
 
-    $ cd marbles/core
-    $ python setup.py flake8
-    $ python setup.py test
+    $ nox
+
+   To separately lint or run tests, specify a session::
+
+    $ nox -s flake8
+    $ nox -s test
 
    .. note:: Don't worry about bumping version numbers yourself. We'll
              handle this in the release that includes your changes.
@@ -152,12 +171,11 @@ Pull Request Guidelines
 Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
-2. If the pull request adds functionality, the docs should be updated. Make sure
-   your new functionality is documented with docstrings and appropriate
+2. If the pull request adds functionality, the docs should be updated. Make
+   sure your new functionality is documented with docstrings and appropriate
    additions to the Sphinx docs, and add the feature to the list in README.md.
-3. The pull request should work for Python 3.5, 3.6, and 3.7. Check
-   https://travis-ci.org/twosigma/marbles/pull_requests and make sure
-   that the tests pass for all supported Python versions.
+3. The pull request should work for Python 3.9, 3.10, 3.11, and 3.12, and on
+   Linux, Windows, and OS X. You'll see those checks run in your pull request.
 4. In order to accept your code contributions, please fill out the appropriate
    Contributor License Agreement in the `cla folder
    <https://github.com/twosigma/marbles/tree/master/cla>`__ and submit it to

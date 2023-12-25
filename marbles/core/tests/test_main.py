@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2018 Two Sigma Open Source, LLC
+#  Copyright (c) 2018-2023 Two Sigma Open Source, LLC
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -235,6 +235,15 @@ class MainWithFailureTestCase(TestScriptRunningTestCase):
             self.assertNotIn('Little Bobby Tables', self.stderr)
             self.assertNotIn('endpoint', self.stderr)
             self.assertNotIn('example.com', self.stderr)
+
+    def test_stack_info_handles_setup_failure(self):
+        '''Our stack_info() handles setup failures without crashing.'''
+        self.assertNotIn('_stack.get_stack_info', self.stderr)
+
+    def test_setup_failure_shows_locals(self):
+        '''Setup failures should show locals when running with marbles.'''
+        if self.run_with_marbles:
+            self.assertRegex(self.stderr, r'Locals:\r?\n.*local_var = 1')
 
 
 class MainWithErrorTestCase(TestScriptRunningTestCase):

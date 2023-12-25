@@ -6,5 +6,5 @@ dist/
 coverage.xml
 *.pyc
 .eggs
-.tox/
+.venv/
 **/.DS_Store

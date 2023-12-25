@@ -44,8 +44,8 @@ When we run this test, we'll see ``file_name`` in locals
 
 .. _advanced-note:
 
-Notes
------
+Using Notes
+-----------
 
 Note annotations are intended to help the test author communicate any context or background information they have about the test. For example, what's the context of the edge case this particular test method is exercising? The note annotation is a good place to put information that doesn't fit into the test method name or into the assertion statement.
 
@@ -93,8 +93,8 @@ Custom assertions
 
 :class:`unittest.TestCase`\s expose several assert methods for use in unit tests. These assert methods range from very straightforward assertions like :meth:`~unittest.TestCase.assertTrue` to the more detailed assertions like :meth:`~unittest.TestCase.assertWarnsRegex`. These assertions allow the test author to clearly and concisely assert their expectations.
 
-marbles.mixins
-^^^^^^^^^^^^^^
+Mixins
+^^^^^^
 
 The :mod:`marbles.mixins` package adds even more assertion methods that you can use, including assertions about betweenness, monotonicity, files, etc. For the most part, :mod:`marbles.mixins` assertions trivially wrap :mod:`unittest` assertions. The reason to use specific assertions is that the semantically-richer method names can give the test consumer valuable information about the predicate being tested, the types of the objects being tested, etc. For example, :meth:`~unittest.TestCase.assertRegex` doesn't tell you anything about the string being tested, :meth:`~marbles.mixins.FileMixins.assertFileNameRegex` immediately tells you that the string being tested is a file name.
 
@@ -109,7 +109,7 @@ These custom assertions are provided via mixin classes so that they can use othe
 
     :mod:`marbles.mixins` can be mixed into a :class:`unittest.TestCase`, a :class:`marbles.core.TestCase`, a :class:`marbles.core.AnnotatedTestCase`, or any other class that implements a :class:`unittest.TestCase` interface. To enforce this, mixins define `abstract methods <abc>`_. This means that, when mixing them into your test case, they must come `after` the class(es) that implement those methods instead of appearing first in the inheritance list like normal mixins.
 
-    .. _abc: https://docs.python.org/3.5/library/abc.html#abc.abstractmethod
+    .. _abc: https://docs.python.org/3/library/abc.html#abc.abstractmethod
 
 Writing your own mixins
 ^^^^^^^^^^^^^^^^^^^^^^^

@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2018 Two Sigma Open Source, LLC
+#  Copyright (c) 2018-2023 Two Sigma Open Source, LLC
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -54,6 +54,28 @@ class ResponseTestCase(unittest.TestCase):
         self.assertEqual(
             requests.put(endpoint, data=data).json()['code'],
             201)
+
+
+class SetupFailureTestCase(unittest.TestCase):
+    '''Test when setUp() contains failing assertions.'''
+
+    def setUp(self):
+        local_var = 1
+        self.assertEqual(local_var, 2, 'oh no')
+
+    def test_foo(self):
+        self.assertTrue(True, 'yay')
+
+
+class TeardownFailureTestCase(unittest.TestCase):
+    '''Test when tearDown() contains failing assertions.'''
+
+    def tearDown(self):
+        local_var = 1
+        self.assertEqual(local_var, 2, 'oh no')
+
+    def test_foo(self):
+        self.assertTrue(True, 'yay')
 
 
 if __name__ == '__main__':

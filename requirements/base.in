@@ -1,0 +1,2 @@
+-r ../marbles/core/requirements.txt
+-r ../marbles/mixins/requirements.txt

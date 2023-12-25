@@ -1,0 +1,57 @@
+{
+    "folders": [
+        {
+            "name": "marbles",
+            "path": "."
+        },
+        {
+            "name": "marbles.core",
+            "path": "marbles/core"
+        },
+        {
+            "name": "marbles.mixins",
+            "path": "marbles/mixins"
+        }
+    ],
+    "settings": {
+        "python.testing.unittestArgs": [
+            "discover",
+            "-v",
+            "-s",
+            ".",
+            "-p",
+            "*test*.py"
+        ],
+        "python.testing.pytestEnabled": false,
+        "python.testing.unittestEnabled": true,
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
+            "**/.coverage": true,
+            "**/.coverage.*": true,
+            "**/*.egg-info": true,
+            ".eggs": true,
+            ".nox": true,
+            "**/dist": true,
+            "**/__pycache__": true
+        },
+        "esbonio.sphinx.confDir": "",
+        "git.branchProtection": ["main"]
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.vscode-pylance",
+            "ms-python.flake8",
+            "ms-python.black-formatter",
+            "ms-python.mypy-type-checker",
+            "tamasfe.even-better-toml",
+            "lextudio.restructuredtext",
+            "trond-snekvik.simple-rst"
+        ]
+    }
+}

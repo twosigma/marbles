@@ -10,9 +10,6 @@ marbles
 .. image:: https://img.shields.io/pypi/v/marbles.svg
         :target: https://pypi.python.org/pypi/marbles
 
-.. image:: https://img.shields.io/travis/twosigma/marbles.svg
-        :target: https://travis-ci.org/twosigma/marbles
-
 .. image:: https://readthedocs.org/projects/marbles/badge/?version=latest
         :target: https://marbles.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status

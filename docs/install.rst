@@ -36,8 +36,8 @@ To install marbles with conda
 
    conda install -c conda-forge marbles
 
-Source
-------
+From Source
+-----------
 
 If you need a copy of the source, you can clone the `GitHub`_ repository or download the `tarball`_.
 

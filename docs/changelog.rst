@@ -2,6 +2,13 @@
 Changelog
 =========
 
+* :release:`0.12.3 <2023-12-20>`
+* :bug:`128` Properly handle assertion failures during setUp/tearDown
+* :support:`145` Support Python 3.12 (and drop 3.8)
+* :release:`0.12.2 <2023-12-20>`
+* :support:`144` Support Python 3.11
+* :support:`139` Support Python 3.10
+* :support:`138` Test on Windows
 * :release:`0.12.1 <2020-08-02>`
 * :support:`125` Fix long_description for PyPI
 * :release:`0.12.0 <2020-05-23>`
