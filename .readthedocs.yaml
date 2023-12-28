@@ -11,5 +11,5 @@ sphinx:
 python:
   install:
     - requirements: requirements/docs.txt
-    - package: marbles/core
-    - package: marbles/mixins
+    - path: marbles/core
+    - path: marbles/mixins
