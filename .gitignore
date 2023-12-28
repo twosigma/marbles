@@ -7,3 +7,4 @@ coverage.xml
 *.pyc
 .eggs
 .venv/
+**/.DS_Store

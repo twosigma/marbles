@@ -171,7 +171,7 @@ class AnnotationError(Exception):
 
 
 class ContextualAssertionError(AssertionError):
-    '''Extends :class:`AssertionError` to accept and display additiona
+    '''Extends :class:`AssertionError` to accept and display additional
     information beyond the static ``msg`` parameter provided by
     :mod:`unittest` assertions.
 
@@ -526,7 +526,7 @@ class TestCase(unittest.TestCase):
     Example:
 
     .. literalinclude:: examples/getting_started.py.annotated
-       :lines: 1-4,26-43
+       :lines: 1-4,33-44
     '''
 
     failureException = ContextualAssertionError
