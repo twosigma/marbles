@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2018-2023 Two Sigma Open Source, LLC
+#  Copyright (c) 2018-2024 Two Sigma Open Source, LLC
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to

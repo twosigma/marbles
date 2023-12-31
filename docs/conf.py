@@ -60,7 +60,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'marbles'
-copyright = '2018-2023, Two Sigma Open Source, LLC'
+copyright = '2018-2024, Two Sigma Open Source, LLC'
 author = 'Jane Adams and Leif Walsh'
 
 # The version info for the project you're documenting, acts as replacement for
