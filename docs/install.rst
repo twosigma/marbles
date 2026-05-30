@@ -57,7 +57,7 @@ Tarball
 
 .. code-block:: bash
 
-   curl -OL https://github.com/twosigma/marbles/tarball/master
+   curl -OL https://github.com/twosigma/marbles/tarball/main
    tar xvzf /path/to/archive.tar.gz
    cd marbles
    pip install .

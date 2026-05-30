@@ -128,7 +128,7 @@ The marbles :doc:`changelog` is maintained by the Sphinx plugin
 `releases`_, and its source is in :file:`docs/changelog.rst`.
 
 Most pull requests should add an item to the `changelog
-<https://github.com/twosigma/marbles/blob/master/docs/changelog.rst>`__,
+<https://github.com/twosigma/marbles/blob/main/docs/changelog.rst>`__,
 at the top, either a bug, feature, or support note.
 
 .. note::
@@ -148,7 +148,7 @@ at the top, either a bug, feature, or support note.
 
 Right before releasing a new version of marbles, add a release item to
 the top of the `changelog
-<https://github.com/twosigma/marbles/blob/master/docs/changelog.rst>`__
+<https://github.com/twosigma/marbles/blob/main/docs/changelog.rst>`__
 noting the version string and release date, then follow the below
 instructions on `Releasing a new version`_.
 

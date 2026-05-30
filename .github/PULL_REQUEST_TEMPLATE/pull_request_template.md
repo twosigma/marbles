@@ -9,11 +9,11 @@ _What new tests were added to cover new features or behaviors?_
 
 ## Checklist
 _Make sure you did the following (if applicable):_
-- [ ] Signed and returned a copy of the [CLA](https://github.com/twosigma/marbles/tree/master/cla)
+- [ ] Signed and returned a copy of the [CLA](https://github.com/twosigma/marbles/tree/main/cla)
 - [ ] Added tests for any new features or behaviors
 - [ ] Ran ``nox -s flake8`` to make sure code style is consistent
 - [ ] Built and reviewed the docs
-- [ ] Added a note to the [changelog](https://github.com/twosigma/marbles/blob/master/docs/changelog.rst)
+- [ ] Added a note to the [changelog](https://github.com/twosigma/marbles/blob/main/docs/changelog.rst)
 
 #### Open Questions and Pre-Merge TODOs
 - [ ] Use GitHub checklists. When solved, check the box and explain the answer.

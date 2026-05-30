@@ -178,5 +178,5 @@ Before you submit a pull request, check that it meets these guidelines:
    Linux, Windows, and OS X. You'll see those checks run in your pull request.
 4. In order to accept your code contributions, please fill out the appropriate
    Contributor License Agreement in the `cla folder
-   <https://github.com/twosigma/marbles/tree/master/cla>`__ and submit it to
+   <https://github.com/twosigma/marbles/tree/main/cla>`__ and submit it to
    tsos@twosigma.com. We need this before we can accept your pull request.
