@@ -525,8 +525,7 @@ class TestCase(unittest.TestCase):
 
     Example:
 
-    .. literalinclude:: examples/getting_started.py.annotated
-       :lines: 1-4,33-44
+    .. literalinclude:: examples/catalog_data.py
     '''
 
     failureException = ContextualAssertionError
