@@ -3,6 +3,8 @@ Changelog
 =========
 
 * :release:`0.12.3 <2023-12-20>`
+* :bug:`74` Support uniqueness assertions for iterable containers that do not
+  support slicing
 * :bug:`128` Properly handle assertion failures during setUp/tearDown
 * :support:`145` Support Python 3.12 (and drop 3.8)
 * :release:`0.12.2 <2023-12-20>`

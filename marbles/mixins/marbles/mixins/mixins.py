@@ -359,6 +359,15 @@ class UniqueMixins(abc.ABC):
     elements.
     '''
 
+    @staticmethod
+    def _unique(container):
+        seen = []
+        for elem in container:
+            if elem in seen:
+                return False
+            seen.append(elem)
+        return True
+
     @abc.abstractmethod
     def fail(self, msg):
         pass  # pragma: no cover
@@ -391,14 +400,8 @@ class UniqueMixins(abc.ABC):
 
         standardMsg = 'Elements in %s are not unique' % (container,)
 
-        # We iterate over each element in the container instead of
-        # comparing len(container) == len(set(container)) to allow
-        # for containers that contain unhashable types
-        for idx, elem in enumerate(container):
-            # If elem appears at an earlier or later index position
-            # the elements are not unique
-            if elem in container[:idx] or elem in container[idx+1:]:
-                self.fail(self._formatMessage(msg, standardMsg))
+        if not self._unique(container):
+            self.fail(self._formatMessage(msg, standardMsg))
 
     def assertNotUnique(self, container, msg=None):
         '''Fail if elements in ``container`` are unique.
@@ -420,16 +423,8 @@ class UniqueMixins(abc.ABC):
 
         standardMsg = 'Elements in %s are unique' % (container,)
 
-        # We iterate over each element in the container instead of
-        # comparing len(container) == len(set(container)) to allow
-        # for containers that contain unhashable types
-        for idx, elem in enumerate(container):
-            # If elem appears at an earlier or later index position
-            # the elements are not unique
-            if elem in container[:idx] or elem in container[idx+1:]:
-                return  # succeed fast
-
-        self.fail(self._formatMessage(msg, standardMsg))
+        if self._unique(container):
+            self.fail(self._formatMessage(msg, standardMsg))
 
 
 class FileMixins(abc.ABC):
