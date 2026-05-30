@@ -23,6 +23,7 @@
 import operator
 import os
 import unittest
+from collections import deque
 from unittest import mock
 from datetime import date, datetime, timedelta, timezone
 
@@ -266,6 +267,21 @@ class TestUniqueMixins(unittest.TestCase):
         msg = 'Elements in %s are unique' % ([set([1, 2, 3]), set([2, 3, 4])],)
         with self.assertRaises(AssertionError) as e:
             self.kls.assertNotUnique([set([1, 2, 3]), set([2, 3, 4])])
+        self.assertEqual(e.exception.args[0], msg)
+
+        # containers that are iterable but do not support slicing
+        self.kls.assertUnique(deque([1, 2, 3]))
+
+        msg = 'Elements in %s are not unique' % (deque([1, 2, 1]),)
+        with self.assertRaises(AssertionError) as e:
+            self.kls.assertUnique(deque([1, 2, 1]))
+        self.assertEqual(e.exception.args[0], msg)
+
+        self.kls.assertNotUnique(deque([1, 2, 1]))
+
+        msg = 'Elements in %s are unique' % (deque([1, 2, 3]),)
+        with self.assertRaises(AssertionError) as e:
+            self.kls.assertNotUnique(deque([1, 2, 3]))
         self.assertEqual(e.exception.args[0], msg)
 
 
