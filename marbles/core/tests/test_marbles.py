@@ -315,11 +315,20 @@ class ExampleTestCaseMixin(
     def assertTruthyWithoutMessage(self, value):
         self.assertTrue(value)
 
+    def assertPassthroughEqual(self, *args, **kwargs):
+        self.assertEqual(*args, **kwargs)
+
     def test_assertion_without_msg_success(self):
         self.assertTruthyWithoutMessage(True, note='some note')
 
     def test_assertion_without_msg_failure(self):
         self.assertTruthyWithoutMessage(False, note='some note')
+
+    def test_passthrough_assertion_success(self):
+        self.assertPassthroughEqual(1, 1, note='some note')
+
+    def test_passthrough_assertion_failure(self):
+        self.assertPassthroughEqual(1, 2, note='some note')
 
 
 @unittest.skip('This is the TestCase being tested')
@@ -447,6 +456,12 @@ class InterfaceTestCase(MarblesTestCase):
         self.case.test_assertion_without_msg_success()
         with self.assertRaises(ContextualAssertionError):
             self.case.test_assertion_without_msg_failure()
+
+    def test_passthrough_assertion_ok(self):
+        '''Can marbles run pure passthrough custom assertions?'''
+        self.case.test_passthrough_assertion_success()
+        with self.assertRaises(ContextualAssertionError):
+            self.case.test_passthrough_assertion_failure()
 
     def test_missing_annotation(self):
         '''Does marbles check for missing annotations?'''
