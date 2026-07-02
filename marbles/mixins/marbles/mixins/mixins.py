@@ -181,7 +181,17 @@ class MonotonicMixins(abc.ABC):
 
     @staticmethod
     def _monotonic(op, sequence):
-        return all(op(i, j) for i, j in zip(sequence, sequence[1:]))
+        elements = iter(sequence)
+        try:
+            previous = next(elements)
+        except StopIteration:
+            return True
+
+        for current in elements:
+            if not op(previous, current):
+                return False
+            previous = current
+        return True
 
     def assertMonotonicIncreasing(self, sequence, strict=True, msg=None):
         '''Fail if ``sequence`` is not monotonically increasing.
@@ -371,6 +381,15 @@ class UniqueMixins(abc.ABC):
     def _formatMessage(self, msg, standardMsg):
         pass  # pragma: no cover
 
+    @staticmethod
+    def _contains_duplicates(elements):
+        previous = []
+        for elem in elements:
+            if elem in previous:
+                return True
+            previous.append(elem)
+        return False
+
     def assertUnique(self, container, msg=None):
         '''Fail if elements in ``container`` are not unique.
 
@@ -394,11 +413,8 @@ class UniqueMixins(abc.ABC):
         # We iterate over each element in the container instead of
         # comparing len(container) == len(set(container)) to allow
         # for containers that contain unhashable types
-        for idx, elem in enumerate(container):
-            # If elem appears at an earlier or later index position
-            # the elements are not unique
-            if elem in container[:idx] or elem in container[idx+1:]:
-                self.fail(self._formatMessage(msg, standardMsg))
+        if self._contains_duplicates(container):
+            self.fail(self._formatMessage(msg, standardMsg))
 
     def assertNotUnique(self, container, msg=None):
         '''Fail if elements in ``container`` are unique.
@@ -423,11 +439,8 @@ class UniqueMixins(abc.ABC):
         # We iterate over each element in the container instead of
         # comparing len(container) == len(set(container)) to allow
         # for containers that contain unhashable types
-        for idx, elem in enumerate(container):
-            # If elem appears at an earlier or later index position
-            # the elements are not unique
-            if elem in container[:idx] or elem in container[idx+1:]:
-                return  # succeed fast
+        if self._contains_duplicates(container):
+            return  # succeed fast
 
         self.fail(self._formatMessage(msg, standardMsg))
 
@@ -1150,10 +1163,13 @@ class CategoricalMixins(abc.ABC):
 
         standardMsg = '%s levels != %s levels' % (levels1, levels2)
 
-        if not all(level in levels2 for level in levels1):
+        levels1_values = list(levels1)
+        levels2_values = list(levels2)
+
+        if not all(level in levels2_values for level in levels1_values):
             self.fail(self._formatMessage(msg, standardMsg))
 
-        if not all(level in levels1 for level in levels2):
+        if not all(level in levels1_values for level in levels2_values):
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertCategoricalLevelsNotEqual(self, levels1, levels2, msg=None):
@@ -1179,11 +1195,14 @@ class CategoricalMixins(abc.ABC):
 
         standardMsg = '%s levels == %s levels' % (levels1, levels2)
 
+        levels1_values = list(levels1)
+        levels2_values = list(levels2)
+
         unshared_levels = False
-        if not all(level in levels2 for level in levels1):
+        if not all(level in levels2_values for level in levels1_values):
             unshared_levels = True
 
-        if not all(level in levels1 for level in levels2):
+        if not all(level in levels1_values for level in levels2_values):
             unshared_levels = True
 
         if not unshared_levels:
@@ -1257,6 +1276,14 @@ class DateTimeMixins(abc.ABC):
     def assertIsNotNone(self, obj, msg):
         pass  # pragma: no cover
 
+    @staticmethod
+    def _present_for_date_time(element):
+        if isinstance(element, datetime):
+            return datetime.today()
+        if isinstance(element, date):
+            return date.today()
+        raise TypeError('Expected iterable of datetime or date objects')
+
     def assertDateTimesBefore(self, sequence, target, strict=True, msg=None):
         '''Fail if any elements in ``sequence`` are not before
         ``target``.
@@ -1303,15 +1330,20 @@ class DateTimeMixins(abc.ABC):
         # Null date(time)s will always compare False, but
         # we want to know about null date(time)s
         if isinstance(target, collections.abc.Iterable):
-            if len(target) != len(sequence):
+            sequence_values = list(sequence)
+            target_values = list(target)
+            if len(target_values) != len(sequence_values):
                 raise ValueError(('Length mismatch: '
                                   'first argument contains %s elements, '
                                   'second argument contains %s elements' % (
-                                      len(sequence), len(target))))
-            if not all(op(i, j) for i, j in zip(sequence, target)):
+                                      len(sequence_values),
+                                      len(target_values))))
+            if not all(op(i, j)
+                       for i, j in zip(sequence_values, target_values)):
                 self.fail(self._formatMessage(msg, standardMsg))
         elif isinstance(target, (date, datetime)):
-            if not all(op(element, target) for element in sequence):
+            sequence_values = list(sequence)
+            if not all(op(element, target) for element in sequence_values):
                 self.fail(self._formatMessage(msg, standardMsg))
         else:
             raise TypeError(
@@ -1364,15 +1396,20 @@ class DateTimeMixins(abc.ABC):
         # Null date(time)s will always compare False, but
         # we want to know about null date(time)s
         if isinstance(target, collections.abc.Iterable):
-            if len(target) != len(sequence):
+            sequence_values = list(sequence)
+            target_values = list(target)
+            if len(target_values) != len(sequence_values):
                 raise ValueError(('Length mismatch: '
                                   'first argument contains %s elements, '
                                   'second argument contains %s elements' % (
-                                      len(sequence), len(target))))
-            if not all(op(i, j) for i, j in zip(sequence, target)):
+                                      len(sequence_values),
+                                      len(target_values))))
+            if not all(op(i, j)
+                       for i, j in zip(sequence_values, target_values)):
                 self.fail(self._formatMessage(msg, standardMsg))
         elif isinstance(target, (date, datetime)):
-            if not all(op(element, target) for element in sequence):
+            sequence_values = list(sequence)
+            if not all(op(element, target) for element in sequence_values):
                 self.fail(self._formatMessage(msg, standardMsg))
         else:
             raise TypeError(
@@ -1410,16 +1447,11 @@ class DateTimeMixins(abc.ABC):
         if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
-        # Cannot compare datetime to date, so if dates are provided use
-        # date.today(), if datetimes are provided use datetime.today()
-        if isinstance(max(sequence), datetime):
-            target = datetime.today()
-        elif isinstance(max(sequence), date):
-            target = date.today()
-        else:
-            raise TypeError('Expected iterable of datetime or date objects')
+        sequence_values = list(sequence)
+        target = self._present_for_date_time(max(sequence_values))
 
-        self.assertDateTimesBefore(sequence, target, strict=strict, msg=msg)
+        self.assertDateTimesBefore(
+            sequence_values, target, strict=strict, msg=msg)
 
     def assertDateTimesFuture(self, sequence, strict=True, msg=None):
         '''Fail if any elements in ``sequence`` are not in the future.
@@ -1453,16 +1485,11 @@ class DateTimeMixins(abc.ABC):
         if not isinstance(sequence, collections.abc.Iterable):
             raise TypeError('First argument is not iterable')
 
-        # Cannot compare datetime to date, so if dates are provided use
-        # date.today(), if datetimes are provided use datetime.today()
-        if isinstance(min(sequence), datetime):
-            target = datetime.today()
-        elif isinstance(min(sequence), date):
-            target = date.today()
-        else:
-            raise TypeError('Expected iterable of datetime or date objects')
+        sequence_values = list(sequence)
+        target = self._present_for_date_time(min(sequence_values))
 
-        self.assertDateTimesAfter(sequence, target, strict=strict, msg=msg)
+        self.assertDateTimesAfter(
+            sequence_values, target, strict=strict, msg=msg)
 
     def assertDateTimesFrequencyEqual(self, sequence, frequency, msg=None):
         '''Fail if any elements in ``sequence`` aren't separated by
@@ -1535,16 +1562,11 @@ class DateTimeMixins(abc.ABC):
         if not isinstance(lag, timedelta):
             raise TypeError('Second argument is not a timedelta object')
 
-        # Cannot compare datetime to date, so if dates are provided use
-        # date.today(), if datetimes are provided use datetime.today()
-        if isinstance(max(sequence), datetime):
-            target = datetime.today()
-        elif isinstance(max(sequence), date):
-            target = date.today()
-        else:
-            raise TypeError('Expected iterable of datetime or date objects')
+        sequence_values = list(sequence)
+        most_recent = max(sequence_values)
+        target = self._present_for_date_time(most_recent)
 
-        self.assertEqual(target - max(sequence), lag, msg=msg)
+        self.assertEqual(target - most_recent, lag, msg=msg)
 
     def assertDateTimesLagLess(self, sequence, lag, msg=None):
         '''Fail if max element in ``sequence`` is separated from
@@ -1581,16 +1603,11 @@ class DateTimeMixins(abc.ABC):
         if not isinstance(lag, timedelta):
             raise TypeError('Second argument is not a timedelta object')
 
-        # Cannot compare datetime to date, so if dates are provided use
-        # date.today(), if datetimes are provided use datetime.today()
-        if isinstance(max(sequence), datetime):
-            target = datetime.today()
-        elif isinstance(max(sequence), date):
-            target = date.today()
-        else:
-            raise TypeError('Expected iterable of datetime or date objects')
+        sequence_values = list(sequence)
+        most_recent = max(sequence_values)
+        target = self._present_for_date_time(most_recent)
 
-        self.assertLess(target - max(sequence), lag, msg=msg)
+        self.assertLess(target - most_recent, lag, msg=msg)
 
     def assertDateTimesLagLessEqual(self, sequence, lag, msg=None):
         '''Fail if max element in ``sequence`` is separated from
@@ -1627,16 +1644,11 @@ class DateTimeMixins(abc.ABC):
         if not isinstance(lag, timedelta):
             raise TypeError('Second argument is not a timedelta object')
 
-        # Cannot compare datetime to date, so if dates are provided use
-        # date.today(), if datetimes are provided use datetime.today()
-        if isinstance(max(sequence), datetime):
-            target = datetime.today()
-        elif isinstance(max(sequence), date):
-            target = date.today()
-        else:
-            raise TypeError('Expected iterable of datetime or date objects')
+        sequence_values = list(sequence)
+        most_recent = max(sequence_values)
+        target = self._present_for_date_time(most_recent)
 
-        self.assertLessEqual(target - max(sequence), lag, msg=msg)
+        self.assertLessEqual(target - most_recent, lag, msg=msg)
 
     def assertTimeZoneIsNone(self, dt, msg=None):
         '''Fail if ``dt`` has a non-null ``tzinfo`` attribute.

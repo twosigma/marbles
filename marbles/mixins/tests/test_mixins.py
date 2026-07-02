@@ -149,6 +149,26 @@ class TestMonotonicMixins(unittest.TestCase):
         # If there are no elements in the sequence it's monotonic
         self.assertTrue(self.kls._monotonic(operator.le, []))
 
+    def test_assert_monotonic_non_indexable_iterables(self):
+        self.kls.assertMonotonicIncreasing(iter(self.seqstrict), strict=True)
+        self.kls.assertMonotonicIncreasing(
+            {'a': 1, 'b': 2, 'c': 3}.values(), strict=True)
+        self.kls.assertMonotonicDecreasing(iter(self.seqrevstrict),
+                                           strict=True)
+
+        self.kls.assertNotMonotonicIncreasing(iter(self.seqrevstrict),
+                                              strict=True)
+        self.kls.assertNotMonotonicDecreasing(iter(self.seqstrict),
+                                              strict=True)
+
+        with self.assertRaises(AssertionError):
+            self.kls.assertMonotonicIncreasing(iter(self.seqrev),
+                                               strict=False)
+
+        with self.assertRaises(AssertionError):
+            self.kls.assertMonotonicDecreasing(iter(self.seq),
+                                               strict=False)
+
     def test_assert_monotonic_increasing(self):
         self.kls.assertMonotonicIncreasing(self.seqstrict, strict=True)
         self.kls.assertMonotonicIncreasing(self.seq, strict=False)
@@ -266,6 +286,25 @@ class TestUniqueMixins(unittest.TestCase):
         msg = 'Elements in %s are unique' % ([set([1, 2, 3]), set([2, 3, 4])],)
         with self.assertRaises(AssertionError) as e:
             self.kls.assertNotUnique([set([1, 2, 3]), set([2, 3, 4])])
+        self.assertEqual(e.exception.args[0], msg)
+
+    def test_assert_unique_non_indexable_iterables(self):
+        self.kls.assertUnique(iter(self.sequnique))
+        self.kls.assertUnique({1, 2, 3})
+        self.kls.assertUnique({'a': 1, 'b': 2}.values())
+
+        duplicate_values = {'a': 1, 'b': 1}.values()
+        msg = 'Elements in %s are not unique' % (duplicate_values,)
+        with self.assertRaises(AssertionError) as e:
+            self.kls.assertUnique(duplicate_values)
+        self.assertEqual(e.exception.args[0], msg)
+
+        self.kls.assertNotUnique(iter(self.seq))
+
+        unique_values = {'a': 1, 'b': 2}.values()
+        msg = 'Elements in %s are unique' % (unique_values,)
+        with self.assertRaises(AssertionError) as e:
+            self.kls.assertNotUnique(unique_values)
         self.assertEqual(e.exception.args[0], msg)
 
 
@@ -829,6 +868,24 @@ class TestCategoricalMixins(unittest.TestCase):
                                                      [set([1, 2, 3])])
         self.assertEqual(e.exception.args[0], msg)
 
+    def test_assert_categorical_level_equalities_with_generators(self):
+        self.kls.assertCategoricalLevelsEqual(
+            (level for level in self.levels1),
+            (level for level in self.levels2))
+        self.kls.assertCategoricalLevelsNotEqual(
+            (level for level in self.levels1),
+            (level for level in self.levels3))
+
+        with self.assertRaises(AssertionError):
+            self.kls.assertCategoricalLevelsEqual(
+                (level for level in self.levels1),
+                (level for level in self.levels3))
+
+        with self.assertRaises(AssertionError):
+            self.kls.assertCategoricalLevelsNotEqual(
+                (level for level in self.levels1),
+                (level for level in self.levels2))
+
     def test_trivial_asserts(self):
         assert_map = {
             self.kls.assertCategoricalLevelIn: 'assertIn',
@@ -1032,6 +1089,21 @@ class TestDateTimeMixins(unittest.TestCase):
             self.kls.assertDateTimesBefore(self.fdates, target, strict=False)
         self.assertEqual(e.exception.args[0], msg % (self.fdates, target))
 
+    def test_before_with_generators(self):
+        self.kls.assertDateTimesBefore(
+            (dt for dt in self.pdates),
+            (dt for dt in self.fdates))
+
+        self.kls.assertDateTimesBefore(
+            (dt for dt in self.pdates),
+            datetime.now(),
+            strict=False)
+
+        with self.assertRaises(ValueError):
+            self.kls.assertDateTimesBefore(
+                (dt for dt in self.pdates),
+                (dt for dt in self.fdates[:-1]))
+
     def test_after(self):
         # sequence of targets provided
         self.kls.assertDateTimesAfter(self.fdates, self.pdates)
@@ -1089,6 +1161,21 @@ class TestDateTimeMixins(unittest.TestCase):
             self.kls.assertDateTimesAfter(self.pdates, target, strict=False)
         self.assertEqual(e.exception.args[0], msg % (self.pdates, target))
 
+    def test_after_with_generators(self):
+        self.kls.assertDateTimesAfter(
+            (dt for dt in self.fdates),
+            (dt for dt in self.pdates))
+
+        self.kls.assertDateTimesAfter(
+            (dt for dt in self.fdates),
+            datetime.now(),
+            strict=False)
+
+        with self.assertRaises(ValueError):
+            self.kls.assertDateTimesAfter(
+                (dt for dt in self.fdates),
+                (dt for dt in self.pdates[:-1]))
+
     @mock.patch.object(mixins.DateTimeMixins, 'assertDateTimesBefore')
     def test_past(self, mock_assert_before):
         target = date.today()
@@ -1108,6 +1195,16 @@ class TestDateTimeMixins(unittest.TestCase):
 
         self.assertIsInstance(mock_assert_before.call_args[0][1], date)
         self.assertEqual(mock_assert_before.call_args[0][1], target)
+
+    @mock.patch.object(mixins.DateTimeMixins, 'assertDateTimesBefore')
+    def test_past_with_generators(self, mock_assert_before):
+        target = date.today()
+
+        self.kls.assertDateTimesPast(dt for dt in self.pdates)
+        self.assertEqual(mock_assert_before.call_args[0][0], self.pdates)
+
+        self.assertIsInstance(mock_assert_before.call_args[0][1], datetime)
+        self.assertEqual(mock_assert_before.call_args[0][1].date(), target)
 
     @mock.patch.object(mixins.DateTimeMixins, 'assertDateTimesAfter')
     def test_future(self, mock_assert_after):
@@ -1129,6 +1226,16 @@ class TestDateTimeMixins(unittest.TestCase):
         self.assertIsInstance(mock_assert_after.call_args[0][1], date)
         self.assertEqual(mock_assert_after.call_args[0][1], target)
 
+    @mock.patch.object(mixins.DateTimeMixins, 'assertDateTimesAfter')
+    def test_future_with_generators(self, mock_assert_after):
+        target = date.today()
+
+        self.kls.assertDateTimesFuture(dt for dt in self.fdates)
+        self.assertEqual(mock_assert_after.call_args[0][0], self.fdates)
+
+        self.assertIsInstance(mock_assert_after.call_args[0][1], datetime)
+        self.assertEqual(mock_assert_after.call_args[0][1].date(), target)
+
     def test_frequency(self):
         self.pdates = [x.date() for x in self.pdates]
         self.fdates = [x.date() for x in self.fdates]
@@ -1145,6 +1252,12 @@ class TestDateTimeMixins(unittest.TestCase):
         with self.assertRaises(AssertionError) as e:
             self.kls.assertDateTimesFrequencyEqual(self.pdates, timedelta(2))
         self.assertEqual(e.exception.args[0], msg % (self.pdates,))
+
+    def test_frequency_with_generators(self):
+        self.pdates = [x.date() for x in self.pdates]
+
+        self.kls.assertDateTimesFrequencyEqual(
+            (dt for dt in self.pdates), timedelta(1))
 
     def test_lag(self):
         with mock.patch.object(unittest.TestCase, 'assertEqual') as m:
@@ -1192,6 +1305,23 @@ class TestDateTimeMixins(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             self.kls.assertDateTimesLagLess(self.pdates, timedelta(0))
+
+    def test_lag_with_generators(self):
+        with mock.patch.object(unittest.TestCase, 'assertEqual') as m:
+            diff = datetime.now() - max(self.pdates)
+            self.kls.assertDateTimesLagEqual(
+                (dt for dt in self.pdates), diff)
+            self.assertTrue(m.called)
+
+        with mock.patch.object(unittest.TestCase, 'assertLess') as m:
+            self.kls.assertDateTimesLagLess(
+                (dt for dt in self.pdates), timedelta(2))
+            self.assertTrue(m.called)
+
+        with mock.patch.object(unittest.TestCase, 'assertLessEqual') as m:
+            self.kls.assertDateTimesLagLessEqual(
+                (dt for dt in self.pdates), timedelta(2))
+            self.assertTrue(m.called)
 
     def test_assert_time_zone_equalities(self):
         with mock.patch.object(unittest.TestCase, 'assertIsNone') as m:
