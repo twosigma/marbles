@@ -312,6 +312,15 @@ class ExampleTestCaseMixin(
         note = 'the date is {dt:%Y%m%d}'
         self.assertTrue(False, note=note)
 
+    def assertTruthyWithoutMessage(self, value):
+        self.assertTrue(value)
+
+    def test_assertion_without_msg_success(self):
+        self.assertTruthyWithoutMessage(True, note='some note')
+
+    def test_assertion_without_msg_failure(self):
+        self.assertTruthyWithoutMessage(False, note='some note')
+
 
 @unittest.skip('This is the TestCase being tested')
 class ExampleTestCase(TestCase, ExampleTestCaseMixin):
@@ -432,6 +441,12 @@ class InterfaceTestCase(MarblesTestCase):
         self.case.test_odd_argument_order_success()
         with self.assertRaises(ContextualAssertionError):
             self.case.test_odd_argument_order_failure()
+
+    def test_assertion_without_msg_ok(self):
+        '''Can marbles run custom assertions that do not accept msg?'''
+        self.case.test_assertion_without_msg_success()
+        with self.assertRaises(ContextualAssertionError):
+            self.case.test_assertion_without_msg_failure()
 
     def test_missing_annotation(self):
         '''Does marbles check for missing annotations?'''

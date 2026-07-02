@@ -477,6 +477,14 @@ def _find_msg_argument(signature):
     return msg_idx, default_msg, non_msg_params
 
 
+def _accepts_msg(signature):
+    '''Does this signature accept a ``msg`` keyword argument?'''
+    if 'msg' in signature.parameters:
+        return True
+    return any(param.kind == inspect.Parameter.VAR_KEYWORD
+               for param in signature.parameters.values())
+
+
 def _extract_msg(args, kwargs, msg_idx, default_msg, non_msg_params):
     '''Extracts the ``msg`` argument from the passed ``args``.
 
@@ -539,6 +547,7 @@ class TestCase(unittest.TestCase):
     def __wrap_assertion(self, attr):
         signature = inspect.signature(attr)
         msg_idx, default_msg, non_msg_params = _find_msg_argument(signature)
+        accepts_msg = _accepts_msg(signature)
 
         @functools.wraps(attr)
         def wrapper(*args, **kwargs):
@@ -552,7 +561,9 @@ class TestCase(unittest.TestCase):
                     list(args) + list(rem_args), kwargs) as annotation:
                 if rem_args:
                     return attr(*args, annotation, *rem_args, **kwargs)
-                return attr(*args, msg=annotation, **kwargs)
+                if accepts_msg:
+                    return attr(*args, msg=annotation, **kwargs)
+                return attr(*args, **kwargs)
         return wrapper
 
     def __wrap_fail(self, attr):
