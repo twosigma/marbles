@@ -330,6 +330,16 @@ class ExampleTestCaseMixin(
     def test_passthrough_assertion_failure(self):
         self.assertPassthroughEqual(1, 2, note='some note')
 
+    def test_assert_logs_failure(self):
+        with self.assertLogs('marbles.tests', level='INFO',
+                             note='some note'):
+            pass
+
+    def test_assert_no_logs_failure(self):
+        with self.assertNoLogs('marbles.tests', level='INFO',
+                               note='some note'):
+            logging.getLogger('marbles.tests').info('test record')
+
 
 @unittest.skip('This is the TestCase being tested')
 class ExampleTestCase(TestCase, ExampleTestCaseMixin):
@@ -456,6 +466,22 @@ class InterfaceTestCase(MarblesTestCase):
         self.case.test_assertion_without_msg_success()
         with self.assertRaises(ContextualAssertionError):
             self.case.test_assertion_without_msg_failure()
+
+    def test_assert_logs_without_msg_ok(self):
+        '''Can marbles run assertLogs and preserve annotations?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_assert_logs_failure()
+        e = ar.exception
+        self.assertEqual(e.note.strip(), 'some note')
+
+    @unittest.skipUnless(hasattr(unittest.TestCase, 'assertNoLogs'),
+                         'assertNoLogs is unavailable')
+    def test_assert_no_logs_without_msg_ok(self):
+        '''Can marbles run assertNoLogs and preserve annotations?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_assert_no_logs_failure()
+        e = ar.exception
+        self.assertEqual(e.note.strip(), 'some note')
 
     def test_passthrough_assertion_ok(self):
         '''Can marbles run pure passthrough custom assertions?'''

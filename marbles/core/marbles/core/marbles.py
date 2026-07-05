@@ -572,7 +572,10 @@ class TestCase(unittest.TestCase):
                     return attr(*args, annotation, *rem_args, **kwargs)
                 if accepts_msg:
                     return attr(*args, msg=annotation, **kwargs)
-                return attr(*args, **kwargs)
+                result = attr(*args, **kwargs)
+                if hasattr(result, 'msg'):
+                    result.msg = annotation
+                return result
         return wrapper
 
     def __wrap_fail(self, attr):
