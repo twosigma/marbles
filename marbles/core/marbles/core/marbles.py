@@ -61,6 +61,7 @@ import re
 import sys
 import textwrap
 import unittest
+import unittest.util
 
 from . import log
 from . import _stack
@@ -338,7 +339,7 @@ Source ({filename}):
 
     @classmethod
     def _format_local(cls, name, value):
-        value_str = repr(value)
+        value_str = unittest.util.safe_repr(value, short=True)
         if '\n' in value_str:
             value_str = textwrap.indent(value_str, '\t\t')
             return '\t{0} =\n{1}'.format(name, value_str)

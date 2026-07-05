@@ -506,6 +506,15 @@ class TestContextualAssertionError(MarblesTestCase):
         self.assertIn("\n\t\t  a = 1,\n",
                       e._format_locals(e.public_test_locals))
 
+    def test_long_locals_truncated(self):
+        '''Are locals with long reprs truncated?'''
+        value = 'x' * 200
+        expected_repr = unittest.util.safe_repr(value, short=True)
+        formatted = ContextualAssertionError._format_local('value', value)
+
+        self.assertEqual('\tvalue = {0}'.format(expected_repr), formatted)
+        self.assertLess(len(expected_repr), len(repr(value)))
+
     def test_assert_raises_without_msg(self):
         '''Do we capture annotations properly for assertRaises?'''
         with self.assertRaises(ContextualAssertionError) as ar:
