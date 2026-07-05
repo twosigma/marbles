@@ -454,13 +454,20 @@ def _find_msg_argument(signature):
         msg_idx = list(names).index('msg')
         default_msg = signature.parameters['msg'].default
     except ValueError:  # 'msg' is not in list
-        # It's likely that this is a custom assertion that's just
-        # passing all remaining args and kwargs through
-        # (e.g. tests.marbles.ReversingTestCaseMixin). Unfortunately,
-        # we can't inspect its code to find the assert it's wrapping,
-        # so we just have to assume it's of the standard form with msg
-        # in the last position with a default of None.
-        msg_idx = -1
+        # It's likely that this is a custom assertion that's passing
+        # args and kwargs through (e.g.
+        # tests.marbles.ReversingTestCaseMixin). Unfortunately, we
+        # can't inspect its code to find the assert it's wrapping. If
+        # it accepts only varargs, pass positional args through and let
+        # the wrapped assertion find its own msg argument. Otherwise,
+        # assume it's of the standard form with msg in the last
+        # position with a default of None.
+        if all(param.kind in (inspect.Parameter.VAR_POSITIONAL,
+                              inspect.Parameter.VAR_KEYWORD)
+               for param in signature.parameters.values()):
+            msg_idx = None
+        else:
+            msg_idx = -1
         default_msg = None
 
     # We also don't want to steal any actually positional arguments if
@@ -477,6 +484,14 @@ def _find_msg_argument(signature):
     return msg_idx, default_msg, non_msg_params
 
 
+def _accepts_msg(signature):
+    '''Does this signature accept a ``msg`` keyword argument?'''
+    if 'msg' in signature.parameters:
+        return True
+    return any(param.kind == inspect.Parameter.VAR_KEYWORD
+               for param in signature.parameters.values())
+
+
 def _extract_msg(args, kwargs, msg_idx, default_msg, non_msg_params):
     '''Extracts the ``msg`` argument from the passed ``args``.
 
@@ -489,7 +504,9 @@ def _extract_msg(args, kwargs, msg_idx, default_msg, non_msg_params):
     rem_args = []
     if 'msg' in kwargs:
         msg = kwargs.pop('msg')
-    elif len(args) > non_msg_params and msg_idx < len(args):
+    elif (msg_idx is not None
+          and len(args) > non_msg_params
+          and msg_idx < len(args)):
         msg = args[msg_idx]
         if 0 <= msg_idx:
             rem_args = args[msg_idx + 1:]
@@ -539,6 +556,7 @@ class TestCase(unittest.TestCase):
     def __wrap_assertion(self, attr):
         signature = inspect.signature(attr)
         msg_idx, default_msg, non_msg_params = _find_msg_argument(signature)
+        accepts_msg = _accepts_msg(signature)
 
         @functools.wraps(attr)
         def wrapper(*args, **kwargs):
@@ -552,7 +570,12 @@ class TestCase(unittest.TestCase):
                     list(args) + list(rem_args), kwargs) as annotation:
                 if rem_args:
                     return attr(*args, annotation, *rem_args, **kwargs)
-                return attr(*args, msg=annotation, **kwargs)
+                if accepts_msg:
+                    return attr(*args, msg=annotation, **kwargs)
+                result = attr(*args, **kwargs)
+                if hasattr(result, 'msg'):
+                    result.msg = annotation
+                return result
         return wrapper
 
     def __wrap_fail(self, attr):

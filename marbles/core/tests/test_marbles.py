@@ -312,6 +312,34 @@ class ExampleTestCaseMixin(
         note = 'the date is {dt:%Y%m%d}'
         self.assertTrue(False, note=note)
 
+    def assertTruthyWithoutMessage(self, value):
+        self.assertTrue(value)
+
+    def assertPassthroughEqual(self, *args, **kwargs):
+        self.assertEqual(*args, **kwargs)
+
+    def test_assertion_without_msg_success(self):
+        self.assertTruthyWithoutMessage(True, note='some note')
+
+    def test_assertion_without_msg_failure(self):
+        self.assertTruthyWithoutMessage(False, note='some note')
+
+    def test_passthrough_assertion_success(self):
+        self.assertPassthroughEqual(1, 1, note='some note')
+
+    def test_passthrough_assertion_failure(self):
+        self.assertPassthroughEqual(1, 2, note='some note')
+
+    def test_assert_logs_failure(self):
+        with self.assertLogs('marbles.tests', level='INFO',
+                             note='some note'):
+            pass
+
+    def test_assert_no_logs_failure(self):
+        with self.assertNoLogs('marbles.tests', level='INFO',
+                               note='some note'):
+            logging.getLogger('marbles.tests').info('test record')
+
 
 @unittest.skip('This is the TestCase being tested')
 class ExampleTestCase(TestCase, ExampleTestCaseMixin):
@@ -432,6 +460,34 @@ class InterfaceTestCase(MarblesTestCase):
         self.case.test_odd_argument_order_success()
         with self.assertRaises(ContextualAssertionError):
             self.case.test_odd_argument_order_failure()
+
+    def test_assertion_without_msg_ok(self):
+        '''Can marbles run custom assertions that do not accept msg?'''
+        self.case.test_assertion_without_msg_success()
+        with self.assertRaises(ContextualAssertionError):
+            self.case.test_assertion_without_msg_failure()
+
+    def test_assert_logs_without_msg_ok(self):
+        '''Can marbles run assertLogs and preserve annotations?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_assert_logs_failure()
+        e = ar.exception
+        self.assertEqual(e.note.strip(), 'some note')
+
+    @unittest.skipUnless(hasattr(unittest.TestCase, 'assertNoLogs'),
+                         'assertNoLogs is unavailable')
+    def test_assert_no_logs_without_msg_ok(self):
+        '''Can marbles run assertNoLogs and preserve annotations?'''
+        with self.assertRaises(ContextualAssertionError) as ar:
+            self.case.test_assert_no_logs_failure()
+        e = ar.exception
+        self.assertEqual(e.note.strip(), 'some note')
+
+    def test_passthrough_assertion_ok(self):
+        '''Can marbles run pure passthrough custom assertions?'''
+        self.case.test_passthrough_assertion_success()
+        with self.assertRaises(ContextualAssertionError):
+            self.case.test_passthrough_assertion_failure()
 
     def test_missing_annotation(self):
         '''Does marbles check for missing annotations?'''
