@@ -1,4 +1,5 @@
 import importlib
+import logging
 
 import setuptools
 from setuptools.errors import BaseError
@@ -54,7 +55,7 @@ class MarblesTestCommand(setuptools.Command):
 
         if not test.result.wasSuccessful():
             msg = 'Test failed: %s' % test.result
-            self.announce(msg)
+            self.announce(msg, logging.ERROR)
             raise BaseError(msg)
 
     @property
