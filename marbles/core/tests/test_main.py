@@ -26,10 +26,10 @@ import os
 import os.path
 import subprocess
 import sys
+import sysconfig
 import tempfile
 import unittest
 import unittest.util
-from distutils import sysconfig
 
 import marbles.core
 
@@ -71,14 +71,14 @@ class CommandRunningTestCase(unittest.TestCase):
         # in the places we're using to test.
 
         # Also, due to https://github.com/pypa/virtualenv/issues/355,
-        # we can't use site.getsitepackages(), but
-        # distutils.sysconfig.get_python_lib() works.
+        # we can't use site.getsitepackages(), but sysconfig can find
+        # this environment's site-packages path.
         core_dir = os.path.dirname(os.path.dirname(__file__))
         if sys.gettrace():
             # Only add this .pth file if we're running under the
             # coverage tool, which is the most likely reason that
             # sys.gettrace() would be set to anything.
-            site_packages = sysconfig.get_python_lib()
+            site_packages = sysconfig.get_path('purelib')
             with tempfile.NamedTemporaryFile(
                     mode='w', dir=site_packages, suffix='.pth',
                     delete=False) as pth:
@@ -271,6 +271,28 @@ class VersionTestCase(CommandRunningTestCase):
         self.assertEqual('', self.stderr)
 
 
+class MainFilterTestCase(CommandRunningTestCase):
+    '''Test that marbles passes unittest filtering arguments through.'''
+
+    def __init__(self, methodName='runTest'):  # noqa: D102
+        test_dir = os.path.dirname(__file__)
+        test_path = os.path.join(
+            test_dir, 'examples', 'example_marbles.py')
+        super().__init__(
+            methodName=methodName,
+            cmd=[sys.executable, '-m', 'marbles', test_path, '-k', 'Response'])
+
+    def test_runs_matching_tests(self):
+        '''The -k argument should run matching tests.'''
+        self.assertIn('ResponseTestCase.test_create_resource', self.stderr)
+        self.assertIn('Ran 1 test', self.stderr)
+
+    def test_skips_non_matching_tests(self):
+        '''The -k argument should skip non-matching tests.'''
+        self.assertNotIn('SetupFailureTestCase', self.stderr)
+        self.assertNotIn('TeardownFailureTestCase', self.stderr)
+
+
 def load_tests_from_testcase(loader, class_, test_files):
     '''Load and parametrize tests for ``class_``.'''
     runners = [
@@ -302,6 +324,9 @@ def load_tests(loader, tests, pattern):  # noqa: D103
 
     suite.addTests(VersionTestCase(methodName=test_name)
                    for test_name in loader.getTestCaseNames(VersionTestCase))
+    suite.addTests(MainFilterTestCase(methodName=test_name)
+                   for test_name in loader.getTestCaseNames(
+                       MainFilterTestCase))
 
     return suite
 
